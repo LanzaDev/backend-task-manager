@@ -1,0 +1,10 @@
+nest
+typescript
+architecture clean, ddd
+jwt
+#prisma(postgres)
+#bscript
+#class-validator
+#class-transformer
+#zod
+#dotenv
