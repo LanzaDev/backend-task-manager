@@ -2,9 +2,11 @@ nest
 typescript
 architecture clean, ddd
 jwt
+fastify
 #prisma(postgres)
 #bscript
 #class-validator
 #class-transformer
 #zod
 #dotenv
+#swagger

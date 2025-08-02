@@ -1,6 +1,16 @@
 import { z } from 'zod';
 
 export const envSchema = z.object({
+  // App
+  APP_NAME: z.string(),
+  APP_ENV: z.string(),
+  APP_PORT: z.coerce.number(),
+  APP_URL: z.string(),
   // Database
+  DATABASE_USERNAME: z.string(),
+  DATABASE_PASSWORD: z.string(),
+  DATABASE_HOST: z.string(),
+  DATABASE_PORT: z.coerce.number(),
+  DATABASE_NAME: z.string(),
   DATABASE_URL: z.string(),
 });
