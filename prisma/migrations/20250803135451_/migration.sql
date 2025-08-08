@@ -3,7 +3,7 @@ CREATE TYPE "public"."TaskStatus" AS ENUM ('CANCELADA', 'PENDENTE', 'CONCLUÍDA'
 
 -- CreateTable
 CREATE TABLE "public"."User" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
@@ -13,8 +13,8 @@ CREATE TABLE "public"."User" (
 
 -- CreateTable
 CREATE TABLE "public"."Task" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT,
     "status" "public"."TaskStatus" NOT NULL DEFAULT 'PENDENTE',

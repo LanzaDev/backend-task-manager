@@ -14,7 +14,7 @@ enum TaskStatus {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
+  id       String @id @default(uuid())
   name     String
   email    String @unique
   password String
@@ -22,11 +22,11 @@ model User {
 }
 
 model Task {
-  id          Int      @id @default(autoincrement())
-  user        User     @relation(fields: [userId], references: [id])
-  userId      Int
+  id          String     @id @default(uuid())
+  user        User       @relation(fields: [userId], references: [id])
+  userId      String
   title       String
   description String?
   status      TaskStatus @default(PENDENTE)
-  createdAt   DateTime @default(now())
+  createdAt   DateTime   @default(now())
 }

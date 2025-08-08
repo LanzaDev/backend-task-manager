@@ -1,0 +1,15 @@
+### Criar usuário
+POST http://localhost:3000/user
+Content-Type: application/json
+
+{
+  "name": "Lucas Lima",
+  "email": "lucas@example.com",
+  "password": "senhaForte123"
+}
+
+### Achar usuário
+GET http://localhost:3000/user/lucas@example.com
+
+### Deletar usuário
+DELETE http://localhost:3000/user/4bc689d9-e8bf-4db4-90db-d2f4a97fd780
