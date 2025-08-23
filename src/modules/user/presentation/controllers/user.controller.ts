@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { CreateUserUseCase } from '../../application/use-cases/create-user.use-case';
-import { CreateUserDTO } from '../../application/dtos/create-user.dto';
 import { FindUserUseCase } from '../../application/use-cases/find-user.use-case';
 import { DeleteUserUseCase } from '../../application/use-cases/delete-user.use-case';
-import { DeleteUserDTO } from '../../application/dtos/delete-user.dto';
+import { CreateUserDTO } from '../../application/dto/input/create-user.dto';
+import { DeleteUserDTO } from '../../application/dto/input/delete-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -23,7 +23,7 @@ export class UserController {
     const user = await this.findUserUseCase.execute({ email });
 
     if (!user) {
-      console.log();
+      throw new Error('Error');
     }
 
     return user;
@@ -35,6 +35,6 @@ export class UserController {
     dto.id = id;
 
     await this.deleteUserUseCase.execute(dto);
-    return { message: 'Usuário deletado com sucesso' };
+    return { message: 'User successfully deleted' };
   }
 }

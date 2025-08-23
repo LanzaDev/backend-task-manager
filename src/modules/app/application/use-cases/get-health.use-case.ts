@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseRepository } from '@/modules/app/domain/providers/database.provider';
-import { GetHealthOutputDTO } from '@/modules/app/application/dtos/get-health-output.dto';
+import { GetHealthOutputDTO } from '@/modules/app/application/dto/get-health-output.dto';
 
 @Injectable()
 export class GetHealthUseCase {

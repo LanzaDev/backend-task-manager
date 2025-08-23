@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UserRepository } from '../../domain/repositories/user.repository';
+import { IUserRepository } from '../../domain/repositories/user.repository';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { UserMapper } from '../mappers/user.mapper';
 
@@ -15,16 +15,16 @@ export interface IFindUserByEmailOutput {
 
 @Injectable()
 export class FindUserUseCase {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(private readonly userRepository: IUserRepository) {}
 
   async execute(
     input: IFindUserByEmailInput,
   ): Promise<IFindUserByEmailOutput | null> {
     const emailVO = new Email(input.email);
-    const user = await this.userRepository.findByEmail(emailVO.getValue());
+    const user = await this.userRepository.findByEmail(emailVO);
 
     if (!user) {
-      throw new NotFoundException('Usuário não encontrado');
+      throw new NotFoundException('User not found');
     }
 
     return UserMapper.toDTO(user);

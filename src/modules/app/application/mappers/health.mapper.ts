@@ -1,4 +1,4 @@
-import { GetHealthOutputDTO } from '@/modules/app/application/dtos/get-health-output.dto';
+import { GetHealthOutputDTO } from '@/modules/app/application/dto/get-health-output.dto';
 
 export class HealthMapper {
   static toOutput(params: {

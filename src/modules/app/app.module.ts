@@ -5,9 +5,10 @@ import { GetHealthUseCase } from '@/modules/app/application/use-cases/get-health
 import { DatabaseRepository } from '@/modules/app/domain/providers/database.provider';
 import { PrismaHealthRepository } from '@/modules/app/infra/providers/prisma-health.provider';
 import { UserModule } from '../user/user.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [SharedModule, UserModule],
+  imports: [SharedModule, UserModule, AuthModule],
   controllers: [CheckApiHealthController],
   providers: [
     GetHealthUseCase,

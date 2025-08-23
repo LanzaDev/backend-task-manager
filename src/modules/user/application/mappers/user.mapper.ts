@@ -1,5 +1,5 @@
-import { CreateUserDTO } from '../dtos/create-user.dto';
-import { ResponseUserDTO } from '../dtos/response-user.dto';
+import { CreateUserDTO } from '../dto/input/create-user.dto';
+import { ResponseUserDTO } from '../dto/output/response-user.dto';
 import { User } from '../../domain/entities/user.entity';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
@@ -17,10 +17,14 @@ export class UserMapper {
   }
 
   static toDTO(entity: User): ResponseUserDTO {
-    return new ResponseUserDTO(entity);
+    return {
+      id: entity.getId(),
+      name: entity.getName(),
+      email: entity.getEmailValue(),
+    };
   }
 
   static toDTOList(entities: User[]): ResponseUserDTO[] {
-    return entities.map((user) => new ResponseUserDTO(user));
+    return entities.map((user) => this.toDTO(user));
   }
 }

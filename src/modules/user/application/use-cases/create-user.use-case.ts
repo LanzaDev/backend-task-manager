@@ -1,34 +1,25 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { UserRepository } from '../../domain/repositories/user.repository';
-import { CreateUserDTO } from '../dtos/create-user.dto';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { IUserRepository } from '../../domain/repositories/user.repository';
 import { UserMapper } from '../mappers/user.mapper';
-import { ResponseUserDTO } from '../dtos/response-user.dto';
+import { CreateUserDTO } from '../dto/input/create-user.dto';
+import { ResponseUserDTO } from '../dto/output/response-user.dto';
+import { Email } from '@/shared/domain/value-objects/email.vo';
 
 @Injectable()
 export class CreateUserUseCase {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(private readonly userRepository: IUserRepository) {}
 
   async execute(data: CreateUserDTO): Promise<ResponseUserDTO> {
-    try {
-      // Verifica se já existe
-      const userExists = await this.userRepository.findByEmail(data.email);
-      if (userExists) {
-        throw new ConflictException('Email já cadastrado');
-      }
-      // DTO --> Entity
-      const user = await UserMapper.toEntity(data);
-      await this.userRepository.create(user); // Salva no DB
-      return UserMapper.toDTO(user); // retorna DTO de resposta
+    const email = new Email(data.email);
 
-    } catch (error) {
-      if (
-        error instanceof PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
-        throw new ConflictException('Email já está em uso');
-      }
-      throw error; // Lança outros erros normalmente
+    const userExists = await this.userRepository.findByEmail(email);
+    if (userExists) {
+      throw new ConflictException('Email already registered');
     }
+    // DTO --> Entity
+    const user = await UserMapper.toEntity(data);
+    await this.userRepository.save(user);
+
+    return UserMapper.toDTO(user);
   }
 }

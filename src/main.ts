@@ -14,8 +14,8 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Task-Manager')
-    .setDescription('Documentação')
+    .setTitle(env.APP_NAME)
+    .setDescription('Documentation')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
@@ -26,9 +26,9 @@ async function bootstrap() {
 
   if (env.APP_ENV === 'dev') {
     console.log('------------------------------------');
-    console.log(`API rodando na porta ${env.APP_PORT}.`);
+    console.log(`API running on port ${env.APP_PORT}.`);
     console.log(`API: ${env.APP_URL}`);
-    console.log(`Docs: ${process.env.APP_URL}/docs`);
+    console.log(`Docs: ${env.APP_URL}/docs`);
     console.log('------------------------------------');
   }
 }
