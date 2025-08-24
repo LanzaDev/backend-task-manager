@@ -2,25 +2,26 @@ import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
 import { randomUUID } from 'crypto';
 import { Task } from '@/modules/task/domain/entities/task.entity';
+import { Role } from '@/shared/domain/value-objects/role.vo';
 
 interface UserSchema {
   name: string;
   email: Email;
   password: Password;
-  role?: string;
+  role?: Role;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
 export class User {
   private readonly id: string;
-  private props: UserSchema;
+  private readonly props: UserSchema;
   private tasks: Task[] = [];
 
   constructor(props: UserSchema, id?: string) {
     this.props = {
       ...props,
-      role: props.role ?? 'user',
+      role: props.role ?? 'USER',
       createdAt: props.createdAt ?? new Date(),
       updatedAt: props.updatedAt ?? new Date(),
     };
@@ -66,8 +67,8 @@ export class User {
     this.touch();
   }
 
-  getRole(): string {
-    return this.props.role ?? 'user';
+  getRole(): Role {
+    return this.props.role ?? 'USER';
   }
 
   getCreatedAt(): Date {

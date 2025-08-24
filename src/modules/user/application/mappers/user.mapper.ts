@@ -17,14 +17,10 @@ export class UserMapper {
   }
 
   static toDTO(entity: User): ResponseUserDTO {
-    return {
-      id: entity.getId(),
-      name: entity.getName(),
-      email: entity.getEmailValue(),
-    };
+    return new ResponseUserDTO(entity);
   }
 
   static toDTOList(entities: User[]): ResponseUserDTO[] {
-    return entities.map((user) => this.toDTO(user));
+    return entities.map((user) => new ResponseUserDTO(user));
   }
 }

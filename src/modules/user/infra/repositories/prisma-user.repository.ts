@@ -4,6 +4,7 @@ import { IUserRepository } from '@/modules/user/domain/repositories/user.reposit
 import { User } from '@/modules/user/domain/entities/user.entity';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
+import { Role } from '@/shared/domain/value-objects/role.vo';
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
@@ -44,7 +45,7 @@ export class PrismaUserRepository implements IUserRepository {
         name: data.name,
         email: new Email(data.email),
         password: Password.fromHashed(data.password),
-        role: data.role,
+        role: data.role as Role,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
       },
@@ -63,7 +64,7 @@ export class PrismaUserRepository implements IUserRepository {
         name: data.name,
         email: new Email(data.email),
         password: Password.fromHashed(data.password),
-        role: data.role,
+        role: data.role as Role,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
       },

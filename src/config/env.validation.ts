@@ -13,4 +13,7 @@ export const envSchema = z.object({
   DATABASE_PORT: z.coerce.number(),
   DATABASE_NAME: z.string(),
   DATABASE_URL: z.string(),
+  // JWT
+  JWT_SECRET: z.string(),
+  JWT_EXPIRES_IN: z.string().default('1h'),
 });

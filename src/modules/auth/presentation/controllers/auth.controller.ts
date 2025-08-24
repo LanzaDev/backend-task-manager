@@ -1,0 +1,44 @@
+import {
+  Body,
+  Controller,
+  HttpException,
+  HttpStatus,
+  Post,
+} from '@nestjs/common';
+import { LoginDTO } from '../../application/dto/input/login.dto';
+import { SignResponseDTO } from '../../application/dto/output/sign-response.dto';
+import { SignInUseCase } from '../../application/use-cases/sign-in.use-case';
+import { SignUpUseCase } from '../../application/use-cases/sign-up.use-case';
+import { RegisterDTO } from '../../application/dto/input/register.dto';
+
+@Controller('auth')
+export class AuthController {
+  constructor(
+    private readonly signInUseCase: SignInUseCase,
+    private readonly signUpUseCase: SignUpUseCase,
+  ) {}
+
+  @Post('signIn')
+  async signIn(@Body() dto: LoginDTO): Promise<SignResponseDTO> {
+    try {
+      return await this.signInUseCase.execute(dto);
+    } catch (err) {
+      throw new HttpException(
+        err.message || 'Unauthorized',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+  }
+
+  @Post('signUp')
+  async signUp(@Body() dto: RegisterDTO): Promise<SignResponseDTO> {
+    try {
+      return await this.signUpUseCase.execute(dto);
+    } catch (err) {
+      throw new HttpException(
+        err.message || 'Bad Request',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+}

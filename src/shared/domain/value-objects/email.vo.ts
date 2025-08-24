@@ -10,7 +10,7 @@ export class Email {
   }
 
   static isValid(email: string): boolean {
-    // Regex RFC 5322 simplificada
+    // Regex RFC 5322 simplified
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
     return emailRegex.test(email);
   }
@@ -24,12 +24,13 @@ export class Email {
   }
 
 
-  equals(other: Email) {
+  equals(other: Email): boolean {
+    if (!other) return false;
     return this.value === other.getValue();
   }
 }
 
-// Exception específica do domínio
+// Domain-specific exception
 export class InvalidEmailError extends Error{
   constructor(email: string) {
     super(`The email "${email}" is not valid`)
