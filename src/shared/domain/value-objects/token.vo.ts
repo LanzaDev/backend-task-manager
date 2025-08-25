@@ -16,7 +16,7 @@ export class Token {
     return this.value === other.getValue();
   }
 
-  //util for debugger
+  // useful for debugging
   toString(): string {
     return this.value;
   }

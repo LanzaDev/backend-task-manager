@@ -1,4 +1,6 @@
-import { ArrayNotEmpty, IsArray, IsEmail, IsIn, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { RoleEnum } from '@/shared/domain/value-objects/role.vo';
+
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
 
 export class CreateUserDTO {
   @IsNotEmpty()
@@ -7,7 +9,11 @@ export class CreateUserDTO {
   @IsEmail()
   email!: string;
 
-  @IsString()
+  @IsNotEmpty()
   @MinLength(6)
   password!: string;
+
+  @IsOptional()
+  @IsEnum(RoleEnum)
+  role?: RoleEnum;
 }

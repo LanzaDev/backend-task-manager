@@ -5,14 +5,17 @@ import { IUserRepository } from './domain/repositories/user.repository';
 import { PrismaUserRepository } from './infra/repositories/prisma-user.repository';
 import { FindUserUseCase } from './application/use-cases/find-user.use-case';
 import { DeleteUserUseCase } from './application/use-cases/delete-user.use-case';
+import { AdminController } from './presentation/controllers/admin.controller';
+import { AdminUserService } from './application/services/admin-user.service';
 
 @Module({
   imports: [],
-  controllers: [UserController],
+  controllers: [UserController, AdminController],
   providers: [
     CreateUserUseCase,
     FindUserUseCase,
     DeleteUserUseCase,
+    AdminUserService,
     {
       provide: IUserRepository,
       useClass: PrismaUserRepository,

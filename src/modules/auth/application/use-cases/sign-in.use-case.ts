@@ -1,4 +1,4 @@
-import { ForbiddenException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDTO } from '../dto/input/login.dto';
 import { SignResponseDTO } from '../dto/output/sign-response.dto';
@@ -34,6 +34,7 @@ export class SignInUseCase {
     return {
       user: new ResponseUserDTO(user),
       token: token.getValue(),
+      redirectUrl: user.getEmailValue() === 'admin@rdx.com' ? '/admin' : '/user',
     };
   }
 }

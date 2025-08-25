@@ -9,6 +9,7 @@ import { Role } from '@/shared/domain/value-objects/role.vo';
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
   constructor(private readonly prisma: PrismaService) {}
+  private users: User[] = [];
 
   async save(user: User): Promise<void> {
     await this.prisma.user.upsert({
@@ -69,6 +70,24 @@ export class PrismaUserRepository implements IUserRepository {
         updatedAt: data.updatedAt,
       },
       data.id,
+    );
+  }
+
+  async findAll(): Promise<User[]> {
+    const Users = await this.prisma.user.findMany();
+    return Users.map(
+      (user) =>
+        new User(
+          {
+            name: user.name,
+            email: new Email(user.email),
+            password: Password.fromHashed(user.password),
+            role: user.role,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+          },
+          user.id,
+        ),
     );
   }
 }

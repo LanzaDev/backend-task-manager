@@ -41,6 +41,7 @@ export class SignUpUseCase {
     return {
       user: new ResponseUserDTO(user),
       token: token.getValue(),
+      redirectUrl: user.getEmailValue() === 'admin@rdx.com' ? '/admin' : '/user',
     };
   }
 }

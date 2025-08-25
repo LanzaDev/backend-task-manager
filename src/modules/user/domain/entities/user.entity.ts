@@ -70,6 +70,10 @@ export class User {
   getRole(): Role {
     return this.props.role ?? 'USER';
   }
+  setRole(newRole: Role) {
+    this.props.role = newRole;
+    this.touch();
+  }
 
   getCreatedAt(): Date {
     return this.props.createdAt!;

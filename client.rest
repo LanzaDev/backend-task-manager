@@ -5,16 +5,18 @@ POST http://localhost:3000/user
 Content-Type: application/json
 
 {
-  "name": "Lucas Lima",
-  "email": "lucas@example.com",
-  "password": "password123"
+  "name": "Admin",
+  "email": "adm@rdx.com",
+  "password": "adminRDX"
 }
 
 ### Find user
-GET http://localhost:3000/user/lucas@example.com
+GET http://localhost:3000/user/admin@rdx.com
+Authorization: Bearer
 
 ### Delete user
-DELETE http://localhost:3000/user/
+DELETE http://localhost:3000/user/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxOThmNWM5YS1hZDMwLTRlY2MtYWUzNi04NzI0NTkxZTZkYjMiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc1NjExODQzNCwiZXhwIjoxNzU2MTE4NzM0fQ.iERTIYTBaE0sjSQ4pWWia8Y2f7Oyuae9M9JLQe5R75Q
 
 ### Auth ###
 
@@ -23,8 +25,8 @@ POST http://localhost:3000/auth/signIn
 Content-Type: application/json
 
 {
-  "email": "lucas@example.com",
-  "password": "password123"
+  "email": "admin@rdx.com",
+  "password": "adminRDX"
 }
 
 ### Auth SignUp
@@ -36,3 +38,26 @@ Content-Type: application/json
   "email": "luis@test.com",
   "password": "password123"
 }
+
+### Admin ###
+
+### Admin get all
+GET http://localhost:3000/admin/all
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZWFmYWM2ZC1iZWE4LTQwMTktYjAwZS1mNTBjZmUxNDhjMTkiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NTYxMTgwMjAsImV4cCI6MTc1NjExODMyMH0.yGcMsS2tDDEPl1wWF_ZJ9DzU3ti8fn6j3Usa7XmcZ1c
+### Admin get one
+GET http://localhost:3000/admin/
+Authorization: Bearer
+
+### Admin patch
+PATCH http://localhost:3000/admin/
+Content-Type: application/json
+Authorization: Bearer
+
+{
+  "role": "ADMIN"
+}
+
+
+### Admin delete
+DELETE http://localhost:3000/admin/
+Authorization: Bearer

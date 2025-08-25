@@ -1,11 +1,26 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { CreateUserUseCase } from '../../application/use-cases/create-user.use-case';
 import { FindUserUseCase } from '../../application/use-cases/find-user.use-case';
 import { DeleteUserUseCase } from '../../application/use-cases/delete-user.use-case';
 import { CreateUserDTO } from '../../application/dto/input/create-user.dto';
 import { DeleteUserDTO } from '../../application/dto/input/delete-user.dto';
+import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
+import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
+import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
+import { Role } from '@prisma/client';
 
 @Controller('user')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(Role.USER)
 export class UserController {
   constructor(
     private readonly createUserUseCase: CreateUserUseCase,
@@ -29,10 +44,10 @@ export class UserController {
     return user;
   }
 
-  @Delete(':id')
-  async delete(@Param('id') id: string) {
+  @Delete('me')
+  async delete(@Request() req) {
     const dto = new DeleteUserDTO();
-    dto.id = id;
+    dto.id = req.user.sub; // pega o id do próprio token
 
     await this.deleteUserUseCase.execute(dto);
     return { message: 'User successfully deleted' };

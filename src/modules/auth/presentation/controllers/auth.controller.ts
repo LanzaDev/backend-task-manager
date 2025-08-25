@@ -21,7 +21,12 @@ export class AuthController {
   @Post('signIn')
   async signIn(@Body() dto: LoginDTO): Promise<SignResponseDTO> {
     try {
-      return await this.signInUseCase.execute(dto);
+      const { token, user } = await this.signInUseCase.execute(dto);
+      return {
+        token,
+        user,
+        redirectUrl: dto.email === 'admin@rdx.com' ? '/admin' : '/user',
+      };
     } catch (err) {
       throw new HttpException(
         err.message || 'Unauthorized',
@@ -33,7 +38,8 @@ export class AuthController {
   @Post('signUp')
   async signUp(@Body() dto: RegisterDTO): Promise<SignResponseDTO> {
     try {
-      return await this.signUpUseCase.execute(dto);
+      const { token, user } = await this.signUpUseCase.execute(dto);
+      return { token, user, redirectUrl: '/user' };
     } catch (err) {
       throw new HttpException(
         err.message || 'Bad Request',
