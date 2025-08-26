@@ -1,15 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@/shared/infra/prisma/prisma.service';
-import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
 import { User } from '@/modules/user/domain/entities/user.entity';
+import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
+import { PrismaService } from '@/shared/infra/prisma/prisma.service';
 import { Role } from '@/shared/domain/value-objects/role.vo';
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
   constructor(private readonly prisma: PrismaService) {}
-  private users: User[] = [];
 
   async save(user: User): Promise<void> {
     await this.prisma.user.upsert({

@@ -1,5 +1,5 @@
-import { Email } from '@/shared/domain/value-objects/email.vo';
 import { User } from '../entities/user.entity';
+import { Email } from '@/shared/domain/value-objects/email.vo';
 
 export abstract class IUserRepository {
   abstract save(user: User): Promise<void>;

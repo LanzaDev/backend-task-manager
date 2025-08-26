@@ -1,15 +1,15 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { IUserRepository } from '../../domain/repositories/user.repository';
-import { UserMapper } from '../mappers/user.mapper';
 import { CreateUserDTO } from '../dto/input/create-user.dto';
-import { ResponseUserDTO } from '../dto/output/response-user.dto';
+import { ResponseAdminDTO } from '../dto/output/response-admin.dto';
+import { UserMapper } from '../mappers/user.mapper';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 
 @Injectable()
 export class CreateUserUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
 
-  async execute(data: CreateUserDTO): Promise<ResponseUserDTO> {
+  async execute(data: CreateUserDTO): Promise<ResponseAdminDTO> {
     const email = new Email(data.email);
 
     const userExists = await this.userRepository.findByEmail(email);
@@ -20,6 +20,6 @@ export class CreateUserUseCase {
     const user = await UserMapper.toEntity(data);
     await this.userRepository.save(user);
 
-    return UserMapper.toDTO(user);
+    return new ResponseAdminDTO(user);
   }
 }

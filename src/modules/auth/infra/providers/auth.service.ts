@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
+import { JwtService } from '@nestjs/jwt';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 
 @Injectable()

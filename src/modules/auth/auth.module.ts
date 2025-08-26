@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './presentation/controllers/auth.controller';
-import { AuthService } from './infra/providers/auth.service';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from './infra/strategies/jwt-strategy';
+import { env } from '@/config/env';
 import { IUserRepository } from '../user/domain/repositories/user.repository';
 import { PrismaUserRepository } from '../user/infra/repositories/prisma-user.repository';
+import { AuthService } from './infra/providers/auth.service';
 import { SignInUseCase } from './application/use-cases/sign-in.use-case';
-import { env } from '@/config/env';
 import { SignUpUseCase } from './application/use-cases/sign-up.use-case';
-import { JwtStrategy } from './infra/strategies/jwt-strategy';
+import { AuthController } from './presentation/controllers/auth.controller';
 
 @Module({
   imports: [

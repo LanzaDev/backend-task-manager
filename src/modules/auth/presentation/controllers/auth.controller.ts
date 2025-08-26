@@ -6,10 +6,10 @@ import {
   Post,
 } from '@nestjs/common';
 import { LoginDTO } from '../../application/dto/input/login.dto';
+import { RegisterDTO } from '../../application/dto/input/register.dto';
 import { SignResponseDTO } from '../../application/dto/output/sign-response.dto';
 import { SignInUseCase } from '../../application/use-cases/sign-in.use-case';
 import { SignUpUseCase } from '../../application/use-cases/sign-up.use-case';
-import { RegisterDTO } from '../../application/dto/input/register.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -25,7 +25,6 @@ export class AuthController {
       return {
         token,
         user,
-        redirectUrl: dto.email === 'admin@rdx.com' ? '/admin' : '/user',
       };
     } catch (err) {
       throw new HttpException(
@@ -39,7 +38,7 @@ export class AuthController {
   async signUp(@Body() dto: RegisterDTO): Promise<SignResponseDTO> {
     try {
       const { token, user } = await this.signUpUseCase.execute(dto);
-      return { token, user, redirectUrl: '/user' };
+      return { token, user };
     } catch (err) {
       throw new HttpException(
         err.message || 'Bad Request',

@@ -15,7 +15,7 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: '*', // accepts any origin (for testing only)
+    origin: 'http://127.0.0.1:5500', // '*' accepts any origin (for testing only)
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   });
 

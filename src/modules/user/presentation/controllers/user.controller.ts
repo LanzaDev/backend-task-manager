@@ -3,16 +3,17 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
-  Post,
+  NotFoundException,
+  Patch,
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { CreateUserUseCase } from '../../application/use-cases/create-user.use-case';
-import { FindUserUseCase } from '../../application/use-cases/find-user.use-case';
-import { DeleteUserUseCase } from '../../application/use-cases/delete-user.use-case';
-import { CreateUserDTO } from '../../application/dto/input/create-user.dto';
+import { IUserRepository } from '../../domain/repositories/user.repository';
+import { UpdateUserDTO } from '../../application/dto/input/update-user.dto';
 import { DeleteUserDTO } from '../../application/dto/input/delete-user.dto';
+import { UserMapper } from '../../application/mappers/user.mapper';
+import { UpdateUserUseCase } from '../../application/use-cases/update-user.use-case';
+import { DeleteUserUseCase } from '../../application/use-cases/delete-user.use-case';
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
 import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
@@ -23,33 +24,42 @@ import { Role } from '@prisma/client';
 @Roles(Role.USER)
 export class UserController {
   constructor(
-    private readonly createUserUseCase: CreateUserUseCase,
-    private readonly findUserUseCase: FindUserUseCase,
+    private readonly userRepository: IUserRepository,
+    private readonly updateUserUserCase: UpdateUserUseCase,
     private readonly deleteUserUseCase: DeleteUserUseCase,
   ) {}
+  @Get('profile')
+  async getProfile(@Request() req) {
+    const user = await this.userRepository.findById(req.user.sub);
+    if (!user) throw new NotFoundException('User not found');
 
-  @Post()
-  async create(@Body() body: CreateUserDTO) {
-    return this.createUserUseCase.execute(body);
+    return UserMapper.toDTO(user);
   }
 
-  @Get(':email')
-  async findByEmail(@Param('email') email: string) {
-    const user = await this.findUserUseCase.execute({ email });
+  @Patch('profile')
+  async update(@Request() req, @Body() dto: UpdateUserDTO) {
+    await this.updateUserUserCase.execute(
+      dto,
+      {
+        id: req.user.sub,
+        role: req.user.role,
+      },
+      req.user.sub,
+    );
 
-    if (!user) {
-      throw new Error('Error');
-    }
-
-    return user;
+    return { message: 'Your profile has been successfully updated.' };
   }
 
-  @Delete('me')
+  @Delete('profile')
   async delete(@Request() req) {
     const dto = new DeleteUserDTO();
-    dto.id = req.user.sub; // pega o id do próprio token
+    dto.id = req.user.sub;
 
-    await this.deleteUserUseCase.execute(dto);
+    await this.deleteUserUseCase.execute(dto, {
+      id: req.user.sub,
+      role: req.user.role,
+    });
+
     return { message: 'User successfully deleted' };
   }
 }

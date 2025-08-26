@@ -1,8 +1,8 @@
+import { Task } from '@/modules/task/domain/entities/task.entity';
+import { randomUUID } from 'crypto';
+import { Role } from '@/shared/domain/value-objects/role.vo';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
-import { randomUUID } from 'crypto';
-import { Task } from '@/modules/task/domain/entities/task.entity';
-import { Role } from '@/shared/domain/value-objects/role.vo';
 
 interface UserSchema {
   name: string;
@@ -69,6 +69,9 @@ export class User {
 
   getRole(): Role {
     return this.props.role ?? 'USER';
+  }
+  canBeDeleted(): boolean {
+    return this.props.role !== 'ADMIN';
   }
   setRole(newRole: Role) {
     this.props.role = newRole;

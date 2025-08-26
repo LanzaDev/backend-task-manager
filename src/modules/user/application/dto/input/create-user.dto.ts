@@ -1,5 +1,4 @@
 import { RoleEnum } from '@/shared/domain/value-objects/role.vo';
-
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
 
 export class CreateUserDTO {

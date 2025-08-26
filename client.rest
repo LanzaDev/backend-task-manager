@@ -1,24 +1,4 @@
-### User ###
-
-### Create user
-POST http://localhost:3000/user
-Content-Type: application/json
-
-{
-  "name": "Admin",
-  "email": "adm@rdx.com",
-  "password": "adminRDX"
-}
-
-### Find user
-GET http://localhost:3000/user/admin@rdx.com
-Authorization: Bearer
-
-### Delete user
-DELETE http://localhost:3000/user/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxOThmNWM5YS1hZDMwLTRlY2MtYWUzNi04NzI0NTkxZTZkYjMiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc1NjExODQzNCwiZXhwIjoxNzU2MTE4NzM0fQ.iERTIYTBaE0sjSQ4pWWia8Y2f7Oyuae9M9JLQe5R75Q
-
-### Auth ###
+### -={ Auth }=- ###
 
 ### Auth SignIn
 POST http://localhost:3000/auth/signIn
@@ -34,30 +14,64 @@ POST http://localhost:3000/auth/signUp
 Content-Type: application/json
 
 {
-  "name": "Luis",
-  "email": "luis@test.com",
-  "password": "password123"
+  "name": "TEST",
+  "email": "email@test.com",
+  "password": "test12"
 }
 
-### Admin ###
+
+### -={ User }=- ###
+
+### User get
+GET http://localhost:3000/user/profile
+Authorization: Bearer
+
+### User update
+PATCH http://localhost:3000/user/profile
+Content-Type: application/json
+Authorization: Bearer
+
+{
+  "name": "Luis"
+}
+
+### User delete
+DELETE http://localhost:3000/user/profile
+Authorization: Bearer
+
+
+### -={ ADMIN }=- ###
 
 ### Admin get all
 GET http://localhost:3000/admin/all
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyZWFmYWM2ZC1iZWE4LTQwMTktYjAwZS1mNTBjZmUxNDhjMTkiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NTYxMTgwMjAsImV4cCI6MTc1NjExODMyMH0.yGcMsS2tDDEPl1wWF_ZJ9DzU3ti8fn6j3Usa7XmcZ1c
-### Admin get one
+Authorization: Bearer
+
+### Admin get one (id)
 GET http://localhost:3000/admin/
 Authorization: Bearer
 
-### Admin patch
-PATCH http://localhost:3000/admin/
+### Admin create new user
+POST http://localhost:3000/admin/add
 Content-Type: application/json
 Authorization: Bearer
+
+{
+  "name": "TEST2",
+  "email": "email2@test.com",
+  "password": "test12",
+  "role": "USER"
+}
+
+### Admin patch (id)
+PATCH http://localhost:3000/admin/
+Content-Type: application/json
+Authorization: Bearer 
 
 {
   "role": "ADMIN"
 }
 
 
-### Admin delete
+### Admin delete (id)
 DELETE http://localhost:3000/admin/
 Authorization: Bearer

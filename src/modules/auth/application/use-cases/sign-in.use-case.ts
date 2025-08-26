@@ -1,11 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDTO } from '../dto/input/login.dto';
+import { ResponseUserDTO } from '@/modules/user/application/dto/output/response-user.dto';
 import { SignResponseDTO } from '../dto/output/sign-response.dto';
 import { Token } from '@/shared/domain/value-objects/token.vo';
-import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
 import { Email } from '@/shared/domain/value-objects/email.vo';
-import { ResponseUserDTO } from '@/modules/user/application/dto/output/response-user.dto';
 
 @Injectable()
 export class SignInUseCase {
@@ -34,7 +34,6 @@ export class SignInUseCase {
     return {
       user: new ResponseUserDTO(user),
       token: token.getValue(),
-      redirectUrl: user.getEmailValue() === 'admin@rdx.com' ? '/admin' : '/user',
     };
   }
 }

@@ -1,13 +1,18 @@
-import { ConflictException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
+import { User } from '@/modules/user/domain/entities/user.entity';
+import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDTO } from '../dto/input/register.dto';
+import { ResponseUserDTO } from '@/modules/user/application/dto/output/response-user.dto';
 import { SignResponseDTO } from '../dto/output/sign-response.dto';
 import { Token } from '@/shared/domain/value-objects/token.vo';
-import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
-import { ResponseUserDTO } from '@/modules/user/application/dto/output/response-user.dto';
-import { User } from '@/modules/user/domain/entities/user.entity';
 
 @Injectable()
 export class SignUpUseCase {
@@ -41,7 +46,6 @@ export class SignUpUseCase {
     return {
       user: new ResponseUserDTO(user),
       token: token.getValue(),
-      redirectUrl: user.getEmailValue() === 'admin@rdx.com' ? '/admin' : '/user',
     };
   }
 }
