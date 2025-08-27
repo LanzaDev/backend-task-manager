@@ -28,6 +28,7 @@ export class UserController {
     private readonly updateUserUserCase: UpdateUserUseCase,
     private readonly deleteUserUseCase: DeleteUserUseCase,
   ) {}
+  
   @Get('profile')
   async getProfile(@Request() req) {
     const user = await this.userRepository.findById(req.user.sub);
@@ -51,9 +52,14 @@ export class UserController {
   }
 
   @Delete('profile')
-  async delete(@Request() req) {
+  async delete(@Request() req, @Body() body: { password?: string }) {
     const dto = new DeleteUserDTO();
     dto.id = req.user.sub;
+    dto.password = body.password;
+
+    if (!dto.password) {
+      throw new Error('Password is required');
+    }
 
     await this.deleteUserUseCase.execute(dto, {
       id: req.user.sub,

@@ -18,7 +18,7 @@ export class CreateUserUseCase {
     }
     // DTO --> Entity
     const user = await UserMapper.toEntity(data);
-    await this.userRepository.save(user);
+    await this.userRepository.create(user);
 
     return new ResponseAdminDTO(user);
   }

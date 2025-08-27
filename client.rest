@@ -37,8 +37,11 @@ Authorization: Bearer
 
 ### User delete
 DELETE http://localhost:3000/user/profile
+Content-Type: application/json
 Authorization: Bearer
-
+{
+  "password": "test1s2"
+}
 
 ### -={ ADMIN }=- ###
 
@@ -46,7 +49,7 @@ Authorization: Bearer
 GET http://localhost:3000/admin/all
 Authorization: Bearer
 
-### Admin get one (id)
+### Admin get one | (id)
 GET http://localhost:3000/admin/
 Authorization: Bearer
 
@@ -62,16 +65,16 @@ Authorization: Bearer
   "role": "USER"
 }
 
-### Admin patch (id)
+### Admin patch | (id)
 PATCH http://localhost:3000/admin/
 Content-Type: application/json
-Authorization: Bearer 
+Authorization: Bearer
 
 {
   "role": "ADMIN"
 }
 
 
-### Admin delete (id)
+### Admin delete | (id)
 DELETE http://localhost:3000/admin/
 Authorization: Bearer

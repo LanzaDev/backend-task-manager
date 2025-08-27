@@ -1,8 +1,8 @@
 -- CreateEnum
-CREATE TYPE "public"."Role" AS ENUM ('USER', 'ADMIN');
+CREATE TYPE "public"."Role" AS ENUM ('user', 'admin');
 
 -- CreateEnum
-CREATE TYPE "public"."TaskStatus" AS ENUM ('CANCELADA', 'PENDENTE', 'CONCLUÍDA');
+CREATE TYPE "public"."TaskStatus" AS ENUM ('pendente', 'em_andamento', 'concluida', 'cancelada');
 
 -- CreateTable
 CREATE TABLE "public"."User" (
@@ -10,7 +10,7 @@ CREATE TABLE "public"."User" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "role" "public"."Role" NOT NULL DEFAULT 'USER',
+    "role" "public"."Role" NOT NULL DEFAULT 'user',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -23,8 +23,12 @@ CREATE TABLE "public"."Task" (
     "userId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT,
-    "status" "public"."TaskStatus" NOT NULL DEFAULT 'PENDENTE',
+    "status" "public"."TaskStatus" NOT NULL DEFAULT 'pendente',
+    "priority" INTEGER,
+    "dueDate" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "completedAt" TIMESTAMP(3),
 
     CONSTRAINT "Task_pkey" PRIMARY KEY ("id")
 );

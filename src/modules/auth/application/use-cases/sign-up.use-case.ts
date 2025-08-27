@@ -37,7 +37,7 @@ export class SignUpUseCase {
       password,
     });
 
-    await this.userRepository.save(user);
+    await this.userRepository.create(user);
 
     const token = new Token(
       this.jwtService.sign({ sub: user.getId(), role: user.getRole() }),

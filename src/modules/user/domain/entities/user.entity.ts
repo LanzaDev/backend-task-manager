@@ -91,22 +91,35 @@ export class User {
   }
 
   // - Tasks -
-  getTasks(): Task[] {
-    return this.tasks;
+  getTasks(): readonly Task[] {
+    return [...this.tasks];
   }
 
   addTask(task: Task) {
+    if (task.getId() !== this.id) {
+      throw new Error('Task does not belong to this user');
+    }
     this.tasks.push(task);
   }
 
   removeTask(taskId: string) {
-    this.tasks = this.tasks.filter(task => task.getId() !== taskId);
+    const exists = this.tasks.some((task) => task.getId() === taskId);
+    if (!exists) {
+      throw new Error('Task not found for this user');
+    }
+    this.tasks = this.tasks.filter((task) => task.getId() !== taskId);
   }
 
   updateTask(updatedTask: Task) {
-    const index = this.tasks.findIndex(task => task.getId() === updatedTask.getId());
-    if (index !== -1) {
-      this.tasks[index] = updatedTask;
+    const index = this.tasks.findIndex(
+      (task) => task.getId() === updatedTask.getId(),
+    );
+    if (index === -1) {
+      throw new Error('Task not found for this user');
     }
+    if (updatedTask.getUserId() !== this.getId()) {
+      throw new Error('Task does not belong to this user.');
+    }
+    this.tasks[index] = updatedTask;
   }
 }

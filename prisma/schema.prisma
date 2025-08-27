@@ -8,14 +8,15 @@ datasource db {
 }
 
 enum Role {
-  USER
-  ADMIN
+  USER  @map("user")
+  ADMIN @map("admin")
 }
 
 enum TaskStatus {
-  CANCELADA
-  PENDENTE
-  CONCLUÍDA
+  PENDENTE     @map("pendente")
+  EM_ANDAMENTO @map("em_andamento")
+  CONCLUIDA    @map("concluida")
+  CANCELADA    @map("cancelada")
 }
 
 model User {
@@ -26,7 +27,7 @@ model User {
   role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Tasks     Task[]
+  tasks     Task[]
 }
 
 model Task {
@@ -36,5 +37,9 @@ model Task {
   title       String
   description String?
   status      TaskStatus @default(PENDENTE)
+  priority    Int?
+  dueDate     DateTime?
   createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  completedAt DateTime?
 }

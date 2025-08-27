@@ -35,6 +35,6 @@ export class UpdateUserUseCase {
     }
     if (dto.role) user.setRole(dto.role);
 
-    await this.userRepository.save(user); // upsert do prisma
+    await this.userRepository.update(user); // upsert do prisma
   }
 }
