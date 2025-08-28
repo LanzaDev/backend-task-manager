@@ -1,4 +1,3 @@
-import { Task } from '@/modules/task/domain/entities/task.entity';
 import { randomUUID } from 'crypto';
 import { Role } from '@/shared/domain/value-objects/role.vo';
 import { Email } from '@/shared/domain/value-objects/email.vo';
@@ -16,7 +15,6 @@ interface UserSchema {
 export class User {
   private readonly id: string;
   private readonly props: UserSchema;
-  private tasks: Task[] = [];
 
   constructor(props: UserSchema, id?: string) {
     this.props = {
@@ -88,38 +86,5 @@ export class User {
 
   private touch() {
     this.props.updatedAt = new Date();
-  }
-
-  // - Tasks -
-  getTasks(): readonly Task[] {
-    return [...this.tasks];
-  }
-
-  addTask(task: Task) {
-    if (task.getId() !== this.id) {
-      throw new Error('Task does not belong to this user');
-    }
-    this.tasks.push(task);
-  }
-
-  removeTask(taskId: string) {
-    const exists = this.tasks.some((task) => task.getId() === taskId);
-    if (!exists) {
-      throw new Error('Task not found for this user');
-    }
-    this.tasks = this.tasks.filter((task) => task.getId() !== taskId);
-  }
-
-  updateTask(updatedTask: Task) {
-    const index = this.tasks.findIndex(
-      (task) => task.getId() === updatedTask.getId(),
-    );
-    if (index === -1) {
-      throw new Error('Task not found for this user');
-    }
-    if (updatedTask.getUserId() !== this.getId()) {
-      throw new Error('Task does not belong to this user.');
-    }
-    this.tasks[index] = updatedTask;
   }
 }

@@ -43,6 +43,7 @@ Authorization: Bearer
   "password": "test1s2"
 }
 
+
 ### -={ ADMIN }=- ###
 
 ### Admin get all
@@ -78,3 +79,40 @@ Authorization: Bearer
 ### Admin delete | (id)
 DELETE http://localhost:3000/admin/
 Authorization: Bearer
+
+
+### -={ Task }=- ###
+
+### Admin find all task
+GET http://localhost:3000/admin/task/all/
+Authorization: Bearer
+
+### Admin find all task by user | (userId)
+GET http://localhost:3000/admin/task/all/
+Authorization: Bearer
+
+### Admin find task by id | (taskId)
+GET http://localhost:3000/admin/task/c0e74932-dacc-44a5-baef-867358e54c7c
+Authorization: Bearer
+
+### Admin create task for user | (userId)
+POST http://localhost:3000/admin/task/34968165-a253-471c-a57d-5a436e9d0020
+Content-Type: application/json
+Authorization: Bearer
+
+{
+  "title": "nuclear material"
+}
+
+### Admin update task by id | (taskId)
+PATCH http://localhost:3000/admin/task/
+Content-Type: application/json
+Authorization: Bearer
+
+{
+  "title": "change"
+}
+
+### Admin Delete task by id | (taskId)
+DELETE http://localhost:3000/admin/task/c0e74932-dacc-44a5-baef-867358e54c7c
+Authorization: Bearer 

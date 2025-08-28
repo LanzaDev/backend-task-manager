@@ -6,6 +6,7 @@ export abstract class ITaskRepository {
   abstract update(task: Task): Promise<Task>;
   abstract delete(taskId: string): Promise<void>;
   abstract findById(taskId: string): Promise<Task | null>;
+  abstract findAllTasks(): Promise<Task[]>
   abstract findAllByUser(userId: string): Promise<Task[]>;
   abstract findByStatus(userId: string, status: TaskStatus): Promise<Task[]>;
 }

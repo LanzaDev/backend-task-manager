@@ -6,9 +6,10 @@ import { DatabaseRepository } from '@/modules/app/domain/providers/database.prov
 import { PrismaHealthRepository } from '@/modules/app/infra/providers/prisma-health.provider';
 import { UserModule } from '../user/user.module';
 import { AuthModule } from '../auth/auth.module';
+import { TaskModule } from '../task/task.module';
 
 @Module({
-  imports: [SharedModule, UserModule, AuthModule],
+  imports: [SharedModule, UserModule, TaskModule, AuthModule],
   controllers: [CheckApiHealthController],
   providers: [
     GetHealthUseCase,
