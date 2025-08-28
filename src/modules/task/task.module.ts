@@ -5,10 +5,11 @@ import { AdminTaskController } from './presentation/controllers/admin-task.contr
 import { CreateTaskUseCase } from './application/use-cases/create-task.use-case';
 import { UpdateTaskUseCase } from './application/use-cases/update-task.use-case';
 import { DeleteTaskUseCase } from './application/use-cases/delete-task.use-case';
+import { UserTaskController } from './presentation/controllers/user-task.controller';
 
 @Module({
   imports: [],
-  controllers: [AdminTaskController],
+  controllers: [AdminTaskController, UserTaskController],
   providers: [
     CreateTaskUseCase,
     UpdateTaskUseCase,

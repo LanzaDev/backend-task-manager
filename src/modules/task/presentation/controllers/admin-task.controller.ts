@@ -29,8 +29,8 @@ import { ResponseTaskDTO } from '../../application/dto/output/response-task.dto'
 export class AdminTaskController {
   constructor(
     private readonly taskRepository: ITaskRepository,
-    private readonly createTaskUserCase: CreateTaskUseCase,
-    private readonly updateTaskUserCase: UpdateTaskUseCase,
+    private readonly createTaskUseCase: CreateTaskUseCase,
+    private readonly updateTaskUseCase: UpdateTaskUseCase,
     private readonly deleteTaskUseCase: DeleteTaskUseCase,
   ) {}
 
@@ -59,7 +59,7 @@ export class AdminTaskController {
     @Param('userId') userId: string,
     @Body() dto: CreateTaskDTO,
   ): Promise<ResponseTaskDTO> {
-    await this.createTaskUserCase.execute(dto, userId);
+    await this.createTaskUseCase.execute(dto, userId);
 
     return new ResponseTaskDTO()
   }
@@ -70,7 +70,7 @@ export class AdminTaskController {
     @Body() dto: UpdateTaskDTO,
     @Request() req,
   ): Promise<ResponseTaskDTO> {
-    const task = await this.updateTaskUserCase.execute(taskId, dto, {
+    const task = await this.updateTaskUseCase.execute(taskId, dto, {
       id: req.user.sub,
       role: req.user.role,
     });

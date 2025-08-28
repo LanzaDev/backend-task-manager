@@ -115,4 +115,34 @@ Authorization: Bearer
 
 ### Admin Delete task by id | (taskId)
 DELETE http://localhost:3000/admin/task/c0e74932-dacc-44a5-baef-867358e54c7c
-Authorization: Bearer 
+Authorization: Bearer
+
+
+# ------------------------------------------------------------------------ #
+
+
+### User find all task
+GET http://localhost:3000/user/task/my-tasks
+Authorization: Bearer
+
+### User create task
+POST http://localhost:3000/user/task
+Content-Type: application/json
+Authorization: Bearer
+
+{
+  "title": "user test"
+}
+
+### User update task | (taskId)
+PATCH http://localhost:3000/user/task/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMzRlMzA0Yi1iMjc4LTRlMWUtODcyZS01MGQ3YWQwYjdiNDUiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc1NjM5MTQ0MSwiZXhwIjoxNzU2MzkzMjQxfQ.tHhAyUA35cEHzALAt6UNwH8b-1vyOIzx18pe0tO25uU
+
+{
+  "title": "user tests"
+}
+
+### User delete task | (taskId)
+DELETE http://localhost:3000/user/task/
+Authorization: Bearer
