@@ -92,11 +92,11 @@ GET http://localhost:3000/admin/task/all/
 Authorization: Bearer
 
 ### Admin find task by id | (taskId)
-GET http://localhost:3000/admin/task/c0e74932-dacc-44a5-baef-867358e54c7c
+GET http://localhost:3000/admin/task/
 Authorization: Bearer
 
 ### Admin create task for user | (userId)
-POST http://localhost:3000/admin/task/34968165-a253-471c-a57d-5a436e9d0020
+POST http://localhost:3000/admin/task/
 Content-Type: application/json
 Authorization: Bearer
 
@@ -113,8 +113,8 @@ Authorization: Bearer
   "title": "change"
 }
 
-### Admin Delete task by id | (taskId)
-DELETE http://localhost:3000/admin/task/c0e74932-dacc-44a5-baef-867358e54c7c
+### Admin delete task by id | (taskId)
+DELETE http://localhost:3000/admin/task/
 Authorization: Bearer
 
 
@@ -137,7 +137,7 @@ Authorization: Bearer
 ### User update task | (taskId)
 PATCH http://localhost:3000/user/task/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMzRlMzA0Yi1iMjc4LTRlMWUtODcyZS01MGQ3YWQwYjdiNDUiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc1NjM5MTQ0MSwiZXhwIjoxNzU2MzkzMjQxfQ.tHhAyUA35cEHzALAt6UNwH8b-1vyOIzx18pe0tO25uU
+Authorization: Bearer
 
 {
   "title": "user tests"
