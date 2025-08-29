@@ -8,18 +8,17 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    // pega os roles definidos no @Roles
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
 
     if (!requiredRoles || requiredRoles.length === 0) {
-      return true; // se não tem roles na rota, deixa passar
+      return true;
     }
 
     const request = context.switchToHttp().getRequest();
-    const user = request.user; // preenchido pelo JwtAuthGuard
+    const user = request.user;
 
     if (!user || !requiredRoles.includes(user.role)) {
       throw new ForbiddenException('Access denied');

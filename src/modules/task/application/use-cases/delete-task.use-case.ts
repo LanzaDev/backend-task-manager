@@ -11,7 +11,6 @@ export class DeleteTaskUseCase {
     const task = await this.taskRepository.findById(dto.taskId);
     if (!task) throw new NotFoundException('Task not found');
 
-    // Verifica permissão: usuário normal só pode deletar suas tasks
     if (user.role !== Role.ADMIN && task.getUserId() !== user.id) {
       throw new ForbiddenException('You cannot delete this task');
     }

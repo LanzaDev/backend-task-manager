@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SharedModule } from '@/shared/shared.module';
 import { CheckApiHealthController } from '@/modules/app/presentation/controllers/check-api-health.controller';
-import { GetHealthUseCase } from '@/modules/app/application/use-cases/get-health.use-case';
+import { CheckHealthUseCase } from '@/modules/app/application/use-cases/check-health.use-case';
 import { DatabaseRepository } from '@/modules/app/domain/providers/database.provider';
 import { PrismaHealthRepository } from '@/modules/app/infra/providers/prisma-health.provider';
 import { UserModule } from '../user/user.module';
@@ -12,7 +12,7 @@ import { TaskModule } from '../task/task.module';
   imports: [SharedModule, UserModule, TaskModule, AuthModule],
   controllers: [CheckApiHealthController],
   providers: [
-    GetHealthUseCase,
+    CheckHealthUseCase,
     {
       provide: DatabaseRepository,
       useClass: PrismaHealthRepository,

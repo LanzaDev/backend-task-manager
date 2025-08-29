@@ -28,7 +28,7 @@ export class UserController {
     private readonly updateUserUserCase: UpdateUserUseCase,
     private readonly deleteUserUseCase: DeleteUserUseCase,
   ) {}
-  
+
   @Get('profile')
   async getProfile(@Request() req) {
     const user = await this.userRepository.findById(req.user.sub);
@@ -38,7 +38,7 @@ export class UserController {
   }
 
   @Patch('profile')
-  async update(@Request() req, @Body() dto: UpdateUserDTO) {
+  async updateProfile(@Request() req, @Body() dto: UpdateUserDTO) {
     await this.updateUserUserCase.execute(
       dto,
       {
@@ -52,7 +52,7 @@ export class UserController {
   }
 
   @Delete('profile')
-  async delete(@Request() req, @Body() body: { password?: string }) {
+  async deleteProfile(@Request() req, @Body() body: { password?: string }) {
     const dto = new DeleteUserDTO();
     dto.id = req.user.sub;
     dto.password = body.password;

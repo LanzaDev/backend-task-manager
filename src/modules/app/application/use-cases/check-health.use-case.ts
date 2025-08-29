@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseRepository } from '@/modules/app/domain/providers/database.provider';
-import { GetHealthOutputDTO } from '@/modules/app/application/dto/get-health-output.dto';
+import { ResponseHealthDTO } from '../dto/output/response-health.dto';
 
 @Injectable()
-export class GetHealthUseCase {
+export class CheckHealthUseCase {
   constructor(private readonly databaseRepository: DatabaseRepository) {}
 
-  async execute(): Promise<GetHealthOutputDTO> {
-    let dbStatus: 'health' | 'unhealth' = 'unhealth';
+  async execute(): Promise<ResponseHealthDTO> {
+    let dbStatus: 'health' | 'unhealthy' = 'unhealthy';
 
     try {
       const dbCheck = await this.databaseRepository.checkDatabaseConnection();

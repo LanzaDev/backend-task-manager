@@ -22,7 +22,7 @@ import { CreateTaskDTO } from '../../application/dto/input/create-task.dto';
 import { UpdateTaskDTO } from '../../application/dto/input/update-task.dto';
 import { ResponseTaskDTO } from '../../application/dto/output/response-task.dto';
 
-@Controller('user/task')
+@Controller('user/task/')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.USER)
 export class UserTaskController {
@@ -34,20 +34,20 @@ export class UserTaskController {
   ) {}
 
   @Get('my-tasks')
-  async getAllTasksByUser(@Request() req) {
+  async getMyTasks(@Request() req) {
     const tasks = await this.taskRepository.findAllByUser(req.user.sub);
     return tasks;
   }
 
   @Post()
-  async createTaskForUser(@Request() req, @Body() dto: CreateTaskDTO) {
+  async createTask(@Request() req, @Body() dto: CreateTaskDTO) {
     const task = await this.createTaskUseCase.execute(dto, req.user.sub);
 
     return new ResponseTaskDTO(task);
   }
 
   @Patch(':taskId')
-  async updateTaskForUser(
+  async updateTask(
     @Param('taskId') taskId: string,
     @Body() dto: UpdateTaskDTO,
     @Request() req,
@@ -61,7 +61,7 @@ export class UserTaskController {
   }
 
   @Delete(':taskId')
-  async deleteTaskForUser(@Param('taskId') taskId: string, @Request() req) {
+  async deleteTask(@Param('taskId') taskId: string, @Request() req) {
     await this.deleteTaskUseCase.execute(
       { taskId },
       { id: req.user.sub, role: req.user.role },

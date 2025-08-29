@@ -9,15 +9,15 @@ import { Email } from '@/shared/domain/value-objects/email.vo';
 export class CreateUserUseCase {
   constructor(private readonly userRepository: IUserRepository) {}
 
-  async execute(data: CreateUserDTO): Promise<ResponseAdminDTO> {
-    const email = new Email(data.email);
+  async execute(dto: CreateUserDTO): Promise<ResponseAdminDTO> {
+    const email = new Email(dto.email);
 
     const userExists = await this.userRepository.findByEmail(email);
     if (userExists) {
       throw new ConflictException('Email already registered');
     }
     // DTO --> Entity
-    const user = await UserMapper.toEntity(data);
+    const user = await UserMapper.toEntity(dto);
     await this.userRepository.create(user);
 
     return new ResponseAdminDTO(user);

@@ -55,7 +55,7 @@ export class AdminController {
   }
 
   @Patch(':id')
-  async update(
+  async updateUser(
     @Param('id') id: string,
     @Body() dto: UpdateUserDTO,
     @Request() req,
@@ -72,7 +72,7 @@ export class AdminController {
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string, @Request() req) {
+  async deleteUser(@Param('id') id: string, @Request() req) {
     const dto = new DeleteUserDTO();
     dto.id = id;
 

@@ -2,7 +2,6 @@ import {
   IsDate,
   IsEnum,
   IsInt,
-  IsOptional,
   IsString,
   Max,
   Min,

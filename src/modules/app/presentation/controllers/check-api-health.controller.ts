@@ -1,5 +1,5 @@
-import { Controller, Get, HttpStatus, Res } from '@nestjs/common';
-import { GetHealthUseCase } from '@/modules/app/application/use-cases/get-health.use-case';
+import { Controller, Get, HttpStatus, InternalServerErrorException, Res } from '@nestjs/common';
+import { CheckHealthUseCase } from '@/modules/app/application/use-cases/check-health.use-case';
 import type { FastifyReply } from 'fastify';
 import {
   ApiTags,
@@ -12,7 +12,7 @@ import {
 @ApiTags('Health')
 @Controller('/')
 export class CheckApiHealthController {
-  constructor(private readonly getHealthUseCase: GetHealthUseCase) {}
+  constructor(private readonly checkHealthUseCase: CheckHealthUseCase) {}
 
   @Get()
   @ApiOperation({
@@ -30,20 +30,19 @@ export class CheckApiHealthController {
     description: 'Unexpected internal error occurred',
     schema: {
       example: {
-        status: 'unhealth',
+        status: 'unhealthy',
         message: 'INTERNAL SERVER ERROR',
         timestamp: '11/07/2025 15:42:21',
       },
     },
   })
-  async getHealth(@Res() res: FastifyReply) {
+  async getHealth() {
     try {
-      const healthStatus = await this.getHealthUseCase.execute();
-
-      return res.status(HttpStatus.OK).send(healthStatus);
+      const healthStatus = await this.checkHealthUseCase.execute();
+      return healthStatus;
     } catch {
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({
-        status: 'unhealth',
+      throw new InternalServerErrorException ({
+        status: 'unhealthy',
         message: 'INTERNAL SERVER ERROR',
         timestamp: new Date().toLocaleString('pt-br', {
           timeZone: 'America/Sao_paulo',

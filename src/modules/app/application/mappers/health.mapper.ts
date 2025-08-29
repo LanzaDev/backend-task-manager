@@ -1,14 +1,14 @@
-import { GetHealthOutputDTO } from '@/modules/app/application/dto/get-health-output.dto';
+import { ResponseHealthDTO } from '../dto/output/response-health.dto';
 
 export class HealthMapper {
   static toOutput(params: {
-    dbStatus: 'health' | 'unhealth';
-  }): GetHealthOutputDTO {
+    dbStatus: 'health' | 'unhealthy';
+  }): ResponseHealthDTO {
     const { dbStatus } = params;
 
     const status = 'health';
 
-    return new GetHealthOutputDTO({
+    return new ResponseHealthDTO({
       status,
       database: dbStatus,
       timestamp: new Date().toLocaleString('pt-br', {

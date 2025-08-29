@@ -10,23 +10,20 @@ export class UpdateUserUseCase {
 
   async execute(
     dto: UpdateUserDTO,
-    requester: { id: string; role: string },
+    req: { id: string; role: string },
     targetUserId: string,
   ): Promise<void> {
     const user = await this.userRepository.findById(targetUserId);
     if (!user) throw new NotFoundException('User not found');
 
-    // Se é user comum, só pode atualizar a si mesmo
-    if (requester.role === 'USER' && requester.id !== targetUserId) {
-      throw new ForbiddenException('Você só pode atualizar seu próprio perfil');
+    if (req.role === 'USER' && req.id !== targetUserId) {
+      throw new ForbiddenException('You can only update your own profile');
     }
 
-    // Se é user, não pode atualizar role
-    if (requester.role === 'USER') {
+    if (req.role === 'USER') {
       delete dto.role;
     }
 
-    // Aplica os updates na entidade
     if (dto.name) user.setName(dto.name);
     if (dto.email) user.setEmail(new Email(dto.email));
     if (dto.password) {
@@ -35,6 +32,6 @@ export class UpdateUserUseCase {
     }
     if (dto.role) user.setRole(dto.role);
 
-    await this.userRepository.update(user); // upsert do prisma
+    await this.userRepository.update(user);
   }
 }

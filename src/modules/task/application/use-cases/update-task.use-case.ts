@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { ITaskRepository } from '../../domain/repositories/task.repository';
 import { UpdateTaskDTO } from '../dto/input/update-task.dto';
 import { Task } from '../../domain/entities/task.entity';
@@ -11,6 +11,10 @@ export class UpdateTaskUseCase {
   async execute(taskId: string, dto: UpdateTaskDTO, user: { id: string; role: Role }): Promise<Task> {
     const task = await this.taskRepository.findById(taskId);
     if (!task) throw new NotFoundException('Task not found');
+
+    if (user.role !== 'ADMIN' && task.getUserId() !== user.id) {
+      throw new ForbiddenException('You cannot update this task');
+    }
 
     if (dto.title) task.setTitle(dto.title);
     if (dto.description) task.setDescription(dto.description);

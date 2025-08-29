@@ -65,7 +65,7 @@ export class AdminTaskController {
   }
 
   @Patch(':taskId')
-  async updateTask(
+  async updateTaskForUser(
     @Param('taskId') taskId: string,
     @Body() dto: UpdateTaskDTO,
     @Request() req,
@@ -78,7 +78,7 @@ export class AdminTaskController {
   }
 
   @Delete(':taskId')
-  async deleteTask(@Param('taskId') taskId: string, @Request() req) {
+  async deleteTaskForUser(@Param('taskId') taskId: string, @Request() req) {
     const dto = new DeleteTaskDTO();
     dto.taskId = taskId;
 
