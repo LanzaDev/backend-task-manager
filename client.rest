@@ -14,9 +14,17 @@ POST http://localhost:3000/auth/signUp
 Content-Type: application/json
 
 {
-  "name": "TEST",
-  "email": "email@test.com",
-  "password": "test12"
+  "name": "login",
+  "email": "email.example@gmail.com",
+  "password": "signUp"
+}
+
+### Auth forgot password
+POST http://localhost:3000/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "email.example@gmail.com"
 }
 
 

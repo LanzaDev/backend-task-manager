@@ -1,6 +1,5 @@
 import { Controller, Get, HttpStatus, InternalServerErrorException, Res } from '@nestjs/common';
 import { CheckHealthUseCase } from '@/modules/app/application/use-cases/check-health.use-case';
-import type { FastifyReply } from 'fastify';
 import {
   ApiTags,
   ApiOperation,

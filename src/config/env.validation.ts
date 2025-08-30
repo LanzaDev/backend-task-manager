@@ -16,4 +16,9 @@ export const envSchema = z.object({
   // JWT
   JWT_SECRET: z.string(),
   JWT_EXPIRES_IN: z.string().default('1h'),
+  // Email
+  EMAIL_HOST: z.string(),
+  EMAIL_PORT: z.coerce.number(),
+  EMAIL_USER: z.string(),
+  EMAIL_PASSWORD: z.string(),
 });
