@@ -24,7 +24,7 @@ POST http://localhost:3000/auth/forgot-password
 Content-Type: application/json
 
 {
-  "email": "luk4s1511@gmail.com"
+  "email": "lucas1511gll@gmail.com"
 }
 
 ### Auth reset password

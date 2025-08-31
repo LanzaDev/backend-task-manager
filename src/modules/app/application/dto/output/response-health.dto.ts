@@ -8,6 +8,9 @@ export class ResponseHealthDTO {
   database: 'health' | 'unhealthy';
 
   @Expose()
+  cache: 'health' | 'unhealthy';
+
+  @Expose()
   timestamp: string;
 
   constructor(props: ResponseHealthDTO) {

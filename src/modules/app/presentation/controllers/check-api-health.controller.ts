@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus, InternalServerErrorException, Res } from '@nestjs/common';
+import { Controller, Get, HttpStatus, InternalServerErrorException } from '@nestjs/common';
 import { CheckHealthUseCase } from '@/modules/app/application/use-cases/check-health.use-case';
 import {
   ApiTags,
@@ -35,9 +35,14 @@ export class CheckApiHealthController {
       },
     },
   })
-  async getHealth() {
+  async checkHealth() {
     try {
       const healthStatus = await this.checkHealthUseCase.execute();
+
+      if (healthStatus.database === 'unhealthy' || healthStatus.cache === 'unhealthy') {
+        return HttpStatus.SERVICE_UNAVAILABLE, healthStatus;
+      }
+
       return healthStatus;
     } catch {
       throw new InternalServerErrorException ({

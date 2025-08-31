@@ -6,6 +6,7 @@ export const envSchema = z.object({
   APP_ENV: z.string(),
   APP_PORT: z.coerce.number(),
   APP_URL: z.string(),
+
   // Database
   DATABASE_USERNAME: z.string(),
   DATABASE_PASSWORD: z.string(),
@@ -13,9 +14,19 @@ export const envSchema = z.object({
   DATABASE_PORT: z.coerce.number(),
   DATABASE_NAME: z.string(),
   DATABASE_URL: z.string(),
+
+  // Cache
+  CACHE_HOST: z.string(),
+  CACHE_PORT: z.coerce.number(),
+  CACHE_PASSWORD: z.string(),
+  CACHE_DB: z.coerce.number().default(0),
+  CACHE_TTL: z.coerce.number(),
+  CACHE_URL: z.string(),
+
   // JWT
   JWT_SECRET: z.string(),
   JWT_EXPIRES_IN: z.string().default('1h'),
+
   // Email
   EMAIL_HOST: z.string(),
   EMAIL_PORT: z.coerce.number(),

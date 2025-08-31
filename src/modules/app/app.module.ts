@@ -8,6 +8,8 @@ import { UserModule } from '../user/user.module';
 import { AuthModule } from '../auth/auth.module';
 import { TaskModule } from '../task/task.module';
 import { EmailModule } from '../mail/email.module';
+import { CacheRepository } from './domain/providers/cache.provider';
+import { RedisHealthRepository } from './infra/providers/redis-health.provider';
 
 @Module({
   imports: [SharedModule, UserModule, TaskModule, AuthModule, EmailModule],
@@ -17,6 +19,10 @@ import { EmailModule } from '../mail/email.module';
     {
       provide: DatabaseRepository,
       useClass: PrismaHealthRepository,
+    },
+    {
+      provide: CacheRepository,
+      useClass: RedisHealthRepository,
     },
   ],
 })

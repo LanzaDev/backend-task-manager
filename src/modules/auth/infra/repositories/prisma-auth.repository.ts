@@ -1,14 +1,21 @@
-import { PasswordResetToken } from "@prisma/client";
-import { IPasswordResetTokenRepository } from "../../domain/repositories/password.repository";
-import { PrismaService } from "@/shared/infra/prisma/prisma.service";
-import { Token } from "@/shared/domain/value-objects/token.vo";
-import { Injectable } from "@nestjs/common";
+import { PasswordResetToken } from '@prisma/client';
+import { IPasswordResetTokenRepository } from '../../domain/repositories/password.repository';
+import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
+import { Token } from '@/shared/domain/value-objects/token.vo';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class PrismaPasswordResetTokenRepository implements IPasswordResetTokenRepository {
+export class PrismaPasswordResetTokenRepository
+  implements IPasswordResetTokenRepository
+{
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: { userId: string; token: Token; expiresAt: Date; used: boolean }): Promise<void> {
+  async create(data: {
+    userId: string;
+    token: Token;
+    expiresAt: Date;
+    used: boolean;
+  }): Promise<void> {
     await this.prisma.passwordResetToken.create({
       data: {
         userId: data.userId,
