@@ -5,8 +5,8 @@ POST http://localhost:3000/auth/signIn
 Content-Type: application/json
 
 {
-  "email": "admin@rdx.com",
-  "password": "adminRDX"
+  "email": "luk4s1511@gmail.com",
+  "password": "560065"
 }
 
 ### Auth SignUp
@@ -24,7 +24,17 @@ POST http://localhost:3000/auth/forgot-password
 Content-Type: application/json
 
 {
-  "email": "email.example@gmail.com"
+  "email": "luk4s1511@gmail.com"
+}
+
+### Auth reset password
+POST http://localhost:3000/auth/recover
+Content-Type: application/json
+
+{
+  "token": "e3b33bba-cc45-4134-9497-64b64e317a7c",
+  "password": "560065",
+  "confirmPassword": "560065"
 }
 
 

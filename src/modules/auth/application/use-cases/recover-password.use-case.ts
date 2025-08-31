@@ -34,7 +34,7 @@ export class RecoverPasswordUseCase {
       used: false,
     });
 
-    const resetLink = `https://localhost:3000/recover?token=${token.getValue()}`;
+    const resetLink = `https://localhost:3000/recover`;
 
     await this.emailProvider.sendEmail({
       to: [user.getEmailValue()],

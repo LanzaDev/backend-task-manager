@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  HttpCode,
   HttpException,
   HttpStatus,
   Post,
+  Query,
 } from '@nestjs/common';
 import { LoginDTO } from '../../application/dto/input/login.dto';
 import { RegisterDTO } from '../../application/dto/input/register.dto';
@@ -13,6 +15,7 @@ import { SignInUseCase } from '../../application/use-cases/sign-in.use-case';
 import { SignUpUseCase } from '../../application/use-cases/sign-up.use-case';
 import { ResetPasswordUseCase } from '../../application/use-cases/reset-password.use-case';
 import { RecoverPasswordUseCase } from '../../application/use-cases/recover-password.use-case';
+import { ResetPasswordDTO } from '../../application/dto/input/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -56,5 +59,21 @@ export class AuthController {
   async forgotPassword(@Body() dto: ForgotYourPasswordDTO) {
     await this.recoverPasswordUseCase.execute(dto);
     return { message: 'Recovery email sent if the email is registered' };
+  }
+
+  @Post('recover')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async resetPassword(@Body() dto: ResetPasswordDTO) {
+    if (dto.password !== dto.confirmPassword) {
+      throw new HttpException(
+        'Passwords do not match',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.resetPasswordUseCase.execute({
+      token: dto.token,
+      newPassword: dto.password,
+    });
   }
 }

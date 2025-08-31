@@ -2,6 +2,7 @@ import { IPasswordResetTokenRepository } from '../../domain/repositories/passwor
 import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Password } from '@/shared/domain/value-objects/password.vo';
+import { ResetPasswordDTO } from '../dto/input/reset-password.dto';
 
 @Injectable()
 export class ResetPasswordUseCase {
@@ -10,12 +11,8 @@ export class ResetPasswordUseCase {
     private readonly tokenRepository: IPasswordResetTokenRepository,
   ) {}
 
-  async execute(dto: { token: string; newPassword: string }): Promise<void> {
+  async execute(dto: { token: string, newPassword: string }): Promise<void> {
     const tokenRecord = await this.tokenRepository.findByToken(dto.token);
-
-    if (!tokenRecord) {
-      throw new HttpException('Token not found', HttpStatus.UNAUTHORIZED);
-    }
 
     if (!tokenRecord || tokenRecord.used) {
       throw new HttpException(
@@ -34,6 +31,7 @@ export class ResetPasswordUseCase {
     }
 
     const password = await Password.create(dto.newPassword);
+
     await user.setPassword(password);
     await this.userRepository.update(user);
     await this.tokenRepository.markAsUsed(tokenRecord.id);
