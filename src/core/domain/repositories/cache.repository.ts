@@ -1,14 +1,13 @@
 import { ClassConstructor } from 'class-transformer';
+import { MetaInputVO } from '@/shared/domain/value-objects/meta-input.vo';
 import { env } from '@/config/env';
-import { MetaInputVO } from '@/shared/domain/value-objects/meta-input.vo'; // Representa um objeto de valor que serve para controle de filtro de listas nos repositories
 
-export abstract class CacheRepository<V extends object> {
-  // Abstração do provider de cache
+export abstract class CacheRepository<V = unknown> {
   protected ttl: number;
 
   constructor(
-    protected name: string, // Representa o nome do recurso que está sendo cacheado
-    protected classConstructor: ClassConstructor<V>, // Representa o construtor da classe do objeto a ser armazenado (dê preferência por usar DTO). Isso serve para garantir a tipagem correta do cache
+    protected name: string,
+    protected classConstructor: ClassConstructor<V>,
     ttl?: number,
   ) {
     this.ttl = ttl || env.CACHE_TTL;

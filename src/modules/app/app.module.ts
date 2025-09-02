@@ -1,15 +1,20 @@
 import { Module } from '@nestjs/common';
+
+import { AuthModule } from '@/modules/auth/auth.module';
+import { EmailModule } from '@/modules/mail/email.module';
+import { TaskModule } from '@/modules/task/task.module';
+import { UserModule } from '@/modules/user/user.module';
 import { SharedModule } from '@/shared/shared.module';
-import { CheckApiHealthController } from '@/modules/app/presentation/controllers/check-api-health.controller';
-import { CheckHealthUseCase } from '@/modules/app/application/use-cases/check-health.use-case';
+
+import { CacheRepository } from '@/modules/app/domain/providers/cache.provider';
 import { DatabaseRepository } from '@/modules/app/domain/providers/database.provider';
+
+import { CheckHealthUseCase } from '@/modules/app/application/use-cases/check-health.use-case';
+
+import { RedisHealthRepository } from '@/modules/app/infra/providers/redis-health.provider';
 import { PrismaHealthRepository } from '@/modules/app/infra/providers/prisma-health.provider';
-import { UserModule } from '../user/user.module';
-import { AuthModule } from '../auth/auth.module';
-import { TaskModule } from '../task/task.module';
-import { EmailModule } from '../mail/email.module';
-import { CacheRepository } from './domain/providers/cache.provider';
-import { RedisHealthRepository } from './infra/providers/redis-health.provider';
+
+import { CheckApiHealthController } from '@/modules/app/presentation/controllers/check-api-health.controller';
 
 @Module({
   imports: [SharedModule, UserModule, TaskModule, AuthModule, EmailModule],
@@ -17,12 +22,12 @@ import { RedisHealthRepository } from './infra/providers/redis-health.provider';
   providers: [
     CheckHealthUseCase,
     {
-      provide: DatabaseRepository,
-      useClass: PrismaHealthRepository,
-    },
-    {
       provide: CacheRepository,
       useClass: RedisHealthRepository,
+    },
+    {
+      provide: DatabaseRepository,
+      useClass: PrismaHealthRepository,
     },
   ],
 })

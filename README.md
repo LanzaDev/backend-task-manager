@@ -5,6 +5,7 @@ Repositório da API do **Task Manager**, um sistema para gerenciar tarefas de fo
 ⚡ Requisitos:<br>
 `node v22.*`<br>
 `Banco de dados Postgres (ou SQLite para testes rápidos)`<br>
+`Redis`<br>
 `pnpm (ou npm + corepack)`
 
 ## 💡 Instalando o pnpm
@@ -64,9 +65,24 @@ DATABASE_PORT="5432"
 DATABASE_NAME="task"
 DATABASE_URL="postgres://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}"
 
+#Cache
+CACHE_HOST="127.0.0.1"
+CACHE_PORT="6379"
+CACHE_PASSWORD="senha123"
+CACHE_DB="0"
+CACHE_TTL="60"
+CACHE_URL="redis://:senha123@127.0.0.1:6379/0"
+
 # Auth
 JWT_SECRET="task123"
-JWT_ACCESS_TOKEN_EXPIRES_IN="10d"
+ACCESS_TOKEN_EXP="900"
+REFRESH_TOKEN_EXP="7200"
+
+# Email
+EMAIL_HOST="smtp.gmail.com"
+EMAIL_PORT="465"
+EMAIL_USER="email.example@gmail.com"
+EMAIL_PASSWORD="senha123"
 
 ```
 ### 4. Instale as dependências

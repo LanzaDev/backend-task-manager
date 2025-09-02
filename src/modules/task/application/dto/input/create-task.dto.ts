@@ -1,6 +1,6 @@
 import { TaskStatus } from '@/modules/task/domain/entities/task.entity';
-import { IsDate, IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { IsDate, IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class CreateTaskDTO {
   @IsString()

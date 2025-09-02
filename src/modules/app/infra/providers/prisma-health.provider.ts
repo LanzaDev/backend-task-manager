@@ -1,6 +1,6 @@
-import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
-import { DatabaseRepository } from '@/modules/app/domain/providers/database.provider';
 import { Injectable } from '@nestjs/common';
+import { DatabaseRepository } from '@/modules/app/domain/providers/database.provider';
+import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
 
 @Injectable()
 export class PrismaHealthRepository implements DatabaseRepository {
@@ -10,7 +10,10 @@ export class PrismaHealthRepository implements DatabaseRepository {
       await this.prisma.$queryRaw`SELECT 1`;
       return true;
     } catch (error) {
-      console.log('db connection error: ', error);
+      console.log(
+        'db connection error: ',
+        error instanceof Error ? error.stack : String(error),
+      );
       return false;
     }
   }

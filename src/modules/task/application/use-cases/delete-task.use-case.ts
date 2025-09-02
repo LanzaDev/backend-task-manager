@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { ITaskRepository } from '../../domain/repositories/task.repository';
-import { DeleteTaskDTO } from '../dto/input/delete-task.dto';
+import { ITaskRepository } from '@/modules/task/domain/repositories/task.repository';
+import { DeleteTaskDTO } from '@/modules/task/application/dto/input/delete-task.dto';
 import { Role } from '@prisma/client';
 
 @Injectable()

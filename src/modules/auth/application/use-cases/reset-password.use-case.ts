@@ -1,8 +1,7 @@
-import { IPasswordResetTokenRepository } from '../../domain/repositories/password.repository';
-import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { IPasswordResetTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
+import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
 import { Password } from '@/shared/domain/value-objects/password.vo';
-import { ResetPasswordDTO } from '../dto/input/reset-password.dto';
 
 @Injectable()
 export class ResetPasswordUseCase {
@@ -14,16 +13,9 @@ export class ResetPasswordUseCase {
   async execute(dto: { token: string, newPassword: string }): Promise<void> {
     const tokenRecord = await this.tokenRepository.findByToken(dto.token);
 
-    if (!tokenRecord || tokenRecord.used) {
-      throw new HttpException(
-        'Invalid or expired token',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-
-    if (tokenRecord.expiresAt < new Date()) {
-      throw new HttpException('Token expired', HttpStatus.UNAUTHORIZED);
-    }
+   if (!tokenRecord || tokenRecord.used || tokenRecord.expiresAt < new Date()) {
+    throw new HttpException('Invalid or expired token', HttpStatus.UNAUTHORIZED);
+  }
 
     const user = await this.userRepository.findById(tokenRecord.userId);
     if (!user) {

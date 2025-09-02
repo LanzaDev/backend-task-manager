@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
-import { IUserRepository } from "../../domain/repositories/user.repository";
-import { UpdateUserDTO } from "../dto/input/update-user.dto";
+import { IUserRepository } from "@/modules/user/domain/repositories/user.repository";
+import { UpdateUserDTO } from "@/modules/user/application/dto/input/update-user.dto";
 import { Email } from "@/shared/domain/value-objects/email.vo";
 import { Password } from "@/shared/domain/value-objects/password.vo";
 

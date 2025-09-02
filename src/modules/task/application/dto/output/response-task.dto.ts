@@ -1,3 +1,5 @@
+import { Task, TaskStatus } from '@/modules/task/domain/entities/task.entity';
+import { Expose } from 'class-transformer';
 import {
   IsDate,
   IsEnum,
@@ -6,8 +8,6 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { Expose } from 'class-transformer';
-import { Task, TaskStatus } from '@/modules/task/domain/entities/task.entity';
 
 export class ResponseTaskDTO {
   @IsString()

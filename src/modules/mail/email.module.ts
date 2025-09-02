@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { NodemailerEmailProvider } from './infra/providers/nodemailer.provider';
+import { NodemailerEmailService } from '@/modules/mail/infra/services/nodemailer.service';
 
 @Module({
   imports: [ConfigModule],
   providers: [
     {
-      provide: 'IEmailProvider',
-      useClass: NodemailerEmailProvider,
+      provide: 'IEmailService',
+      useClass: NodemailerEmailService,
     },
   ],
-  exports: ['IEmailProvider'],
+  exports: ['IEmailService'],
 })
 export class EmailModule {}

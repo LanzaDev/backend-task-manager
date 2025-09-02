@@ -9,15 +9,18 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { IUserRepository } from '../../domain/repositories/user.repository';
-import { UpdateUserDTO } from '../../application/dto/input/update-user.dto';
-import { DeleteUserDTO } from '../../application/dto/input/delete-user.dto';
-import { UserMapper } from '../../application/mappers/user.mapper';
-import { UpdateUserUseCase } from '../../application/use-cases/update-user.use-case';
-import { DeleteUserUseCase } from '../../application/use-cases/delete-user.use-case';
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
 import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
 import { Role } from '@prisma/client';
+
+import { UpdateUserDTO } from '../../application/dto/input/update-user.dto';
+import { DeleteUserDTO } from '../../application/dto/input/delete-user.dto';
+
+import { UserMapper } from '../../application/mappers/user.mapper';
+
+import { UpdateUserUseCase } from '../../application/use-cases/update-user.use-case';
+import { DeleteUserUseCase } from '../../application/use-cases/delete-user.use-case';
 
 @Controller('user')
 @UseGuards(JwtAuthGuard, RolesGuard)

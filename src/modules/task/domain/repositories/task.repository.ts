@@ -1,5 +1,5 @@
-import { Task } from "../entities/task.entity";
-import { TaskStatus } from '../entities/task.entity';
+import { Task } from "@/modules/task/domain/entities/task.entity";
+import { TaskStatus } from '@/modules/task/domain/entities/task.entity';
 
 export abstract class ITaskRepository {
   abstract create(task: Task): Promise<Task>;

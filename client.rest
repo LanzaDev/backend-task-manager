@@ -5,8 +5,8 @@ POST http://localhost:3000/auth/signIn
 Content-Type: application/json
 
 {
-  "email": "luk4s1511@gmail.com",
-  "password": "560065"
+  "email": "email.example@gmail.com",
+  "password": "signUp"
 }
 
 ### Auth SignUp
@@ -15,7 +15,7 @@ Content-Type: application/json
 
 {
   "name": "login",
-  "email": "email.example@gmail.com",
+  "email": "email.exampfcle@gmail.com",
   "password": "signUp"
 }
 
@@ -32,9 +32,18 @@ POST http://localhost:3000/auth/recover
 Content-Type: application/json
 
 {
-  "token": "e3b33bba-cc45-4134-9497-64b64e317a7c",
+  "token": "59123065-686e-4146-971c-3e978702d439",
   "password": "560065",
   "confirmPassword": "560065"
+}
+
+### Auth logout
+POST http://localhost:3000/auth/logout
+Content-Type: application/json
+
+{
+  "userId": "ad8aa7ce-c48f-4497-b300-e4b06330e868",
+  "refreshToken": "fb8ca7b6-3180-4508-a9de-068d64d23caf"
 }
 
 
@@ -58,7 +67,7 @@ DELETE http://localhost:3000/user/profile
 Content-Type: application/json
 Authorization: Bearer
 {
-  "password": "test1s2"
+  "password": ""
 }
 
 

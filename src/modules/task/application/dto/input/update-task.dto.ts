@@ -1,5 +1,5 @@
-import { IsDate, IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { TaskStatus } from '@/modules/task/domain/entities/task.entity';
+import { IsDate, IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class UpdateTaskDTO {
   @IsOptional()

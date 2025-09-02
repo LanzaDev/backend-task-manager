@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { DatabaseRepository } from '@/modules/app/domain/providers/database.provider';
 import { ResponseHealthDTO } from '@/modules/app/application/dto/output/response-health.dto';
 import { CacheRepository } from '@/modules/app/domain/providers/cache.provider';
 
 @Injectable()
 export class CheckHealthUseCase {
+  private readonly logger = new Logger(CheckHealthUseCase.name);
+
   constructor(
     private readonly databaseRepository: DatabaseRepository,
     private readonly cacheRepository: CacheRepository,
@@ -20,7 +22,7 @@ export class CheckHealthUseCase {
         dbStatus = 'health';
       }
     } catch (error) {
-      console.error('DB connection failed: ', error);
+      this.logger.error(`DB connection failed: ${error.message}`, error instanceof Error ? error.stack : String(error));
     }
 
     try {
@@ -29,7 +31,7 @@ export class CheckHealthUseCase {
         cacheStatus = 'health';
       }
     } catch (error) {
-      console.error('Cache connection failed: ', error);
+      this.logger.error(`Cache connection failed: ${error.message}`, error instanceof Error ? error.stack : String(error));
     }
 
     return {

@@ -1,6 +1,6 @@
-import { CreateUserDTO } from '../dto/input/create-user.dto';
-import { ResponseUserDTO } from '../dto/output/response-user.dto';
-import { User } from '../../domain/entities/user.entity';
+import { User } from '@/modules/user/domain/entities/user.entity';
+import { CreateUserDTO } from '@/modules/user/application/dto/input/create-user.dto';
+import { ResponseUserDTO } from '@/modules/user/application/dto/output/response-user.dto';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
 

@@ -5,10 +5,10 @@ export class ResponseHealthDTO {
   status: 'health' | 'unhealthy';
 
   @Expose()
-  database: 'health' | 'unhealthy';
+  cache: 'health' | 'unhealthy';
 
   @Expose()
-  cache: 'health' | 'unhealthy';
+  database: 'health' | 'unhealthy';
 
   @Expose()
   timestamp: string;

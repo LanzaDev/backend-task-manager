@@ -10,18 +10,20 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ITaskRepository } from '../../domain/repositories/task.repository';
+import { ITaskRepository } from '@/modules/task/domain/repositories/task.repository';
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
 import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
 import { Role } from '@prisma/client';
-import { CreateTaskUseCase } from '../../application/use-cases/create-task.use-case';
-import { DeleteTaskUseCase } from '../../application/use-cases/delete-task.use-case';
-import { UpdateTaskUseCase } from '../../application/use-cases/update-task.use-case';
-import { CreateTaskDTO } from '../../application/dto/input/create-task.dto';
-import { UpdateTaskDTO } from '../../application/dto/input/update-task.dto';
-import { DeleteTaskDTO } from '../../application/dto/input/delete-task.dto';
-import { ResponseTaskDTO } from '../../application/dto/output/response-task.dto';
+
+import { CreateTaskDTO } from '@/modules/task/application/dto/input/create-task.dto';
+import { UpdateTaskDTO } from '@/modules/task/application/dto/input/update-task.dto';
+import { DeleteTaskDTO } from '@/modules/task/application/dto/input/delete-task.dto';
+import { ResponseTaskDTO } from '@/modules/task/application/dto/output/response-task.dto';
+
+import { CreateTaskUseCase } from '@/modules/task/application/use-cases/create-task.use-case';
+import { DeleteTaskUseCase } from '@/modules/task/application/use-cases/delete-task.use-case';
+import { UpdateTaskUseCase } from '@/modules/task/application/use-cases/update-task.use-case';
 
 @Controller('admin/task/')
 @UseGuards(JwtAuthGuard, RolesGuard)

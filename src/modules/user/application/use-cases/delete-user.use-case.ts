@@ -3,8 +3,8 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { IUserRepository } from '../../domain/repositories/user.repository';
-import { DeleteUserDTO } from '../dto/input/delete-user.dto';
+import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
+import { DeleteUserDTO } from '@/modules/user/application/dto/input/delete-user.dto';
 import { Role } from '@/shared/domain/value-objects/role.vo';
 
 @Injectable()

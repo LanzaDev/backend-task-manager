@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { ITaskRepository } from '../../domain/repositories/task.repository';
-import { UpdateTaskDTO } from '../dto/input/update-task.dto';
-import { Task } from '../../domain/entities/task.entity';
+import { Task } from '@/modules/task/domain/entities/task.entity';
+import { ITaskRepository } from '@/modules/task/domain/repositories/task.repository';
+import { UpdateTaskDTO } from '@/modules/task/application/dto/input/update-task.dto';
 import { Role } from '@/shared/domain/value-objects/role.vo';
 
 @Injectable()

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Task } from '../../domain/entities/task.entity';
-import { ITaskRepository } from '../../domain/repositories/task.repository';
+import { Task } from '@/modules/task/domain/entities/task.entity';
+import { TaskStatus } from '@/modules/task/domain/entities/task.entity';
+import { ITaskRepository } from '@/modules/task/domain/repositories/task.repository';
 import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
-import { TaskStatus } from '../../domain/entities/task.entity';
 
 @Injectable()
 export class PrismaTaskRepository implements ITaskRepository {

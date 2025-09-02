@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Task } from '../../domain/entities/task.entity';
-import { ITaskRepository } from '../../domain/repositories/task.repository';
-import { CreateTaskDTO } from '../dto/input/create-task.dto';
+import { Injectable } from '@nestjs/common';
+import { Task } from '@/modules/task/domain/entities/task.entity';
+import { ITaskRepository } from '@/modules/task/domain/repositories/task.repository';
+import { CreateTaskDTO } from '@/modules/task/application/dto/input/create-task.dto';
 
 @Injectable()
 export class CreateTaskUseCase {

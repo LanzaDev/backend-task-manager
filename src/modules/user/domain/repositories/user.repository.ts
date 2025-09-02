@@ -1,4 +1,4 @@
-import { User } from '../entities/user.entity';
+import { User } from '@/modules/user/domain/entities/user.entity';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 
 export abstract class IUserRepository {

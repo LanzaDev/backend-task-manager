@@ -1,8 +1,8 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { IUserRepository } from '../../domain/repositories/user.repository';
-import { CreateUserDTO } from '../dto/input/create-user.dto';
-import { ResponseAdminDTO } from '../dto/output/response-admin.dto';
-import { UserMapper } from '../mappers/user.mapper';
+import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
+import { CreateUserDTO } from '@/modules/user/application/dto/input/create-user.dto';
+import { ResponseAdminDTO } from '@/modules/user/application/dto/output/response-admin.dto';
+import { UserMapper } from '@/modules/user/application/mappers/user.mapper';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 
 @Injectable()

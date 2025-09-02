@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { User } from '@/modules/user/domain/entities/user.entity';
 import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
+import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
+
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
-import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
 import { Role } from '@/shared/domain/value-objects/role.vo';
 
 @Injectable()

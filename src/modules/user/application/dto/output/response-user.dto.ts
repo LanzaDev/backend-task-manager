@@ -1,6 +1,6 @@
 import { User } from '@/modules/user/domain/entities/user.entity';
-import { IsEmail, IsEnum, IsString, IsUUID } from 'class-validator';
 import { Expose } from 'class-transformer'
+import { IsEmail, IsEnum, IsString, IsUUID } from 'class-validator';
 
 export class ResponseUserDTO {
   @IsUUID()

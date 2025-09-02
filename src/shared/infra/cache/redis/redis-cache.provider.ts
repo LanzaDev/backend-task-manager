@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { CacheRepository } from '@/core/domain/repositories/cache.repository';
-import { CacheClient } from '../../config/redis.config';
 import { plainToInstance } from 'class-transformer';
+import { CacheRepository } from '@/core/domain/repositories/cache.repository';
+import { CacheClient } from '@/shared/infra/config/redis.config';
 import { MetaInputVO } from '@/shared/domain/value-objects/meta-input.vo';
 
 @Injectable()
 export class RedisCacheRepository<V extends object> extends CacheRepository<V> {
   private client = CacheClient;
-  private systemName = 'new ad backend';
+  private systemName = 'Task Manager';
 
   private buildUniqueKey(key: string): string {
     return `${this.systemName}:${this.name}:unique:${key}`;

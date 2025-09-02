@@ -10,19 +10,23 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { IUserRepository } from '../../domain/repositories/user.repository';
-import { CreateUserDTO } from '../../application/dto/input/create-user.dto';
-import { UpdateUserDTO } from '../../application/dto/input/update-user.dto';
-import { DeleteUserDTO } from '../../application/dto/input/delete-user.dto';
-import { ResponseAdminDTO } from '../../application/dto/output/response-admin.dto';
-import { UserMapper } from '../../application/mappers/user.mapper';
-import { CreateUserUseCase } from '../../application/use-cases/create-user.use-case';
-import { UpdateUserUseCase } from '../../application/use-cases/update-user.use-case';
-import { DeleteUserUseCase } from '../../application/use-cases/delete-user.use-case';
+import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
 import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
 import { Role } from '@prisma/client';
+
+import { CreateUserDTO } from '@/modules/user/application/dto/input/create-user.dto';
+import { UpdateUserDTO } from '@/modules/user/application/dto/input/update-user.dto';
+import { DeleteUserDTO } from '@/modules/user/application/dto/input/delete-user.dto';
+import { ResponseAdminDTO } from '@/modules/user/application/dto/output/response-admin.dto';
+
+import { UserMapper } from '@/modules/user/application/mappers/user.mapper';
+
+import { CreateUserUseCase } from '@/modules/user/application/use-cases/create-user.use-case';
+import { UpdateUserUseCase } from '@/modules/user/application/use-cases/update-user.use-case';
+import { DeleteUserUseCase } from '@/modules/user/application/use-cases/delete-user.use-case';
+
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)

@@ -4,7 +4,10 @@ import { Expose } from 'class-transformer';
 export class SignResponseDTO {
   @Expose()
   user: ResponseUserDTO;
-  
+
   @Expose()
-  token: string;
+  accessToken: string;
+
+  @Expose()
+  refreshToken!: string;
 }

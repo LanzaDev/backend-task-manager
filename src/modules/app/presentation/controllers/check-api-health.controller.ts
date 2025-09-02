@@ -1,5 +1,9 @@
-import { Controller, Get, HttpStatus, InternalServerErrorException } from '@nestjs/common';
-import { CheckHealthUseCase } from '@/modules/app/application/use-cases/check-health.use-case';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -7,6 +11,7 @@ import {
   ApiServiceUnavailableResponse,
   ApiInternalServerErrorResponse,
 } from '@nestjs/swagger';
+import { CheckHealthUseCase } from '@/modules/app/application/use-cases/check-health.use-case';
 
 @ApiTags('Health')
 @Controller('/')
@@ -39,13 +44,16 @@ export class CheckApiHealthController {
     try {
       const healthStatus = await this.checkHealthUseCase.execute();
 
-      if (healthStatus.database === 'unhealthy' || healthStatus.cache === 'unhealthy') {
-        return HttpStatus.SERVICE_UNAVAILABLE, healthStatus;
+      if (
+        healthStatus.database === 'unhealthy' ||
+        healthStatus.cache === 'unhealthy'
+      ) {
+        return (HttpStatus.SERVICE_UNAVAILABLE, healthStatus);
       }
 
       return healthStatus;
     } catch {
-      throw new InternalServerErrorException ({
+      throw new InternalServerErrorException({
         status: 'unhealthy',
         message: 'INTERNAL SERVER ERROR',
         timestamp: new Date().toLocaleString('pt-br', {

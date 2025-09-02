@@ -20,12 +20,13 @@ export const envSchema = z.object({
   CACHE_PORT: z.coerce.number(),
   CACHE_PASSWORD: z.string(),
   CACHE_DB: z.coerce.number().default(0),
-  CACHE_TTL: z.coerce.number(),
+  CACHE_TTL: z.coerce.number().default(5),
   CACHE_URL: z.string(),
 
   // JWT
   JWT_SECRET: z.string(),
-  JWT_EXPIRES_IN: z.string().default('1h'),
+  ACCESS_TOKEN_EXP: z.coerce.number().default(15),
+  REFRESH_TOKEN_EXP: z.coerce.number().default(7),
 
   // Email
   EMAIL_HOST: z.string(),

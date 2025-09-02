@@ -1,17 +1,19 @@
+import { Inject, Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { addHours } from 'date-fns';
+
 import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
-import { IPasswordResetTokenRepository } from '../../domain/repositories/password.repository';
-import { Inject, Injectable } from '@nestjs/common';
+import { IPasswordResetTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
+import { ForgotYourPasswordDTO } from '@/modules/auth/application/dto/input/forgot-your-password.dto';
+
+import type { IEmailService } from '@/modules/mail/domain/services/email.service';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Token } from '@/shared/domain/value-objects/token.vo';
-import { ForgotYourPasswordDTO } from '../dto/input/forgot-your-password.dto';
-import type { IEmailProvider } from '@/modules/mail/infra/providers/email.provider';
 
 @Injectable()
 export class RecoverPasswordUseCase {
   constructor(
-    @Inject('IEmailProvider') private readonly emailProvider: IEmailProvider,
+    @Inject('IEmailService') private readonly emailService: IEmailService,
     private readonly userRepository: IUserRepository,
     private readonly tokenRepository: IPasswordResetTokenRepository,
   ) {}
@@ -36,7 +38,7 @@ export class RecoverPasswordUseCase {
 
     const resetLink = `https://localhost:3000/recover`;
 
-    await this.emailProvider.sendEmail({
+    await this.emailService.sendEmail({
       to: [user.getEmailValue()],
       subject: 'Recuperação de senha',
       html: `<p>Olá ${user.getName()},</p>
