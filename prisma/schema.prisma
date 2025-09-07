@@ -20,15 +20,16 @@ enum TaskStatus {
 }
 
 model User {
-  id                 String               @id @default(uuid())
-  name               String
-  email              String               @unique
-  password           String
-  role               Role                 @default(USER)
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  tasks              Task[]
-  PasswordResetToken PasswordResetToken[]
+  id                String              @id @default(uuid())
+  name              String
+  email             String              @unique
+  password          String
+  role              Role                @default(USER)
+  isVerified        Boolean             @default(false)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  tasks             Task[]
+  VerificationToken VerificationToken[]
 }
 
 model Task {
@@ -45,7 +46,7 @@ model Task {
   completedAt DateTime?
 }
 
-model PasswordResetToken {
+model VerificationToken {
   id        String    @id @default(uuid())
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String

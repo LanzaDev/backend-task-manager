@@ -26,8 +26,7 @@ export class Password {
     return this.hashed;
   }
 
-  async compare(plain: string | Password): Promise<boolean> {
-    const raw = plain instanceof Password ? plain.getHashedValue() : plain;
-    return bcrypt.compare(raw, this.hashed);
+  async compare(plain: string): Promise<boolean> {
+    return bcrypt.compare(plain, this.hashed);
   }
 }

@@ -3,14 +3,20 @@ import { AuthTokenCacheRepository } from '@/modules/auth/domain/repositories/aut
 
 @Injectable()
 export class SignOutUseCase {
-  constructor(private readonly authTokenCacheRepository: AuthTokenCacheRepository) {}
+  constructor(
+    private readonly authTokenCacheRepository: AuthTokenCacheRepository,
+  ) {}
 
-  async execute(userId: string, refreshToken?: string) {
-    const cached = await this.authTokenCacheRepository.getSession(userId);
-    if (cached && cached.refreshToken === refreshToken) {
-      await this.authTokenCacheRepository.deleteSession(userId);
-      return true;
+  async execute(refreshToken: string) {
+    const userId =
+      await this.authTokenCacheRepository.getUserIdByToken(refreshToken);
+
+    if (!userId) {
+      return false;
     }
-    return false;
+
+    await this.authTokenCacheRepository.deleteSession(userId);
+
+    return true;
   }
 }

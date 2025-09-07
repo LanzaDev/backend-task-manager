@@ -13,6 +13,7 @@ export class UserMapper {
       name: dto.name,
       email,
       password,
+      isVerified: false,
     });
   }
 

@@ -2,7 +2,7 @@ import { IsNotEmpty, MinLength } from 'class-validator';
 
 export class ResetPasswordDTO {
   @IsNotEmpty()
-  token: string;
+  token!: string;
 
   @IsNotEmpty()
   @MinLength(6)

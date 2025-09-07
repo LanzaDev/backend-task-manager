@@ -3,9 +3,11 @@ export interface SessionData {
 }
 
 export abstract class AuthTokenCacheRepository {
-  abstract setToken(token: string, data: unknown, ttl: number): Promise<void>;
-  abstract getToken<T = unknown>(token: string): Promise<T | null>;
-  abstract deleteToken(token: string): Promise<void>;
+  abstract getUserIdByToken(refreshToken: string): Promise<string | null>
+
+  abstract getUserIdByToken(refreshToken: string): Promise<string | null>;
+  abstract setRefreshToken(refreshToken: string, userId: string, ttl: number): Promise<void>;
+  abstract deleteRefreshToken(refreshToken: string): Promise<void>;
 
   abstract setSession(userId: string, data: SessionData, ttl: number): Promise<void>;
   abstract getSession(userId: string): Promise<SessionData | null>;

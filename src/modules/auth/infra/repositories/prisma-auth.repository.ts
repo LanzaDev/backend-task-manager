@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { IPasswordResetTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
+import { VerificationToken } from '@prisma/client';
+import { IVerificationTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
 import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
-import { PasswordResetToken } from '@prisma/client';
 import { Token } from '@/shared/domain/value-objects/token.vo';
 
 @Injectable()
 export class PrismaPasswordResetTokenRepository
-  implements IPasswordResetTokenRepository
+  implements IVerificationTokenRepository
 {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -16,7 +16,7 @@ export class PrismaPasswordResetTokenRepository
     expiresAt: Date;
     used: boolean;
   }): Promise<void> {
-    await this.prisma.passwordResetToken.create({
+    await this.prisma.verificationToken.create({
       data: {
         userId: data.userId,
         token: data.token.getValue(),
@@ -26,14 +26,14 @@ export class PrismaPasswordResetTokenRepository
     });
   }
 
-  async findByToken(token: string): Promise<PasswordResetToken | null> {
-    return this.prisma.passwordResetToken.findUnique({
+  async findByToken(token: string): Promise<VerificationToken | null> {
+    return this.prisma.verificationToken.findUnique({
       where: { token },
     });
   }
 
   async markAsUsed(id: string): Promise<void> {
-    await this.prisma.passwordResetToken.update({
+    await this.prisma.verificationToken.update({
       where: { id },
       data: {
         used: true,
@@ -43,7 +43,7 @@ export class PrismaPasswordResetTokenRepository
   }
 
   async deleteExpired(): Promise<void> {
-    await this.prisma.passwordResetToken.deleteMany({
+    await this.prisma.verificationToken.deleteMany({
       where: {
         expiresAt: { lt: new Date() },
         used: false,

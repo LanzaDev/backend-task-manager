@@ -19,6 +19,7 @@ export class PrismaUserRepository implements IUserRepository {
         email: user.getEmailValue(),
         password: user.getHashedPassword(),
         role: user.getRole(),
+        isVerified: user.getIsVerified(),
         createdAt: user.getCreatedAt(),
         updatedAt: user.getUpdatedAt(),
       },
@@ -29,6 +30,7 @@ export class PrismaUserRepository implements IUserRepository {
         name: created.name,
         email: new Email(created.email),
         password: Password.fromHashed(created.password),
+        isVerified: created.isVerified,
         role: created.role as Role,
         createdAt: created.createdAt,
       },
@@ -43,6 +45,7 @@ export class PrismaUserRepository implements IUserRepository {
         name: user.getName(),
         email: user.getEmailValue(),
         password: user.getHashedPassword(),
+        isVerified: user.getIsVerified(),
         role: user.getRole(),
         updatedAt: user.getUpdatedAt(),
       },
@@ -54,6 +57,7 @@ export class PrismaUserRepository implements IUserRepository {
         email: new Email(updated.email),
         password: Password.fromHashed(updated.password),
         role: updated.role as Role,
+        isVerified: updated.isVerified,
         createdAt: updated.createdAt,
       },
       updated.id,
@@ -62,6 +66,13 @@ export class PrismaUserRepository implements IUserRepository {
 
   async delete(id: string): Promise<void> {
     await this.prisma.user.delete({ where: { id } });
+  }
+
+  async updateIsVerified(id: string): Promise<void> {
+    await this.prisma.user.update({
+    where: { id },
+    data: { isVerified: true, updatedAt: new Date() },
+  });
   }
 
   async findById(id: string): Promise<User | null> {
@@ -74,6 +85,7 @@ export class PrismaUserRepository implements IUserRepository {
         email: new Email(deleted.email),
         password: Password.fromHashed(deleted.password),
         role: deleted.role as Role,
+        isVerified: deleted.isVerified,
         createdAt: deleted.createdAt,
         updatedAt: deleted.updatedAt,
       },
@@ -93,6 +105,7 @@ export class PrismaUserRepository implements IUserRepository {
         email: new Email(user.email),
         password: Password.fromHashed(user.password),
         role: user.role as Role,
+        isVerified: user.isVerified,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       },
@@ -110,6 +123,7 @@ export class PrismaUserRepository implements IUserRepository {
             email: new Email(user.email),
             password: Password.fromHashed(user.password),
             role: user.role,
+            isVerified: user.isVerified,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,
           },

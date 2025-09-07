@@ -1,10 +1,14 @@
 import {
+  BadRequestException,
   Body,
+  ConflictException,
   Controller,
+  GoneException,
   HttpCode,
   HttpException,
   HttpStatus,
   Post,
+  Query,
 } from '@nestjs/common';
 import { LoginDTO } from '@/modules/auth/application/dto/input/login.dto';
 import { RegisterDTO } from '@/modules/auth/application/dto/input/register.dto';
@@ -17,7 +21,7 @@ import { SignUpUseCase } from '@/modules/auth/application/use-cases/sign-up.use-
 import { ResetPasswordUseCase } from '@/modules/auth/application/use-cases/reset-password.use-case';
 import { RecoverPasswordUseCase } from '@/modules/auth/application/use-cases/recover-password.use-case';
 import { SignOutUseCase } from '@/modules/auth/application/use-cases/sign-out.use-case';
-import { LogoutDTO } from '../../application/dto/input/logout.dto';
+import { EmailVerificationUseCase } from '../../application/use-cases/email-verification.use-case';
 
 @Controller('auth')
 export class AuthController {
@@ -27,6 +31,7 @@ export class AuthController {
     private readonly signInUseCase: SignInUseCase,
     private readonly signUpUseCase: SignUpUseCase,
     private readonly signOutUseCase: SignOutUseCase,
+    private readonly emailVerificationUseCase: EmailVerificationUseCase,
   ) {}
 
   @Post('signIn')
@@ -44,11 +49,10 @@ export class AuthController {
   }
 
   @Post('signUp')
-  async signUp(@Body() dto: RegisterDTO): Promise<SignResponseDTO> {
+  async signUp(@Body() dto: RegisterDTO): Promise<string> {
     try {
-      const { accessToken, refreshToken, user } =
-        await this.signUpUseCase.execute(dto);
-      return { accessToken, refreshToken, user };
+      const user = await this.signUpUseCase.execute(dto);
+      return user;
     } catch (err) {
       throw new HttpException(
         err.message || 'Bad Request',
@@ -64,22 +68,20 @@ export class AuthController {
   }
 
   @Post('recover')
-  @HttpCode(HttpStatus.NO_CONTENT)
   async resetPassword(@Body() dto: ResetPasswordDTO) {
-    if (dto.password !== dto.confirmPassword) {
-      throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
-    }
+    await this.resetPasswordUseCase.execute(dto);
+    return { message: "Password successfully reset" }
+  }
 
-    await this.resetPasswordUseCase.execute({
-      token: dto.token,
-      newPassword: dto.password,
-    });
+  @Post('verify-email')
+  async verifyEmail(@Query('token') token: string) {
+    const result = await this.emailVerificationUseCase.verifyEmailToken(token);
+    return result;
   }
 
   @Post('logout')
-  async logoutSession(@Body() dto: LogoutDTO) {
-    const success = await this.signOutUseCase.execute(dto.userId, dto.refreshToken);
-
+  async logoutSession(@Body('refreshToken') refreshToken: string) {
+    const success = await this.signOutUseCase.execute(refreshToken);
     return { message: success ? 'Logout successful' : 'No active session' };
   }
 }

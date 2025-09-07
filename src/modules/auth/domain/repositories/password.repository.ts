@@ -1,7 +1,7 @@
 import { Token } from "@/shared/domain/value-objects/token.vo";
-import { PasswordResetToken } from "@prisma/client";
+import { VerificationToken } from "@prisma/client";
 
-export abstract class IPasswordResetTokenRepository {
+export abstract class IVerificationTokenRepository {
   abstract create(data: {
     userId: string;
     token: Token;
@@ -9,7 +9,7 @@ export abstract class IPasswordResetTokenRepository {
     used: boolean;
   }): Promise<void>;
 
-  abstract findByToken(token: string): Promise<PasswordResetToken | null>;
+  abstract findByToken(token: string): Promise<VerificationToken | null>;
 
   abstract markAsUsed(id: string): Promise<void>;
 

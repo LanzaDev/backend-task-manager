@@ -3,7 +3,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { env } from '@/config/env';
 
 import { AuthController } from '@/modules/auth/presentation/controllers/auth.controller';
-import { AuthTokenService } from '@/modules/auth/infra/providers/auth-token.service';
 import { JwtStrategy } from '@/modules/auth/infra/strategies/jwt-strategy';
 
 import { SignInUseCase } from '@/modules/auth/application/use-cases/sign-in.use-case';
@@ -14,15 +13,14 @@ import { SignOutUseCase } from '@/modules/auth/application/use-cases/sign-out.us
 
 import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
 import { PrismaUserRepository } from '@/modules/user/infra/repositories/prisma-user.repository';
-import { IPasswordResetTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
+import { IVerificationTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
 import { PrismaPasswordResetTokenRepository } from '@/modules/auth/infra/repositories/prisma-auth.repository';
 
 import { EmailModule } from '@/modules/mail/email.module';
 
 import { AuthTokenCacheRepository } from '@/modules/auth/domain/repositories/auth-token-cache.repository';
 import { RedisAuthTokenCacheRepository } from '@/modules/auth/infra/repositories/redis-auth.repository';
-import { RedisClient } from '@/modules/auth/infra/config/redis.config';
-import { RedisClientRepository } from '@/modules/auth/domain/repositories/redis-client.repository';
+import { EmailVerificationUseCase } from './application/use-cases/email-verification.use-case';
 
 @Module({
   imports: [
@@ -34,32 +32,27 @@ import { RedisClientRepository } from '@/modules/auth/domain/repositories/redis-
   ],
   controllers: [AuthController],
   providers: [
-    AuthTokenService,
     JwtStrategy,
     SignInUseCase,
     SignUpUseCase,
     RecoverPasswordUseCase,
     ResetPasswordUseCase,
     SignOutUseCase,
+    EmailVerificationUseCase,
     RedisAuthTokenCacheRepository,
-
     {
       provide: IUserRepository,
       useClass: PrismaUserRepository,
     },
     {
-      provide: IPasswordResetTokenRepository,
+      provide: IVerificationTokenRepository,
       useClass: PrismaPasswordResetTokenRepository,
     },
     {
       provide: AuthTokenCacheRepository,
       useClass: RedisAuthTokenCacheRepository,
     },
-    {
-      provide: RedisClientRepository,
-      useClass: RedisClient,
-    },
   ],
-  exports: [AuthTokenService],
+  exports: [RedisAuthTokenCacheRepository],
 })
 export class AuthModule {}

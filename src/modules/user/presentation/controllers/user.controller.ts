@@ -60,10 +60,6 @@ export class UserController {
     dto.id = req.user.sub;
     dto.password = body.password;
 
-    if (!dto.password) {
-      throw new Error('Password is required');
-    }
-
     await this.deleteUserUseCase.execute(dto, {
       id: req.user.sub,
       role: req.user.role,

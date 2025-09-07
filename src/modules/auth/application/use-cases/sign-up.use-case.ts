@@ -1,15 +1,13 @@
-import { ConflictException, Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { env } from '@/config/env';
 
 import { User } from '@/modules/user/domain/entities/user.entity';
 import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
-import { AuthTokenCacheRepository } from '@/modules/auth/domain/repositories/auth-token-cache.repository';
+import { IVerificationTokenRepository } from '../../domain/repositories/password.repository';
+
+import { IEmailService } from '@/modules/mail/domain/services/email.service';
 
 import { RegisterDTO } from '../dto/input/register.dto';
-import { ResponseUserDTO } from '@/modules/user/application/dto/output/response-user.dto';
-import { SignResponseDTO } from '@/modules/auth/application/dto/output/sign-response.dto';
 
 import { Token } from '@/shared/domain/value-objects/token.vo';
 import { Email } from '@/shared/domain/value-objects/email.vo';
@@ -18,12 +16,12 @@ import { Password } from '@/shared/domain/value-objects/password.vo';
 @Injectable()
 export class SignUpUseCase {
   constructor(
+    @Inject('IEmailService') private readonly emailService: IEmailService,
     private readonly userRepository: IUserRepository,
-    private readonly jwtService: JwtService,
-    private readonly authTokenCacheRepository: AuthTokenCacheRepository,
+    private readonly verificationTokenRepository: IVerificationTokenRepository,
   ) {}
 
-  async execute(dto: RegisterDTO): Promise<SignResponseDTO> {
+  async execute(dto: RegisterDTO): Promise<string> {
     const email = new Email(dto.email);
 
     const existingUser = await this.userRepository.findByEmail(email);
@@ -36,32 +34,53 @@ export class SignUpUseCase {
       name: dto.name,
       email,
       password,
+      isVerified: false,
     });
-
     await this.userRepository.create(user);
 
-    // Access token (curto prazo)
-    const accessToken = new Token(
-      this.jwtService.sign(
-        { sub: user.getId(), role: user.getRole() },
-        { expiresIn: env.ACCESS_TOKEN_EXP },
-      ),
-    );
+    const verificationToken = new Token(randomUUID());
 
-    // Refresh token (UUID aleatório)
-    const refreshToken = randomUUID();
+    await this.verificationTokenRepository.create({
+      userId: user.getId(),
+      token: verificationToken,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h
+      used: false,
+    });
 
-    // Salva no Redis com TTL
-    await this.authTokenCacheRepository.setSession(
-      user.getId(),
-      { refreshToken },
-      env.REFRESH_TOKEN_EXP,
-    );
+    const redirect_url = `http://localhost:5173/verify-email?token=${verificationToken.getValue()}`;
 
-    return {
-      user: new ResponseUserDTO(user),
-      accessToken: accessToken.getValue(),
-      refreshToken,
-    };
+    await this.emailService.sendEmail({
+      to: [user.getEmailValue()],
+      subject: 'Verifique seu e-mail',
+      html: `<div style="font-family: Arial, sans-serif; color: #333333; font-size: 16px; line-height: 1.5;">
+      <p>Olá ${user.getName()},</p>
+      <p>Você se cadastrou no TaskManager, verifique seu e-mail. Clique no botão abaixo:</p>
+
+      <table cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 20px 0;">
+        <tr>
+          <td align="center" bgcolor="#3803f6" style="border-radius: 8px;">
+            <a href="${redirect_url}"
+               target="_blank"
+               style="font-size: 16px;
+                      font-weight: bold;
+                      font-family: Arial, sans-serif;
+                      color: #ffffff;
+                      text-decoration: none;
+                      padding: 14px 28px;
+                      display: inline-block;">
+              Clique aqui para verificar
+            </a>
+          </td>
+        </tr>
+      </table>
+
+      <p style="color: #333333; text-decoration: none; margin-top: 20px;">
+        Se você não se cadastrou na nossa plataforma, pode ignorar este e-mail.
+      </p>
+    </div>
+  `,
+    });
+
+    return 'Registration successful';
   }
 }

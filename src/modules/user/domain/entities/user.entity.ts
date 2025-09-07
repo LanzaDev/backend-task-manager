@@ -8,6 +8,7 @@ interface UserSchema {
   email: Email;
   password: Password;
   role?: Role;
+  isVerified: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -20,6 +21,7 @@ export class User {
     this.props = {
       ...props,
       role: props.role ?? 'USER',
+      isVerified: props.isVerified ?? false,
       createdAt: props.createdAt ?? new Date(),
       updatedAt: props.updatedAt ?? new Date(),
     };
@@ -73,6 +75,14 @@ export class User {
   }
   setRole(newRole: Role) {
     this.props.role = newRole;
+    this.touch();
+  }
+
+  getIsVerified(): boolean {
+    return this.props.isVerified ?? false;
+  }
+  markAsVerified() {
+    this.props.isVerified = true;
     this.touch();
   }
 

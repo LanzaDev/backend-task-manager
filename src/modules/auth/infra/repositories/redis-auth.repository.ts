@@ -3,58 +3,55 @@ import {
   AuthTokenCacheRepository,
   SessionData,
 } from '@/modules/auth/domain/repositories/auth-token-cache.repository';
-import { RedisClientRepository } from '@/modules/auth/domain/repositories/redis-client.repository';
+import { CacheClient } from '@/shared/infra/config/redis.config';
 
 @Injectable()
 export class RedisAuthTokenCacheRepository implements AuthTokenCacheRepository {
-  constructor(private readonly redisClientRepository: RedisClientRepository) {}
+  private client = CacheClient;
+  private systemName = 'TaskManager:Auth';
 
-  async setToken(token: string, data: unknown, ttl: number): Promise<void> {
-    await this.redisClientRepository
-      .getClient()
-      .set(token, JSON.stringify(data), { EX: ttl });
+  private refreshKey(refreshToken: string) {
+    return `${this.systemName}:refresh:${refreshToken}`;
   }
 
-  async getToken<T = unknown>(token: string): Promise<T | null> {
-    const value = await this.redisClientRepository.getClient().get(token);
-    return value ? (JSON.parse(value) as T) : null;
+  private sessionKey(userId: string) {
+    return `${this.systemName}:session:${userId}`;
   }
 
-  async deleteToken(token: string): Promise<void> {
-    await this.redisClientRepository.getClient().del(token);
+  private blacklistKey(token: string) {
+    return `${this.systemName}:blacklist:${token}`;
   }
 
-  async setSession(
-    userId: string,
-    data: SessionData,
-    ttl: number,
-  ): Promise<void> {
-    await this.redisClientRepository
-      .getClient()
-      .set(`session:${userId}`, JSON.stringify(data), { EX: ttl });
+  async getUserIdByToken(refreshToken: string): Promise<string | null> {
+    return (await this.client.get(this.refreshKey(refreshToken))) || null;
+  }
+
+  async setRefreshToken(refreshToken: string, userId: string, ttl: number): Promise<void> {
+    await this.client.set(this.refreshKey(refreshToken), userId, 'EX', ttl);
+  }
+
+  async deleteRefreshToken(refreshToken: string): Promise<void> {
+    await this.client.del(this.refreshKey(refreshToken));
+  }
+
+  async setSession(userId: string, data: SessionData, ttl: number): Promise<void> {
+    await this.client.set(this.sessionKey(userId), JSON.stringify(data), 'EX', ttl);
   }
 
   async getSession(userId: string): Promise<SessionData | null> {
-    const value = await this.redisClientRepository
-      .getClient()
-      .get(`session:${userId}`);
-    return value ? (JSON.parse(value) as SessionData) : null;
+    const data = await this.client.get(this.sessionKey(userId));
+    return data ? JSON.parse(data) : null;
   }
 
   async deleteSession(userId: string): Promise<void> {
-    await this.redisClientRepository.getClient().del(`session:${userId}`);
+    await this.client.del(this.sessionKey(userId));
   }
 
   async addToBlacklist(token: string, ttl: number): Promise<void> {
-    await this.redisClientRepository
-      .getClient()
-      .set(`blacklist:${token}`, '1', { EX: ttl });
+    await this.client.set(this.blacklistKey(token), 'true', 'EX', ttl);
   }
 
   async isTokenBlacklisted(token: string): Promise<boolean> {
-    const exists = await this.redisClientRepository
-      .getClient()
-      .exists(`blacklist:${token}`);
-    return exists === 1;
+    return (await this.client.exists(this.blacklistKey(token))) > 0;
   }
 }

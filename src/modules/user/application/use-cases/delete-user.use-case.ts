@@ -19,11 +19,11 @@ export class DeleteUserUseCase {
 
     if (!user) throw new NotFoundException('User not found');
 
-    if (req.role === 'USER' && req.id !== dto.id) {
-      throw new BadRequestException('Cannot delete other user');
-    }
+    if (req.role === 'USER') {
+      if (req.id !== dto.id) {
+        throw new BadRequestException('Cannot delete other user');
+      }
 
-    if (req.role === 'USER' && req.id === dto.id) {
       if (!dto.password) {
         throw new Error('Password is required to delete your own account');
       }
@@ -39,5 +39,7 @@ export class DeleteUserUseCase {
     }
 
     await this.userRepository.delete(dto.id);
+
+    return;
   }
 }

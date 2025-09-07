@@ -8,4 +8,5 @@ export abstract class IUserRepository {
   abstract findById(id: string): Promise<User | null>;
   abstract findByEmail(email: Email): Promise<User | null>;
   abstract findAll(): Promise<User[]>;
+  abstract updateIsVerified(id: string): Promise<void>;
 }
