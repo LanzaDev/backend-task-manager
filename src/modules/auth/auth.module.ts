@@ -10,17 +10,24 @@ import { SignUpUseCase } from '@/modules/auth/application/use-cases/sign-up.use-
 import { RecoverPasswordUseCase } from '@/modules/auth/application/use-cases/recover-password.use-case';
 import { ResetPasswordUseCase } from '@/modules/auth/application/use-cases/reset-password.use-case';
 import { SignOutUseCase } from '@/modules/auth/application/use-cases/sign-out.use-case';
+import { EmailVerificationUseCase } from './application/use-cases/email-verification.use-case';
 
-import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
-import { PrismaUserRepository } from '@/modules/user/infra/repositories/prisma-user.repository';
+import { IUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
+import { IUserReadRepository } from '../user/domain/repositories/user.read-repository';
+import { AuthTokenCacheReadRepository } from './domain/repositories/auth-token-cache.read-repository';
+import { AuthTokenCacheWriteRepository } from './domain/repositories/auth-token-cache.write-repository';
+
 import { IVerificationTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
-import { PrismaPasswordResetTokenRepository } from '@/modules/auth/infra/repositories/prisma-auth.repository';
+import { RedisAuthTokenCacheQueryRepository } from './infra/repositories/cache/redis-auth.query.repository';
+import { RedisAuthTokenCommandCacheRepository } from './infra/repositories/cache/redis-auth.command.repository';
+
+import { PrismaUserQueryRepository } from '../user/infra/repositories/database/prisma-user.query.repository';
+import { PrismaUserCommandRepository } from '../user/infra/repositories/database/prisma-user.command.repository';
+import { PrismaPasswordResetTokenRepository } from '@/modules/auth/infra/repositories/database/prisma-auth.repository';
 
 import { EmailModule } from '@/modules/mail/email.module';
+import { CacheModule } from '@/shared/infra/cache/cache.module';
 
-import { AuthTokenCacheRepository } from '@/modules/auth/domain/repositories/auth-token-cache.repository';
-import { RedisAuthTokenCacheRepository } from '@/modules/auth/infra/repositories/redis-auth.repository';
-import { EmailVerificationUseCase } from './application/use-cases/email-verification.use-case';
 
 @Module({
   imports: [
@@ -29,6 +36,7 @@ import { EmailVerificationUseCase } from './application/use-cases/email-verifica
       signOptions: { expiresIn: env.ACCESS_TOKEN_EXP },
     }),
     EmailModule,
+    CacheModule,
   ],
   controllers: [AuthController],
   providers: [
@@ -39,20 +47,27 @@ import { EmailVerificationUseCase } from './application/use-cases/email-verifica
     ResetPasswordUseCase,
     SignOutUseCase,
     EmailVerificationUseCase,
-    RedisAuthTokenCacheRepository,
     {
-      provide: IUserRepository,
-      useClass: PrismaUserRepository,
+      provide: IUserWriteRepository,
+      useClass: PrismaUserCommandRepository,
+    },
+    {
+      provide: IUserReadRepository,
+      useClass: PrismaUserQueryRepository,
     },
     {
       provide: IVerificationTokenRepository,
       useClass: PrismaPasswordResetTokenRepository,
     },
     {
-      provide: AuthTokenCacheRepository,
-      useClass: RedisAuthTokenCacheRepository,
+      provide: AuthTokenCacheReadRepository,
+      useClass: RedisAuthTokenCacheQueryRepository,
+    },
+    {
+      provide: AuthTokenCacheWriteRepository,
+      useClass: RedisAuthTokenCommandCacheRepository,
     },
   ],
-  exports: [RedisAuthTokenCacheRepository],
+  exports: [],
 })
 export class AuthModule {}

@@ -1,11 +1,13 @@
 import { ClassConstructor } from 'class-transformer';
 import { MetaInputVO } from '@/shared/domain/value-objects/meta-input.vo';
 import { env } from '@/config/env';
+import Redis from 'ioredis';
 
 export abstract class CacheRepository<V = unknown> {
   protected ttl: number;
 
   constructor(
+    protected client: Redis,
     protected name: string,
     protected classConstructor: ClassConstructor<V>,
     ttl?: number,

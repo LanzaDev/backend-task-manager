@@ -1,12 +1,8 @@
 import { User } from '@/modules/user/domain/entities/user.entity';
-import { Email } from '@/shared/domain/value-objects/email.vo';
 
-export abstract class IUserRepository {
+export abstract class IUserWriteRepository {
   abstract create(user: User): Promise<User>;
   abstract update(user: User): Promise<User>;
   abstract delete(id: string): Promise<void>;
-  abstract findById(id: string): Promise<User | null>;
-  abstract findByEmail(email: Email): Promise<User | null>;
-  abstract findAll(): Promise<User[]>;
   abstract updateIsVerified(id: string): Promise<void>;
 }

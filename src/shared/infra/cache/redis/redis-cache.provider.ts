@@ -1,13 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { CacheRepository } from '@/core/domain/repositories/cache.repository';
-import { CacheClient } from '@/shared/infra/config/redis.config';
 import { MetaInputVO } from '@/shared/domain/value-objects/meta-input.vo';
+import { REDIS_CLIENT } from '../../config/redis.config';
+import Redis from 'ioredis';
 
 @Injectable()
 export class RedisCacheRepository<V extends object> extends CacheRepository<V> {
-  private client = CacheClient;
   private systemName = 'Task Manager';
+
+constructor(
+    @Inject(REDIS_CLIENT) client: Redis,
+    name: string,
+    classConstructor?: any,
+    ttl?: number,
+  ) {
+    super(client, name, classConstructor ?? Object, ttl);
+  }
 
   private buildUniqueKey(key: string): string {
     return `${this.systemName}:${this.name}:unique:${key}`;

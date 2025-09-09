@@ -2,7 +2,8 @@ import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 
 import { User } from '@/modules/user/domain/entities/user.entity';
-import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
+import { IUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
+import { IUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
 import { IVerificationTokenRepository } from '../../domain/repositories/password.repository';
 
 import { IEmailService } from '@/modules/mail/domain/services/email.service';
@@ -17,14 +18,15 @@ import { Password } from '@/shared/domain/value-objects/password.vo';
 export class SignUpUseCase {
   constructor(
     @Inject('IEmailService') private readonly emailService: IEmailService,
-    private readonly userRepository: IUserRepository,
+    private readonly userWriteRepository: IUserWriteRepository,
+    private readonly userReadRepository: IUserReadRepository,
     private readonly verificationTokenRepository: IVerificationTokenRepository,
   ) {}
 
   async execute(dto: RegisterDTO): Promise<string> {
     const email = new Email(dto.email);
 
-    const existingUser = await this.userRepository.findByEmail(email);
+    const existingUser = await this.userReadRepository.findByEmail(email);
     if (existingUser) {
       throw new ConflictException('Email already in use');
     }
@@ -36,7 +38,7 @@ export class SignUpUseCase {
       password,
       isVerified: false,
     });
-    await this.userRepository.create(user);
+    await this.userWriteRepository.create(user);
 
     const verificationToken = new Token(randomUUID());
 

@@ -9,7 +9,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ITaskRepository } from '../../domain/repositories/task.repository';
+import { ITaskReadRepository } from '../../domain/repositories/task.read-repository';
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
 import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
@@ -28,7 +28,7 @@ import { UpdateTaskUseCase } from '../../application/use-cases/update-task.use-c
 @Roles(Role.USER)
 export class UserTaskController {
   constructor(
-    private readonly taskRepository: ITaskRepository,
+    private readonly taskReadRepository: ITaskReadRepository,
     private readonly createTaskUseCase: CreateTaskUseCase,
     private readonly updateTaskUseCase: UpdateTaskUseCase,
     private readonly deleteTaskUseCase: DeleteTaskUseCase,
@@ -36,14 +36,13 @@ export class UserTaskController {
 
   @Get('my-tasks')
   async getMyTasks(@Request() req) {
-    const tasks = await this.taskRepository.findAllByUser(req.user.sub);
+    const tasks = await this.taskReadRepository.findAllByUser(req.user.sub);
     return tasks;
   }
 
   @Post()
   async createTask(@Request() req, @Body() dto: CreateTaskDTO) {
     const task = await this.createTaskUseCase.execute(dto, req.user.sub);
-
     return new ResponseTaskDTO(task);
   }
 
@@ -67,6 +66,7 @@ export class UserTaskController {
       { taskId },
       { id: req.user.sub, role: req.user.role },
     );
+
     return { message: 'Task deleted successfully' };
   }
 }

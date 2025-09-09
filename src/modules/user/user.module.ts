@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
 
-import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
-import { PrismaUserRepository } from '@/modules/user/infra/repositories/prisma-user.repository';
+import { IUserReadRepository } from './domain/repositories/user.read-repository';
+import { IUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
+import { PrismaUserQueryRepository } from './infra/repositories/database/prisma-user.query.repository';
+import { PrismaUserCommandRepository } from './infra/repositories/database/prisma-user.command.repository';
 
-import { CreateUserUseCase } from '@/modules/user/application/use-cases/create-user.use-case';
-import { UpdateUserUseCase } from '@/modules/user/application/use-cases/update-user.use-case';
-import { DeleteUserUseCase } from '@/modules/user/application/use-cases/delete-user.use-case';
+import { CreateUserUseCase } from '@/modules/user/application/use-cases/commands/create-user.use-case';
+import { UpdateUserUseCase } from '@/modules/user/application/use-cases/commands/update-user.use-case';
+import { DeleteUserUseCase } from '@/modules/user/application/use-cases/commands/delete-user.use-case';
 
 import { UserController } from '@/modules/user/presentation/controllers/user.controller';
 import { AdminController } from '@/modules/user/presentation/controllers/admin.controller';
@@ -18,8 +20,12 @@ import { AdminController } from '@/modules/user/presentation/controllers/admin.c
     UpdateUserUseCase,
     DeleteUserUseCase,
     {
-      provide: IUserRepository,
-      useClass: PrismaUserRepository,
+      provide: IUserWriteRepository,
+      useClass: PrismaUserCommandRepository,
+    },
+    {
+      provide: IUserReadRepository,
+      useClass: PrismaUserQueryRepository,
     },
   ],
 })

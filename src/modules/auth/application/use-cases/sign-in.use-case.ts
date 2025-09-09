@@ -8,8 +8,8 @@ import { JwtService } from '@nestjs/jwt';
 import { randomUUID } from 'crypto';
 import { env } from '@/config/env';
 
-import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
-import { AuthTokenCacheRepository } from '@/modules/auth/domain/repositories/auth-token-cache.repository';
+import { IUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
+import { AuthTokenCacheWriteRepository } from '@/modules/auth/domain/repositories/auth-token-cache.write-repository';
 
 import { LoginDTO } from '@/modules/auth/application/dto/input/login.dto';
 import { ResponseUserDTO } from '@/modules/user/application/dto/output/response-user.dto';
@@ -22,14 +22,14 @@ import { Email } from '@/shared/domain/value-objects/email.vo';
 export class SignInUseCase {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userRepository: IUserRepository,
-    private readonly authTokenCacheRepository: AuthTokenCacheRepository,
+    private readonly userReadRepository: IUserReadRepository,
+    private readonly authTokenCacheWriteRepository: AuthTokenCacheWriteRepository,
   ) {}
 
   async execute(dto: LoginDTO): Promise<SignResponseDTO> {
     const email = new Email(dto.email);
 
-    const user = await this.userRepository.findByEmail(email);
+    const user = await this.userReadRepository.findByEmail(email);
     if (!user) {
       throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
     }
@@ -46,13 +46,13 @@ export class SignInUseCase {
 
     const refreshToken = randomUUID();
 
-    await this.authTokenCacheRepository.setRefreshToken(
+    await this.authTokenCacheWriteRepository.setRefreshToken(
       refreshToken,
       user.getId(),
       env.REFRESH_TOKEN_EXP,
     );
 
-    await this.authTokenCacheRepository.setSession(
+    await this.authTokenCacheWriteRepository.setSession(
       user.getId(),
       { refreshToken },
       env.REFRESH_TOKEN_EXP,

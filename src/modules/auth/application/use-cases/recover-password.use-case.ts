@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { addHours, addMinutes } from 'date-fns';
 
-import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
+import { IUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { IVerificationTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
 import { ForgotYourPasswordDTO } from '@/modules/auth/application/dto/input/forgot-your-password.dto';
 
@@ -14,13 +14,13 @@ import { Token } from '@/shared/domain/value-objects/token.vo';
 export class RecoverPasswordUseCase {
   constructor(
     @Inject('IEmailService') private readonly emailService: IEmailService,
-    private readonly userRepository: IUserRepository,
+    private readonly userReadRepository: IUserReadRepository,
     private readonly tokenRepository: IVerificationTokenRepository,
   ) {}
 
   async execute(dto: ForgotYourPasswordDTO): Promise<void> {
     const email = new Email(dto.email);
-    const user = await this.userRepository.findByEmail(email);
+    const user = await this.userReadRepository.findByEmail(email);
     if (!user) {
       return;
     }

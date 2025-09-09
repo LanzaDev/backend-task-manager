@@ -10,7 +10,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ITaskRepository } from '@/modules/task/domain/repositories/task.repository';
+import { ITaskReadRepository } from '@/modules/task/domain/repositories/task.read-repository';
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
 import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
@@ -30,7 +30,7 @@ import { UpdateTaskUseCase } from '@/modules/task/application/use-cases/update-t
 @Roles(Role.ADMIN)
 export class AdminTaskController {
   constructor(
-    private readonly taskRepository: ITaskRepository,
+    private readonly taskReadRepository: ITaskReadRepository,
     private readonly createTaskUseCase: CreateTaskUseCase,
     private readonly updateTaskUseCase: UpdateTaskUseCase,
     private readonly deleteTaskUseCase: DeleteTaskUseCase,
@@ -38,19 +38,19 @@ export class AdminTaskController {
 
   @Get('all')
   async getAllTasks() {
-    const tasks = await this.taskRepository.findAllTasks();
+    const tasks = await this.taskReadRepository.findAllTasks();
     return tasks;
   }
 
   @Get('all/:userId')
   async getAllTasksByUser(@Param('userid') userId: string) {
-    const tasks = await this.taskRepository.findAllByUser(userId);
+    const tasks = await this.taskReadRepository.findAllByUser(userId);
     return tasks;
   }
 
   @Get(':taskId')
   async getTaskById(@Param('taskId') taskId: string) {
-    const task = await this.taskRepository.findById(taskId);
+    const task = await this.taskReadRepository.findById(taskId);
     if (!task) throw new NotFoundException('Task not found');
 
     return task;
@@ -63,7 +63,7 @@ export class AdminTaskController {
   ): Promise<ResponseTaskDTO> {
     await this.createTaskUseCase.execute(dto, userId);
 
-    return new ResponseTaskDTO()
+    return new ResponseTaskDTO();
   }
 
   @Patch(':taskId')
@@ -76,6 +76,7 @@ export class AdminTaskController {
       id: req.user.sub,
       role: req.user.role,
     });
+
     return new ResponseTaskDTO(task);
   }
 
@@ -89,8 +90,6 @@ export class AdminTaskController {
       role: req.user.role,
     });
 
-    return {
-      message: 'Task successfully deleted',
-    };
+    return { message: 'Task successfully deleted' };
   }
 }

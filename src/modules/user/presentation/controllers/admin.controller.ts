@@ -10,7 +10,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
+import { IUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
 import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
@@ -23,17 +23,16 @@ import { ResponseAdminDTO } from '@/modules/user/application/dto/output/response
 
 import { UserMapper } from '@/modules/user/application/mappers/user.mapper';
 
-import { CreateUserUseCase } from '@/modules/user/application/use-cases/create-user.use-case';
-import { UpdateUserUseCase } from '@/modules/user/application/use-cases/update-user.use-case';
-import { DeleteUserUseCase } from '@/modules/user/application/use-cases/delete-user.use-case';
-
+import { CreateUserUseCase } from '@/modules/user/application/use-cases/commands/create-user.use-case';
+import { UpdateUserUseCase } from '@/modules/user/application/use-cases/commands/update-user.use-case';
+import { DeleteUserUseCase } from '@/modules/user/application/use-cases/commands/delete-user.use-case';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
 export class AdminController {
   constructor(
-    private readonly userRepository: IUserRepository,
+    private readonly userReadRepository: IUserReadRepository,
     private readonly createUserUserCase: CreateUserUseCase,
     private readonly updateUserUserCase: UpdateUserUseCase,
     private readonly deleteUserUseCase: DeleteUserUseCase,
@@ -41,13 +40,13 @@ export class AdminController {
 
   @Get('all')
   async getAllUsers() {
-    const users = await this.userRepository.findAll();
+    const users = await this.userReadRepository.findAll();
     return users.map((user) => UserMapper.toDTO(user));
   }
 
   @Get(':id')
   async getUserById(@Param('id') id: string) {
-    const user = await this.userRepository.findById(id);
+    const user = await this.userReadRepository.findById(id);
     if (!user) throw new NotFoundException('User not found');
 
     return UserMapper.toDTO(user);

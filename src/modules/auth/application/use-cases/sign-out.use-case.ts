@@ -1,21 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { AuthTokenCacheRepository } from '@/modules/auth/domain/repositories/auth-token-cache.repository';
+import { AuthTokenCacheWriteRepository } from '@/modules/auth/domain/repositories/auth-token-cache.write-repository';
+import { AuthTokenCacheReadRepository } from '../../domain/repositories/auth-token-cache.read-repository';
 
 @Injectable()
 export class SignOutUseCase {
   constructor(
-    private readonly authTokenCacheRepository: AuthTokenCacheRepository,
+    private readonly authTokenCacheWriteRepository: AuthTokenCacheWriteRepository,
+    private readonly authTokenCacheReadRepository: AuthTokenCacheReadRepository,
   ) {}
 
   async execute(refreshToken: string) {
     const userId =
-      await this.authTokenCacheRepository.getUserIdByToken(refreshToken);
+      await this.authTokenCacheReadRepository.getUserIdByToken(refreshToken);
 
     if (!userId) {
       return false;
     }
 
-    await this.authTokenCacheRepository.deleteSession(userId);
+    await this.authTokenCacheWriteRepository.deleteSession(userId);
 
     return true;
   }

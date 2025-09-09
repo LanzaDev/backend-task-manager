@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
+
 import { User } from '@/modules/user/domain/entities/user.entity';
-import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
+import { IUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
+
 import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
 
 import { Email } from '@/shared/domain/value-objects/email.vo';
@@ -8,7 +10,7 @@ import { Password } from '@/shared/domain/value-objects/password.vo';
 import { Role } from '@/shared/domain/value-objects/role.vo';
 
 @Injectable()
-export class PrismaUserRepository implements IUserRepository {
+export class PrismaUserCommandRepository implements IUserWriteRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(user: User): Promise<User> {
@@ -70,65 +72,8 @@ export class PrismaUserRepository implements IUserRepository {
 
   async updateIsVerified(id: string): Promise<void> {
     await this.prisma.user.update({
-    where: { id },
-    data: { isVerified: true, updatedAt: new Date() },
-  });
-  }
-
-  async findById(id: string): Promise<User | null> {
-    const deleted = await this.prisma.user.findUnique({ where: { id } });
-    if (!deleted) return null;
-
-    return new User(
-      {
-        name: deleted.name,
-        email: new Email(deleted.email),
-        password: Password.fromHashed(deleted.password),
-        role: deleted.role as Role,
-        isVerified: deleted.isVerified,
-        createdAt: deleted.createdAt,
-        updatedAt: deleted.updatedAt,
-      },
-      deleted.id,
-    );
-  }
-
-  async findByEmail(email: Email): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { email: email.getValue() },
+      where: { id },
+      data: { isVerified: true, updatedAt: new Date() },
     });
-    if (!user) return null;
-
-    return new User(
-      {
-        name: user.name,
-        email: new Email(user.email),
-        password: Password.fromHashed(user.password),
-        role: user.role as Role,
-        isVerified: user.isVerified,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
-      user.id,
-    );
-  }
-
-  async findAll(): Promise<User[]> {
-    const Users = await this.prisma.user.findMany();
-    return Users.map(
-      (user) =>
-        new User(
-          {
-            name: user.name,
-            email: new Email(user.email),
-            password: Password.fromHashed(user.password),
-            role: user.role,
-            isVerified: user.isVerified,
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt,
-          },
-          user.id,
-        ),
-    );
   }
 }

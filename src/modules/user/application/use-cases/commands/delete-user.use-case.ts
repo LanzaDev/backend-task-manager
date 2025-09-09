@@ -3,19 +3,23 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { IUserRepository } from '@/modules/user/domain/repositories/user.repository';
+import { IUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
+import { IUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { DeleteUserDTO } from '@/modules/user/application/dto/input/delete-user.dto';
 import { Role } from '@/shared/domain/value-objects/role.vo';
 
 @Injectable()
 export class DeleteUserUseCase {
-  constructor(private readonly userRepository: IUserRepository) {}
+  constructor(
+    private readonly userWriteRepository: IUserWriteRepository,
+    private readonly userReadRepository: IUserReadRepository,
+  ) {}
 
   async execute(
     dto: DeleteUserDTO,
     req: { id: string; role: Role },
   ): Promise<void> {
-    const user = await this.userRepository.findById(dto.id);
+    const user = await this.userReadRepository.findById(dto.id);
 
     if (!user) throw new NotFoundException('User not found');
 
@@ -38,8 +42,6 @@ export class DeleteUserUseCase {
       throw new BadRequestException('Cannot delete admin');
     }
 
-    await this.userRepository.delete(dto.id);
-
-    return;
+    await this.userWriteRepository.delete(dto.id);
   }
 }
