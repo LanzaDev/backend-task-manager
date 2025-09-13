@@ -8,7 +8,7 @@ import { ITaskWriteRepository } from '@/modules/task/domain/repositories/task.wr
 import { ITaskReadRepository } from '../../domain/repositories/task.read-repository';
 
 import { UpdateTaskDTO } from '@/modules/task/application/dto/input/update-task.dto';
-import { Role } from '@/shared/domain/value-objects/role.vo';
+import { Role } from '@/shared/types/role.type';
 
 @Injectable()
 export class UpdateTaskUseCase {

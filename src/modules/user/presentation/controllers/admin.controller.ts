@@ -8,12 +8,13 @@ import {
   Patch,
   Post,
   Request,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { IUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
-import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
-import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
-import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
+import { JwtAuthGuard } from '@/common/guards/jwt.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
 import { CreateUserDTO } from '@/modules/user/application/dto/input/create-user.dto';
@@ -23,9 +24,12 @@ import { ResponseAdminDTO } from '@/modules/user/application/dto/output/response
 
 import { UserMapper } from '@/modules/user/application/mappers/user.mapper';
 
-import { CreateUserUseCase } from '@/modules/user/application/use-cases/commands/create-user.use-case';
-import { UpdateUserUseCase } from '@/modules/user/application/use-cases/commands/update-user.use-case';
-import { DeleteUserUseCase } from '@/modules/user/application/use-cases/commands/delete-user.use-case';
+import { CreateUserHandler } from '@/modules/user/application/use-cases/commands/handlers/create-user.handler';
+import { UpdateUserHandler } from '@/modules/user/application/use-cases/commands/handlers/update-user.handler';
+import { DeleteUserHandler } from '@/modules/user/application/use-cases/commands/handlers/delete-user.handler';
+import { UpdateUserCommand } from '../../application/use-cases/commands/implements/update-user.command';
+import { CommandBus } from '@nestjs/cqrs';
+import { DeleteUserCommand } from '../../application/use-cases/commands/implements/delete-user.command';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -33,9 +37,8 @@ import { DeleteUserUseCase } from '@/modules/user/application/use-cases/commands
 export class AdminController {
   constructor(
     private readonly userReadRepository: IUserReadRepository,
-    private readonly createUserUserCase: CreateUserUseCase,
-    private readonly updateUserUserCase: UpdateUserUseCase,
-    private readonly deleteUserUseCase: DeleteUserUseCase,
+    private readonly createUserHandler: CreateUserHandler,
+    private readonly commandBus: CommandBus,
   ) {}
 
   @Get('all')
@@ -54,36 +57,40 @@ export class AdminController {
 
   @Post('add')
   async createUser(@Body() dto: CreateUserDTO): Promise<ResponseAdminDTO> {
-    return this.createUserUserCase.execute(dto);
+    return this.createUserHandler.execute(dto);
   }
 
   @Patch(':id')
   async updateUser(
     @Param('id') id: string,
-    @Body() dto: UpdateUserDTO,
+    @Body() updateData: UpdateUserDTO,
     @Request() req,
   ) {
-    await this.updateUserUserCase.execute(
-      dto,
-      {
-        id: req.user.sub,
-        role: req.user.role,
-      },
+    const command = new UpdateUserCommand(
+      updateData,
+      req.user.sub,
+      req.user.role,
       id,
     );
+
+    await this.commandBus.execute(command);
+
     return { message: 'User successfully updated' };
   }
 
   @Delete(':id')
-  async deleteUser(@Param('id') id: string, @Request() req) {
-    const dto = new DeleteUserDTO();
-    dto.id = id;
+  async deleteUser(@Param('id') targetUserId: string, @Request() req) {
+    if (!req.user?.sub || !req.user?.role) {
+    throw new UnauthorizedException('User not authenticated');
+  }
 
-    await this.deleteUserUseCase.execute(dto, {
-      id: req.user.sub,
-      role: req.user.role,
-    });
+    const command = new DeleteUserCommand(
+      req.user.sub,
+      req.user.role,
+      targetUserId,
+    );
 
+    await this.commandBus.execute(command);
     return {
       message: 'User successfully deleted',
     };

@@ -1,5 +1,11 @@
-import { RoleEnum } from '@/shared/domain/value-objects/role.vo';
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
+import { RoleEnum } from '@/shared/types/role.type';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  MinLength,
+} from 'class-validator';
 
 export class CreateUserDTO {
   @IsNotEmpty()

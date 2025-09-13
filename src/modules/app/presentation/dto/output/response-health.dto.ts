@@ -1,14 +1,15 @@
-import { Expose } from "class-transformer";
+import { HealthStatus } from '@/shared/types/health-status.type';
+import { Expose } from 'class-transformer';
 
 export class ResponseHealthDTO {
   @Expose()
-  status: 'health' | 'unhealthy';
+  status: HealthStatus;
 
   @Expose()
-  cache: 'health' | 'unhealthy';
+  cache: HealthStatus;
 
   @Expose()
-  database: 'health' | 'unhealthy';
+  database: HealthStatus;
 
   @Expose()
   timestamp: string;

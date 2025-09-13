@@ -7,7 +7,7 @@ import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
 
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
-import { Role } from '@/shared/domain/value-objects/role.vo';
+import { Role } from '@/shared/types/role.type';
 
 @Injectable()
 export class PrismaUserCommandRepository implements IUserWriteRepository {

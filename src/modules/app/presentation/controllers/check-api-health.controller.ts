@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  HttpException,
   HttpStatus,
   InternalServerErrorException,
 } from '@nestjs/common';
@@ -44,11 +45,8 @@ export class CheckApiHealthController {
     try {
       const healthStatus = await this.checkHealthUseCase.execute();
 
-      if (
-        healthStatus.database === 'unhealthy' ||
-        healthStatus.cache === 'unhealthy'
-      ) {
-        return (HttpStatus.SERVICE_UNAVAILABLE, healthStatus);
+      if (healthStatus.status === 'unhealthy') {
+        throw new HttpException(healthStatus, HttpStatus.SERVICE_UNAVAILABLE);
       }
 
       return healthStatus;

@@ -7,27 +7,27 @@ import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
 
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
-import { Role } from '@/shared/domain/value-objects/role.vo';
+import { Role } from '@/shared/types/role.type';
 
 @Injectable()
 export class PrismaUserQueryRepository implements IUserReadRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findById(id: string): Promise<User | null> {
-    const deleted = await this.prisma.user.findUnique({ where: { id } });
-    if (!deleted) return null;
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) return null;
 
     return new User(
       {
-        name: deleted.name,
-        email: new Email(deleted.email),
-        password: Password.fromHashed(deleted.password),
-        role: deleted.role as Role,
-        isVerified: deleted.isVerified,
-        createdAt: deleted.createdAt,
-        updatedAt: deleted.updatedAt,
+        name: user.name,
+        email: new Email(user.email),
+        password: Password.fromHashed(user.password),
+        role: user.role as Role,
+        isVerified: user.isVerified,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
       },
-      deleted.id,
+      user.id,
     );
   }
 

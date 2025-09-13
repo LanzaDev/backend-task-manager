@@ -5,8 +5,8 @@ POST http://localhost:3000/auth/signIn
 Content-Type: application/json
 
 {
-  "email": "",
-  "password": ""
+  "email": "lucas1511gll@gmail.com",
+  "password": "560065"
 }
 
 ### Auth SignUp
@@ -65,8 +65,9 @@ Authorization: Bearer
 DELETE http://localhost:3000/user/profile
 Content-Type: application/json
 Authorization: Bearer
+
 {
-  "password": ""
+  "password": "560065"
 }
 
 
@@ -98,7 +99,7 @@ Content-Type: application/json
 Authorization: Bearer
 
 {
-  "role": "ADMIN"
+  "role": "USER"
 }
 
 
@@ -148,13 +149,13 @@ Authorization: Bearer
 
 
 ### User find all task
-GET http://localhost:3000/user/task/my-tasks
+GET http://localhost:3000/user/task/
 Authorization: Bearer
 
 ### User create task
 POST http://localhost:3000/user/task
 Content-Type: application/json
-Authorization: Bearer
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3ZWZiNGQ2Mi1lNDQ1LTQzMWEtOTZkNS1mZDVmZjJhMzgwOTYiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc1NzQyNDg5MCwiZXhwIjoxNzU3NDI1NzkwfQ.WlqlWTJDnn7DLMmMeQYK-IrOsDbymvYcszMA2hOkU4U
 
 {
   "title": "user test"

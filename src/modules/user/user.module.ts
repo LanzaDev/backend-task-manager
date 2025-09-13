@@ -5,20 +5,26 @@ import { IUserWriteRepository } from '@/modules/user/domain/repositories/user.wr
 import { PrismaUserQueryRepository } from './infra/repositories/database/prisma-user.query.repository';
 import { PrismaUserCommandRepository } from './infra/repositories/database/prisma-user.command.repository';
 
-import { CreateUserUseCase } from '@/modules/user/application/use-cases/commands/create-user.use-case';
-import { UpdateUserUseCase } from '@/modules/user/application/use-cases/commands/update-user.use-case';
-import { DeleteUserUseCase } from '@/modules/user/application/use-cases/commands/delete-user.use-case';
+import { CreateUserHandler } from '@/modules/user/application/use-cases/commands/handlers/create-user.handler';
+import { UpdateUserHandler } from '@/modules/user/application/use-cases/commands/handlers/update-user.handler';
+import { DeleteUserHandler } from '@/modules/user/application/use-cases/commands/handlers/delete-user.handler';
 
 import { UserController } from '@/modules/user/presentation/controllers/user.controller';
 import { AdminController } from '@/modules/user/presentation/controllers/admin.controller';
 
+import { CqrsModule } from '@nestjs/cqrs';
+import { GetUserByIdHandler } from './application/use-cases/query/handlers/get-user-by-id.handler';
+import { CheckEmailHandler } from './application/use-cases/query/handlers/check-email.handler';
+
 @Module({
-  imports: [],
+  imports: [CqrsModule],
   controllers: [UserController, AdminController],
   providers: [
-    CreateUserUseCase,
-    UpdateUserUseCase,
-    DeleteUserUseCase,
+    CreateUserHandler,
+    UpdateUserHandler,
+    DeleteUserHandler,
+    GetUserByIdHandler,
+    CheckEmailHandler,
     {
       provide: IUserWriteRepository,
       useClass: PrismaUserCommandRepository,

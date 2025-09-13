@@ -6,13 +6,12 @@ import { TaskModule } from '@/modules/task/task.module';
 import { UserModule } from '@/modules/user/user.module';
 import { SharedModule } from '@/shared/shared.module';
 
-import { CacheRepository } from '@/modules/app/domain/providers/cache.provider';
-import { DatabaseRepository } from '@/modules/app/domain/providers/database.provider';
+import { HealthRepository } from '@/modules/app/domain/repositories/health.repository';
 
 import { CheckHealthUseCase } from '@/modules/app/application/use-cases/check-health.use-case';
 
-import { RedisHealthRepository } from '@/modules/app/infra/providers/redis-health.provider';
-import { PrismaHealthRepository } from '@/modules/app/infra/providers/prisma-health.provider';
+import { RedisHealthRepository } from '@/modules/app/infra/repositories/redis-health.provider';
+import { PrismaHealthRepository } from '@/modules/app/infra/repositories/prisma-health.provider';
 
 import { CheckApiHealthController } from '@/modules/app/presentation/controllers/check-api-health.controller';
 
@@ -22,11 +21,11 @@ import { CheckApiHealthController } from '@/modules/app/presentation/controllers
   providers: [
     CheckHealthUseCase,
     {
-      provide: CacheRepository,
+      provide: HealthRepository,
       useClass: RedisHealthRepository,
     },
     {
-      provide: DatabaseRepository,
+      provide: HealthRepository,
       useClass: PrismaHealthRepository,
     },
   ],

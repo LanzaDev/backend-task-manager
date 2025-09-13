@@ -10,9 +10,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ITaskReadRepository } from '../../domain/repositories/task.read-repository';
-import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
-import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
-import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
+import { JwtAuthGuard } from '@/common/guards/jwt.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
 import { CreateTaskDTO } from '../../application/dto/input/create-task.dto';
@@ -34,7 +34,7 @@ export class UserTaskController {
     private readonly deleteTaskUseCase: DeleteTaskUseCase,
   ) {}
 
-  @Get('my-tasks')
+  @Get()
   async getMyTasks(@Request() req) {
     const tasks = await this.taskReadRepository.findAllByUser(req.user.sub);
     return tasks;

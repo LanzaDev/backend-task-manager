@@ -25,7 +25,7 @@ export class NodemailerEmailService implements IEmailService {
         pass: this.configService.get<string>('EMAIL_PASSWORD'),
       },
       tls: {
-        rejectUnauthorized: false, // ignore self-signed certificates
+        rejectUnauthorized: false, // false - ignore self-signed certificates
       },
     });
   }

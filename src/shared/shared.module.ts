@@ -4,7 +4,6 @@ import { DatabaseModule } from './infra/database/database.module';
 
 @Module({
   imports: [DatabaseModule, CacheModule],
-  providers: [],
   exports: [DatabaseModule, CacheModule],
 })
 export class SharedModule {}

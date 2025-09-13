@@ -1,16 +1,16 @@
 import { User } from '@/modules/user/domain/entities/user.entity';
-import { CreateUserDTO } from '@/modules/user/application/dto/input/create-user.dto';
+import { CreateUserCommand } from '../use-cases/commands/implements/create-user.command';
 import { ResponseUserDTO } from '@/modules/user/application/dto/output/response-user.dto';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
 
 export class UserMapper {
-  static async toEntity(dto: CreateUserDTO): Promise<User> {
-    const email = new Email(dto.email);
-    const password = await Password.create(dto.password);
+  static async toEntity(command: CreateUserCommand): Promise<User> {
+    const email = new Email(command.email);
+    const password = await Password.create(command.password);
 
     return new User({
-      name: dto.name,
+      name: command.name,
       email,
       password,
       isVerified: false,

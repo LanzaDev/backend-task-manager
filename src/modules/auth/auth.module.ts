@@ -3,7 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { env } from '@/config/env';
 
 import { AuthController } from '@/modules/auth/presentation/controllers/auth.controller';
-import { JwtStrategy } from '@/modules/auth/infra/strategies/jwt-strategy';
+import { JwtStrategy } from '@/common/strategies/jwt-strategy';
 
 import { SignInUseCase } from '@/modules/auth/application/use-cases/sign-in.use-case';
 import { SignUpUseCase } from '@/modules/auth/application/use-cases/sign-up.use-case';
@@ -27,7 +27,6 @@ import { PrismaPasswordResetTokenRepository } from '@/modules/auth/infra/reposit
 
 import { EmailModule } from '@/modules/mail/email.module';
 import { CacheModule } from '@/shared/infra/cache/cache.module';
-
 
 @Module({
   imports: [

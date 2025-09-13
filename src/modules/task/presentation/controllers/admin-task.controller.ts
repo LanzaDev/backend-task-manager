@@ -11,9 +11,9 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ITaskReadRepository } from '@/modules/task/domain/repositories/task.read-repository';
-import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
-import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
-import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
+import { JwtAuthGuard } from '@/common/guards/jwt.guard';
+import { RolesGuard } from '@/common/guards/roles.guard';
+import { Roles } from '@/common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
 import { CreateTaskDTO } from '@/modules/task/application/dto/input/create-task.dto';

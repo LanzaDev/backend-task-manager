@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { CacheRepository } from '@/modules/app/domain/providers/cache.provider';
+import { CacheRepository } from '@/core/domain/repositories/cache.repository';
 import { RedisCacheRepository } from './redis/redis-cache.provider';
 import { RedisService } from './redis/redis.service';
 import Redis from 'ioredis';
