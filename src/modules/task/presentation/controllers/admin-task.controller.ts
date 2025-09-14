@@ -10,16 +10,17 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ITaskReadRepository } from '@/modules/task/domain/repositories/task.read-repository';
-import { JwtAuthGuard } from '@/common/guards/jwt.guard';
-import { RolesGuard } from '@/common/guards/roles.guard';
-import { Roles } from '@/common/decorators/roles.decorator';
+import { AbstractTaskReadRepository } from '@/modules/task/domain/repositories/task.read-repository';
+
+import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
+import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
+import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
-import { CreateTaskDTO } from '@/modules/task/application/dto/input/create-task.dto';
-import { UpdateTaskDTO } from '@/modules/task/application/dto/input/update-task.dto';
-import { DeleteTaskDTO } from '@/modules/task/application/dto/input/delete-task.dto';
-import { ResponseTaskDTO } from '@/modules/task/application/dto/output/response-task.dto';
+import { CreateTaskDTO } from '@/modules/task/presentation/dto/input/create-task.dto';
+import { UpdateTaskDTO } from '@/modules/task/presentation/dto/input/update-task.dto';
+import { DeleteTaskDTO } from '@/modules/task/presentation/dto/input/delete-task.dto';
+import { ResponseTaskDTO } from '@/modules/task/presentation/dto/output/response-task.dto';
 
 import { CreateTaskUseCase } from '@/modules/task/application/use-cases/create-task.use-case';
 import { DeleteTaskUseCase } from '@/modules/task/application/use-cases/delete-task.use-case';
@@ -30,7 +31,7 @@ import { UpdateTaskUseCase } from '@/modules/task/application/use-cases/update-t
 @Roles(Role.ADMIN)
 export class AdminTaskController {
   constructor(
-    private readonly taskReadRepository: ITaskReadRepository,
+    private readonly taskReadRepository: AbstractTaskReadRepository,
     private readonly createTaskUseCase: CreateTaskUseCase,
     private readonly updateTaskUseCase: UpdateTaskUseCase,
     private readonly deleteTaskUseCase: DeleteTaskUseCase,

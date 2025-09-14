@@ -9,15 +9,16 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ITaskReadRepository } from '../../domain/repositories/task.read-repository';
-import { JwtAuthGuard } from '@/common/guards/jwt.guard';
-import { RolesGuard } from '@/common/guards/roles.guard';
-import { Roles } from '@/common/decorators/roles.decorator';
+import { AbstractTaskReadRepository } from '../../domain/repositories/task.read-repository';
+
+import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
+import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
+import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
-import { CreateTaskDTO } from '../../application/dto/input/create-task.dto';
-import { UpdateTaskDTO } from '../../application/dto/input/update-task.dto';
-import { ResponseTaskDTO } from '../../application/dto/output/response-task.dto';
+import { CreateTaskDTO } from '../dto/input/create-task.dto';
+import { UpdateTaskDTO } from '../dto/input/update-task.dto';
+import { ResponseTaskDTO } from '../dto/output/response-task.dto';
 
 import { CreateTaskUseCase } from '../../application/use-cases/create-task.use-case';
 import { DeleteTaskUseCase } from '../../application/use-cases/delete-task.use-case';
@@ -28,7 +29,7 @@ import { UpdateTaskUseCase } from '../../application/use-cases/update-task.use-c
 @Roles(Role.USER)
 export class UserTaskController {
   constructor(
-    private readonly taskReadRepository: ITaskReadRepository,
+    private readonly taskReadRepository: AbstractTaskReadRepository,
     private readonly createTaskUseCase: CreateTaskUseCase,
     private readonly updateTaskUseCase: UpdateTaskUseCase,
     private readonly deleteTaskUseCase: DeleteTaskUseCase,

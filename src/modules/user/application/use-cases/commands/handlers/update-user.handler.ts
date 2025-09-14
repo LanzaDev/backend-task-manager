@@ -3,22 +3,21 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { IUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
+import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
 
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
 import { UpdateUserCommand } from '../implements/update-user.command';
-import { GetUserByIdQuery } from '../../query/implements/get-user-by-id.query';
-import { IUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
-import { UpdateUserDTO } from '../../../dto/input/update-user.dto';
+import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
+import { UpdateUserDTO } from '../../../../presentation/dto/input/update-user.dto';
 
 @Injectable()
 @CommandHandler(UpdateUserCommand)
 export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
   constructor(
-    private readonly userWriteRepository: IUserWriteRepository,
-    private readonly userReadRepository: IUserReadRepository,
+    private readonly userWriteRepository: AbstractUserWriteRepository,
+    private readonly userReadRepository: AbstractUserReadRepository,
   ) {}
 
   async execute(command: UpdateUserCommand): Promise<void> {

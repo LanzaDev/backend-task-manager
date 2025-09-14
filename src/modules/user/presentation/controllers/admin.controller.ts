@@ -11,24 +11,22 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { IUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
-import { JwtAuthGuard } from '@/common/guards/jwt.guard';
-import { RolesGuard } from '@/common/guards/roles.guard';
-import { Roles } from '@/common/decorators/roles.decorator';
+import { CommandBus } from '@nestjs/cqrs';
+
+import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
+import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
+import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
+import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
-import { CreateUserDTO } from '@/modules/user/application/dto/input/create-user.dto';
-import { UpdateUserDTO } from '@/modules/user/application/dto/input/update-user.dto';
-import { DeleteUserDTO } from '@/modules/user/application/dto/input/delete-user.dto';
-import { ResponseAdminDTO } from '@/modules/user/application/dto/output/response-admin.dto';
+import { CreateUserDTO } from '@/modules/user/presentation/dto/input/create-user.dto';
+import { UpdateUserDTO } from '@/modules/user/presentation/dto/input/update-user.dto';
+import { ResponseAdminDTO } from '@/modules/user/presentation/dto/output/response-admin.dto';
 
 import { UserMapper } from '@/modules/user/application/mappers/user.mapper';
 
 import { CreateUserHandler } from '@/modules/user/application/use-cases/commands/handlers/create-user.handler';
-import { UpdateUserHandler } from '@/modules/user/application/use-cases/commands/handlers/update-user.handler';
-import { DeleteUserHandler } from '@/modules/user/application/use-cases/commands/handlers/delete-user.handler';
 import { UpdateUserCommand } from '../../application/use-cases/commands/implements/update-user.command';
-import { CommandBus } from '@nestjs/cqrs';
 import { DeleteUserCommand } from '../../application/use-cases/commands/implements/delete-user.command';
 
 @Controller('admin')
@@ -36,7 +34,7 @@ import { DeleteUserCommand } from '../../application/use-cases/commands/implemen
 @Roles(Role.ADMIN)
 export class AdminController {
   constructor(
-    private readonly userReadRepository: IUserReadRepository,
+    private readonly userReadRepository: AbstractUserReadRepository,
     private readonly createUserHandler: CreateUserHandler,
     private readonly commandBus: CommandBus,
   ) {}
@@ -81,8 +79,8 @@ export class AdminController {
   @Delete(':id')
   async deleteUser(@Param('id') targetUserId: string, @Request() req) {
     if (!req.user?.sub || !req.user?.role) {
-    throw new UnauthorizedException('User not authenticated');
-  }
+      throw new UnauthorizedException('User not authenticated');
+    }
 
     const command = new DeleteUserCommand(
       req.user.sub,

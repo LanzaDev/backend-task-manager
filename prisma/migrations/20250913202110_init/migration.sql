@@ -2,7 +2,7 @@
 CREATE TYPE "public"."Role" AS ENUM ('user', 'admin');
 
 -- CreateEnum
-CREATE TYPE "public"."TaskStatus" AS ENUM ('pendente', 'em_andamento', 'concluida', 'cancelada');
+CREATE TYPE "public"."TaskStatus" AS ENUM ('pending', 'in_progress', 'completed', 'cancelled', 'overdue');
 
 -- CreateTable
 CREATE TABLE "public"."User" (
@@ -24,7 +24,7 @@ CREATE TABLE "public"."Task" (
     "userId" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "description" TEXT,
-    "status" "public"."TaskStatus" NOT NULL DEFAULT 'pendente',
+    "status" "public"."TaskStatus" NOT NULL DEFAULT 'pending',
     "priority" INTEGER,
     "dueDate" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -40,7 +40,7 @@ CREATE TABLE "public"."VerificationToken" (
     "userId" TEXT NOT NULL,
     "token" TEXT NOT NULL,
     "expiresAt" TIMESTAMP(3) NOT NULL,
-    "used" BOOLEAN NOT NULL DEFAULT false,
+    "isUsed" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "usedAt" TIMESTAMP(3),
 

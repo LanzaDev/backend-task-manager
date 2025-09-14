@@ -1,10 +1,11 @@
 import { randomUUID } from "crypto";
 
 export enum TaskStatus {
-  PENDENTE = 'PENDENTE',
-  EM_ANDAMENTO = 'EM_ANDAMENTO',
-  CONCLUIDA = 'CONCLUIDA',
-  CANCELADA = 'CANCELADA',
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  OVERDUE = 'OVERDUE',
 }
 
 interface TaskSchema {
@@ -27,16 +28,16 @@ constructor(props: TaskSchema, id?: string) {
     this.id = id || randomUUID();
     this.props = {
       ...props,
-      status: props.status ?? TaskStatus.PENDENTE,
+      status: props.status ?? TaskStatus.PENDING,
       createdAt: props.createdAt ?? new Date(),
     };
     this.updatedAt = new Date();
   }
 
+  // id
   getId(): string {
     return this.id;
   }
-
   getUserId(): string {
     return this.props.userId;
   }
@@ -45,6 +46,7 @@ constructor(props: TaskSchema, id?: string) {
     this.touch();
   }
 
+  // title
   getTitle(): string {
     return this.props.title;
   }
@@ -53,6 +55,7 @@ constructor(props: TaskSchema, id?: string) {
     this.touch();
   }
 
+  // description
   getDescription(): string | undefined {
     return this.props.description;
   }
@@ -61,6 +64,7 @@ constructor(props: TaskSchema, id?: string) {
     this.touch();
   }
 
+  // status
   getStatus(): TaskStatus {
     return this.props.status!;
   }
@@ -69,6 +73,7 @@ constructor(props: TaskSchema, id?: string) {
     this.touch();
   }
 
+  // priority
   getPriority(): number | undefined {
     return this.props.priority;
   }
@@ -77,6 +82,7 @@ constructor(props: TaskSchema, id?: string) {
     this.touch();
   }
 
+  // dueDate
   getDueDate(): Date | undefined {
     return this.props.dueDate;
   }
@@ -85,6 +91,7 @@ constructor(props: TaskSchema, id?: string) {
     this.touch();
   }
 
+  // completedAt
   getCompletedAt(): Date | undefined {
     return this.props.completedAt;
   }
@@ -93,14 +100,15 @@ constructor(props: TaskSchema, id?: string) {
     this.touch();
   }
 
+  // timestamps
   getCreatedAt(): Date {
     return this.props.createdAt!;
   }
-
   getUpdatedAt(): Date {
     return this.updatedAt;
   }
 
+  // touch
   private touch() {
     this.updatedAt = new Date();
   }

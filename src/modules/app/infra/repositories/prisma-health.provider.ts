@@ -5,7 +5,7 @@ import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
 @Injectable()
 export class PrismaHealthRepository implements HealthRepository {
   constructor(private readonly prisma: PrismaService) {}
-  async check(): Promise<boolean> {
+  async checkConnection(): Promise<boolean> {
     try {
       await this.prisma.$queryRaw`SELECT 1`;
       return true;

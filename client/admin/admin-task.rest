@@ -1,0 +1,35 @@
+### -={ Admin | Task }=- ###
+
+### Admin find all task
+GET http://localhost:3000/admin/task/all/
+Authorization: Bearer
+
+### Admin find all task by user | (userId)
+GET http://localhost:3000/admin/task/all/
+Authorization: Bearer
+
+### Admin find task by id | (taskId)
+GET http://localhost:3000/admin/task/
+Authorization: Bearer
+
+### Admin create task for user | (userId)
+POST http://localhost:3000/admin/task/
+Content-Type: application/json
+Authorization: Bearer
+
+{
+  "title": "nuclear material"
+}
+
+### Admin update task by id | (taskId)
+PATCH http://localhost:3000/admin/task/
+Content-Type: application/json
+Authorization: Bearer
+
+{
+  "title": "change"
+}
+
+### Admin delete task by id | (taskId)
+DELETE http://localhost:3000/admin/task/
+Authorization: Bearer

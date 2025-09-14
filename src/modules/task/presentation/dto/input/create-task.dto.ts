@@ -12,7 +12,7 @@ export class CreateTaskDTO {
 
   @IsOptional()
   @IsEnum(TaskStatus)
-  @Transform(({ value }) => value ?? TaskStatus.PENDENTE)
+  @Transform(({ value }) => value ?? TaskStatus.PENDING)
   status?: TaskStatus;
 
   @IsOptional()

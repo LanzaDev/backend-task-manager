@@ -3,17 +3,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { ITaskWriteRepository } from '@/modules/task/domain/repositories/task.write-repository';
-import { ITaskReadRepository } from '../../domain/repositories/task.read-repository';
+import { AbstractTaskWriteRepository } from '@/modules/task/domain/repositories/task.write-repository';
+import { AbstractTaskReadRepository } from '../../domain/repositories/task.read-repository';
 
-import { DeleteTaskDTO } from '@/modules/task/application/dto/input/delete-task.dto';
+import { DeleteTaskDTO } from '@/modules/task/presentation/dto/input/delete-task.dto';
 import { Role } from '@prisma/client';
 
 @Injectable()
 export class DeleteTaskUseCase {
   constructor(
-    private readonly taskWriteRepository: ITaskWriteRepository,
-    private readonly taskReadRepository: ITaskReadRepository,
+    private readonly taskWriteRepository: AbstractTaskWriteRepository,
+    private readonly taskReadRepository: AbstractTaskReadRepository,
   ) {}
 
   async execute(

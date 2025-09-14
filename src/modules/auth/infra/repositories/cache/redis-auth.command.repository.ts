@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import {
-  AuthTokenCacheWriteRepository,
+  AbstractAuthTokenCacheWriteRepository,
   SessionData,
 } from '@/modules/auth/domain/repositories/auth-token-cache.write-repository';
 import { REDIS_CLIENT } from '@/shared/infra/config/redis.config';
 import Redis from 'ioredis';
 
 @Injectable()
-export class RedisAuthTokenCommandCacheRepository implements AuthTokenCacheWriteRepository {
+export class RedisAuthTokenCommandCacheRepository implements AbstractAuthTokenCacheWriteRepository {
   private systemName = 'TaskManager:Auth';
 
   constructor(@Inject(REDIS_CLIENT) private readonly client: Redis) {}

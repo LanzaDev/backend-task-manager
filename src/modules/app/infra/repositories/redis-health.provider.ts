@@ -5,7 +5,7 @@ import { RedisService } from '@/shared/infra/cache/redis/redis.service';
 @Injectable()
 export class RedisHealthRepository implements HealthRepository {
   constructor(private readonly redis: RedisService) {}
-  async check(): Promise<boolean> {
+  async checkConnection(): Promise<boolean> {
     try {
       await this.redis.ping();
       return true;

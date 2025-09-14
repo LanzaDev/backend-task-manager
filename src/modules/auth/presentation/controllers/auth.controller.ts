@@ -1,27 +1,23 @@
 import {
-  BadRequestException,
   Body,
-  ConflictException,
   Controller,
-  GoneException,
-  HttpCode,
   HttpException,
   HttpStatus,
   Post,
   Query,
 } from '@nestjs/common';
-import { LoginDTO } from '@/modules/auth/application/dto/input/login.dto';
-import { RegisterDTO } from '@/modules/auth/application/dto/input/register.dto';
-import { SignResponseDTO } from '@/modules/auth/application/dto/output/sign-response.dto';
-import { ForgotYourPasswordDTO } from '@/modules/auth/application/dto/input/forgot-your-password.dto';
-import { ResetPasswordDTO } from '@/modules/auth/application/dto/input/reset-password.dto';
+import { LoginDTO } from '@/modules/auth/presentation/dto/input/login.dto';
+import { RegisterDTO } from '@/modules/auth/presentation/dto/input/register.dto';
+import { SignResponseDTO } from '@/modules/auth/presentation/dto/output/sign-response.dto';
+import { ForgotYourPasswordDTO } from '@/modules/auth/presentation/dto/input/forgot-your-password.dto';
+import { ResetPasswordDTO } from '@/modules/auth/presentation/dto/input/reset-password.dto';
 
 import { SignInUseCase } from '@/modules/auth/application/use-cases/sign-in.use-case';
 import { SignUpUseCase } from '@/modules/auth/application/use-cases/sign-up.use-case';
 import { ResetPasswordUseCase } from '@/modules/auth/application/use-cases/reset-password.use-case';
 import { RecoverPasswordUseCase } from '@/modules/auth/application/use-cases/recover-password.use-case';
 import { SignOutUseCase } from '@/modules/auth/application/use-cases/sign-out.use-case';
-import { EmailVerificationUseCase } from '../../application/use-cases/email-verification.use-case';
+import { VerifyEmailUseCase } from '../../application/use-cases/verify-email.use-case';
 
 @Controller('auth')
 export class AuthController {
@@ -31,7 +27,7 @@ export class AuthController {
     private readonly signInUseCase: SignInUseCase,
     private readonly signUpUseCase: SignUpUseCase,
     private readonly signOutUseCase: SignOutUseCase,
-    private readonly emailVerificationUseCase: EmailVerificationUseCase,
+    private readonly verifyEmailUseCase: VerifyEmailUseCase,
   ) {}
 
   @Post('signIn')
@@ -70,12 +66,12 @@ export class AuthController {
   @Post('recover')
   async resetPassword(@Body() dto: ResetPasswordDTO) {
     await this.resetPasswordUseCase.execute(dto);
-    return { message: "Password successfully reset" }
+    return { message: 'Password successfully reset' };
   }
 
   @Post('verify-email')
   async verifyEmail(@Query('token') token: string) {
-    const result = await this.emailVerificationUseCase.verifyEmailToken(token);
+    const result = await this.verifyEmailUseCase.verifyEmailToken(token);
     return result;
   }
 

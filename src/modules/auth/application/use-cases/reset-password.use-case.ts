@@ -1,18 +1,18 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
-import { IVerificationTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
-import { IUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
-import { IUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
+import { AbstractVerificationTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
+import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
+import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
 
-import { ResetPasswordDTO } from '../dto/input/reset-password.dto';
+import { ResetPasswordDTO } from '../../presentation/dto/input/reset-password.dto';
 import { Password } from '@/shared/domain/value-objects/password.vo';
 
 @Injectable()
 export class ResetPasswordUseCase {
   constructor(
-    private readonly userWriteRepository: IUserWriteRepository,
-    private readonly userReadRepository: IUserReadRepository,
-    private readonly tokenRepository: IVerificationTokenRepository,
+    private readonly userWriteRepository: AbstractUserWriteRepository,
+    private readonly userReadRepository: AbstractUserReadRepository,
+    private readonly tokenRepository: AbstractVerificationTokenRepository,
   ) {}
 
   async execute(dto: ResetPasswordDTO): Promise<void> {
@@ -24,7 +24,7 @@ export class ResetPasswordUseCase {
 
     if (
       !tokenRecord ||
-      tokenRecord.used ||
+      tokenRecord.isUsed ||
       tokenRecord.expiresAt < new Date()
     ) {
       throw new HttpException(

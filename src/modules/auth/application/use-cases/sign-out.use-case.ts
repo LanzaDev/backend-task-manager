@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { AuthTokenCacheWriteRepository } from '@/modules/auth/domain/repositories/auth-token-cache.write-repository';
-import { AuthTokenCacheReadRepository } from '../../domain/repositories/auth-token-cache.read-repository';
+import { AbstractAuthTokenCacheWriteRepository } from '@/modules/auth/domain/repositories/auth-token-cache.write-repository';
+import { AbstractAuthTokenCacheReadRepository } from '../../domain/repositories/auth-token-cache.read-repository';
 
 @Injectable()
 export class SignOutUseCase {
   constructor(
-    private readonly authTokenCacheWriteRepository: AuthTokenCacheWriteRepository,
-    private readonly authTokenCacheReadRepository: AuthTokenCacheReadRepository,
+    private readonly authTokenCacheWriteRepository: AbstractAuthTokenCacheWriteRepository,
+    private readonly authTokenCacheReadRepository: AbstractAuthTokenCacheReadRepository,
   ) {}
 
   async execute(refreshToken: string) {

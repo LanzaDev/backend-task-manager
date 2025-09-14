@@ -2,13 +2,13 @@ import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 
 import { User } from '@/modules/user/domain/entities/user.entity';
-import { IUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
-import { IUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
-import { IVerificationTokenRepository } from '../../domain/repositories/password.repository';
+import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
+import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
+import { AbstractVerificationTokenRepository } from '../../domain/repositories/password.repository';
 
 import { IEmailService } from '@/modules/mail/domain/services/email.service';
 
-import { RegisterDTO } from '../dto/input/register.dto';
+import { RegisterDTO } from '../../presentation/dto/input/register.dto';
 
 import { Token } from '@/shared/domain/value-objects/token.vo';
 import { Email } from '@/shared/domain/value-objects/email.vo';
@@ -18,9 +18,9 @@ import { Password } from '@/shared/domain/value-objects/password.vo';
 export class SignUpUseCase {
   constructor(
     @Inject('IEmailService') private readonly emailService: IEmailService,
-    private readonly userWriteRepository: IUserWriteRepository,
-    private readonly userReadRepository: IUserReadRepository,
-    private readonly verificationTokenRepository: IVerificationTokenRepository,
+    private readonly userWriteRepository: AbstractUserWriteRepository,
+    private readonly userReadRepository: AbstractUserReadRepository,
+    private readonly verificationTokenRepository: AbstractVerificationTokenRepository,
   ) {}
 
   async execute(dto: RegisterDTO): Promise<string> {
@@ -46,7 +46,7 @@ export class SignUpUseCase {
       userId: user.getId(),
       token: verificationToken,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h
-      used: false,
+      isUsed: false,
     });
 
     const redirect_url = `http://localhost:5173/verify-email?token=${verificationToken.getValue()}`;

@@ -4,17 +4,17 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Task } from '@/modules/task/domain/entities/task.entity';
-import { ITaskWriteRepository } from '@/modules/task/domain/repositories/task.write-repository';
-import { ITaskReadRepository } from '../../domain/repositories/task.read-repository';
+import { AbstractTaskWriteRepository } from '@/modules/task/domain/repositories/task.write-repository';
+import { AbstractTaskReadRepository } from '../../domain/repositories/task.read-repository';
 
-import { UpdateTaskDTO } from '@/modules/task/application/dto/input/update-task.dto';
+import { UpdateTaskDTO } from '@/modules/task/presentation/dto/input/update-task.dto';
 import { Role } from '@/shared/types/role.type';
 
 @Injectable()
 export class UpdateTaskUseCase {
   constructor(
-    private readonly taskWriteRepository: ITaskWriteRepository,
-    private readonly taskReadRepository: ITaskReadRepository,
+    private readonly taskWriteRepository: AbstractTaskWriteRepository,
+    private readonly taskReadRepository: AbstractTaskReadRepository,
   ) {}
 
   async execute(

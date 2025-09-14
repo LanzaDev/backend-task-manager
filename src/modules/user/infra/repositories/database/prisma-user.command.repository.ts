@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { User } from '@/modules/user/domain/entities/user.entity';
-import { IUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
+import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
 
 import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
 
@@ -10,7 +10,7 @@ import { Password } from '@/shared/domain/value-objects/password.vo';
 import { Role } from '@/shared/types/role.type';
 
 @Injectable()
-export class PrismaUserCommandRepository implements IUserWriteRepository {
+export class PrismaUserCommandRepository implements AbstractUserWriteRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(user: User): Promise<User> {
@@ -21,7 +21,7 @@ export class PrismaUserCommandRepository implements IUserWriteRepository {
         email: user.getEmailValue(),
         password: user.getHashedPassword(),
         role: user.getRole(),
-        isVerified: user.getIsVerified(),
+        isVerified: user.isVerified(),
         createdAt: user.getCreatedAt(),
         updatedAt: user.getUpdatedAt(),
       },
@@ -47,7 +47,7 @@ export class PrismaUserCommandRepository implements IUserWriteRepository {
         name: user.getName(),
         email: user.getEmailValue(),
         password: user.getHashedPassword(),
-        isVerified: user.getIsVerified(),
+        isVerified: user.isVerified(),
         role: user.getRole(),
         updatedAt: user.getUpdatedAt(),
       },

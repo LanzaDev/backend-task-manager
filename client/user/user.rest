@@ -1,0 +1,23 @@
+### -={ User }=- ###
+
+### User get
+GET http://localhost:3000/user/profile
+Authorization: Bearer
+
+### User update
+PATCH http://localhost:3000/user/profile
+Content-Type: application/json
+Authorization: Bearer
+
+{
+  "name": "Lucas"
+}
+
+### User delete
+DELETE http://localhost:3000/user/profile
+Content-Type: application/json
+Authorization: Bearer 
+
+{
+  "password": "560065"
+}

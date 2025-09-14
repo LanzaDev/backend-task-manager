@@ -1,9 +1,9 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
-import { IUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
+import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
 
 import { UserMapper } from '@/modules/user/application/mappers/user.mapper';
-import { ResponseAdminDTO } from '@/modules/user/application/dto/output/response-admin.dto';
+import { ResponseAdminDTO } from '@/modules/user/presentation/dto/output/response-admin.dto';
 
 import { Email } from '@/shared/domain/value-objects/email.vo';
 
@@ -14,16 +14,14 @@ import { CreateUserCommand } from '../implements/create-user.command';
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
   constructor(
-    private readonly userWriteRepository: IUserWriteRepository,
+    private readonly userWriteRepository: AbstractUserWriteRepository,
     private readonly queryBus: QueryBus,
   ) {}
 
   async execute(command: CreateUserCommand): Promise<ResponseAdminDTO> {
     const email = new Email(command.email);
 
-    const emailExists = await this.queryBus.execute(
-      new CheckEmailQuery(email)
-    );
+    const emailExists = await this.queryBus.execute(new CheckEmailQuery(email));
 
     if (emailExists) {
       throw new ConflictException('Email already registered');

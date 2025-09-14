@@ -15,7 +15,7 @@ import {
 import { CheckHealthUseCase } from '@/modules/app/application/use-cases/check-health.use-case';
 
 @ApiTags('Health')
-@Controller('/')
+@Controller()
 export class CheckApiHealthController {
   constructor(private readonly checkHealthUseCase: CheckHealthUseCase) {}
 

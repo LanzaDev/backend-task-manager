@@ -28,11 +28,12 @@ export class User {
     this.id = id || randomUUID();
   }
 
-  // - Core -
+  // id
   getId(): string {
     return this.id;
   }
 
+  // name
   getName(): string {
     return this.props.name;
   }
@@ -41,6 +42,7 @@ export class User {
     this.touch();
   }
 
+  // email
   getEmail(): Email {
     return this.props.email;
   }
@@ -52,8 +54,9 @@ export class User {
     this.touch();
   }
 
+  // password
   /** 🔒 Não expõe o VO inteiro, só a validação controlada */
-  async validatePassword(plain: string): Promise<boolean> {
+  async comparePassword(plain: string): Promise<boolean> {
     return this.props.password.compare(plain);
   }
 
@@ -67,6 +70,7 @@ export class User {
     this.touch();
   }
 
+  // role
   getRole(): Role {
     return this.props.role ?? 'USER';
   }
@@ -78,7 +82,8 @@ export class User {
     this.touch();
   }
 
-  getIsVerified(): boolean {
+  // verification
+  isVerified(): boolean {
     return this.props.isVerified ?? false;
   }
   markAsVerified() {
@@ -86,14 +91,15 @@ export class User {
     this.touch();
   }
 
+  // timestamps
   getCreatedAt(): Date {
     return this.props.createdAt!;
   }
-
   getUpdatedAt(): Date {
     return this.props.updatedAt!;
   }
 
+  // touch
   private touch() {
     this.props.updatedAt = new Date();
   }

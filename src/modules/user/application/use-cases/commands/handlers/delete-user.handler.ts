@@ -3,17 +3,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { IUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
+import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
+import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { DeleteUserCommand } from '../implements/delete-user.command';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { IUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 
 @Injectable()
 @CommandHandler(DeleteUserCommand)
 export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
   constructor(
-    private readonly userWriteRepository: IUserWriteRepository,
-    private readonly userReadRepository: IUserReadRepository,
+    private readonly userWriteRepository: AbstractUserWriteRepository,
+    private readonly userReadRepository: AbstractUserReadRepository,
   ) {}
 
   async execute(command: DeleteUserCommand): Promise<void> {
@@ -36,7 +36,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
         throw new Error('Password is required to delete your own account');
       }
 
-      const isPasswordValid = await requesterUser.validatePassword(
+      const isPasswordValid = await requesterUser.comparePassword(
         command.password,
       );
       if (!isPasswordValid) {

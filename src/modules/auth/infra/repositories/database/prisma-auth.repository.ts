@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { VerificationToken } from '@prisma/client';
-import { IVerificationTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
+import { AbstractVerificationTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
 import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
 import { Token } from '@/shared/domain/value-objects/token.vo';
 
 @Injectable()
 export class PrismaPasswordResetTokenRepository
-  implements IVerificationTokenRepository
+  implements AbstractVerificationTokenRepository
 {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -14,14 +14,14 @@ export class PrismaPasswordResetTokenRepository
     userId: string;
     token: Token;
     expiresAt: Date;
-    used: boolean;
+    isUsed: boolean;
   }): Promise<void> {
     await this.prisma.verificationToken.create({
       data: {
         userId: data.userId,
         token: data.token.getValue(),
         expiresAt: data.expiresAt,
-        used: data.used,
+        isUsed: data.isUsed,
       },
     });
   }
@@ -36,7 +36,7 @@ export class PrismaPasswordResetTokenRepository
     await this.prisma.verificationToken.update({
       where: { id },
       data: {
-        used: true,
+        isUsed: true,
         usedAt: new Date(),
       },
     });
@@ -46,7 +46,7 @@ export class PrismaPasswordResetTokenRepository
     await this.prisma.verificationToken.deleteMany({
       where: {
         expiresAt: { lt: new Date() },
-        used: false,
+        isUsed: false,
       },
     });
   }

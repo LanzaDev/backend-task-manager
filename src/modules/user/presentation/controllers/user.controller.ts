@@ -5,27 +5,23 @@ import {
   Delete,
   Get,
   NotFoundException,
-  Param,
   Patch,
   Request,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { IUserReadRepository } from '../../domain/repositories/user.read-repository';
-import { JwtAuthGuard } from '@/common/guards/jwt.guard';
-import { RolesGuard } from '@/common/guards/roles.guard';
-import { Roles } from '@/common/decorators/roles.decorator';
+import { CommandBus } from '@nestjs/cqrs';
+
+import { AbstractUserReadRepository } from '../../domain/repositories/user.read-repository';
+import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
+import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
+import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
-import { UpdateUserDTO } from '../../application/dto/input/update-user.dto';
-import { DeleteUserDTO } from '../../application/dto/input/delete-user.dto';
+import { UpdateUserDTO } from '../dto/input/update-user.dto';
 
 import { UserMapper } from '../../application/mappers/user.mapper';
 
-import { UpdateUserHandler } from '../../application/use-cases/commands/handlers/update-user.handler';
-import { DeleteUserHandler } from '../../application/use-cases/commands/handlers/delete-user.handler';
 import { DeleteUserCommand } from '../../application/use-cases/commands/implements/delete-user.command';
-import { CommandBus } from '@nestjs/cqrs';
 import { UpdateUserCommand } from '../../application/use-cases/commands/implements/update-user.command';
 
 @Controller('user')
@@ -33,7 +29,7 @@ import { UpdateUserCommand } from '../../application/use-cases/commands/implemen
 @Roles(Role.USER)
 export class UserController {
   constructor(
-    private readonly userReadRepository: IUserReadRepository,
+    private readonly userReadRepository: AbstractUserReadRepository,
     private readonly commandBus: CommandBus,
   ) {}
 

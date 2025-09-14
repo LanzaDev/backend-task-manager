@@ -2,7 +2,7 @@ export interface SessionData {
   refreshToken: string;
 }
 
-export abstract class AuthTokenCacheWriteRepository {
+export abstract class AbstractAuthTokenCacheWriteRepository {
   abstract setRefreshToken(refreshToken: string, userId: string, ttl: number): Promise<void>;
   abstract deleteRefreshToken(refreshToken: string): Promise<void>;
   abstract setSession(userId: string, data: SessionData, ttl: number): Promise<void>;

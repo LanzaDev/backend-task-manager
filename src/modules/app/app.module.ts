@@ -7,12 +7,10 @@ import { UserModule } from '@/modules/user/user.module';
 import { SharedModule } from '@/shared/shared.module';
 
 import { HealthRepository } from '@/modules/app/domain/repositories/health.repository';
-
-import { CheckHealthUseCase } from '@/modules/app/application/use-cases/check-health.use-case';
-
 import { RedisHealthRepository } from '@/modules/app/infra/repositories/redis-health.provider';
 import { PrismaHealthRepository } from '@/modules/app/infra/repositories/prisma-health.provider';
 
+import { CheckHealthUseCase } from '@/modules/app/application/use-cases/check-health.use-case';
 import { CheckApiHealthController } from '@/modules/app/presentation/controllers/check-api-health.controller';
 
 @Module({

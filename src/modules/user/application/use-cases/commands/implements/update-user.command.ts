@@ -1,4 +1,4 @@
-import { UpdateUserDTO } from '../../../dto/input/update-user.dto';
+import { UpdateUserDTO } from '../../../../presentation/dto/input/update-user.dto';
 
 export class UpdateUserCommand {
   constructor(

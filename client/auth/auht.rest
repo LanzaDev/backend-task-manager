@@ -1,0 +1,57 @@
+### -={ Auth }=- ###
+
+### Auth SignIn
+POST http://localhost:3000/auth/signIn
+Content-Type: application/json
+
+{
+  "email": "lucas1511gll@gmail.com",
+  "password": "560065"
+}
+
+### Auth SignUp
+POST http://localhost:3000/auth/signUp
+Content-Type: application/json
+
+{
+  "name": "Lanza",
+  "email": "lucas1511gll@gmail.com",
+  "password": "560065"
+}
+
+### Auth forgot password
+POST http://localhost:3000/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": ""
+}
+
+### Auth reset password
+POST http://localhost:3000/auth/recover
+Content-Type: application/json
+
+{
+  "token": "d870d6c8-bfe4-416f-943a-c81124150d7c",
+  "password": "123456",
+  "confirmPassword": "123456"
+}
+
+### Auth verify email
+POST http://localhost:3000/auth/verify-email
+Content-Type: application/json
+
+{
+  "token": "1e04f574-fdd6-4bbf-8720-8f0bf95575c9"
+}
+
+### Auth logout
+POST http://localhost:3000/auth/logout
+Content-Type: application/json
+
+{
+  "refreshToken": ""
+}
+
+
+

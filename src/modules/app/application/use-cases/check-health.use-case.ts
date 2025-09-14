@@ -14,7 +14,7 @@ export class CheckHealthUseCase {
     let cacheStatus: HealthStatus = 'unhealthy';
 
     try {
-      if (await this.healthRepository.check()) {
+      if (await this.healthRepository.checkConnection()) {
         dbStatus = 'healthy';
       }
     } catch (error) {
@@ -25,7 +25,7 @@ export class CheckHealthUseCase {
     }
 
     try {
-      if (await this.healthRepository.check()) {
+      if (await this.healthRepository.checkConnection()) {
         cacheStatus = 'healthy';
       }
     } catch (error) {

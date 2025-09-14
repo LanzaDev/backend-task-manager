@@ -1,6 +1,6 @@
 import { User } from '@/modules/user/domain/entities/user.entity';
 import { CreateUserCommand } from '../use-cases/commands/implements/create-user.command';
-import { ResponseUserDTO } from '@/modules/user/application/dto/output/response-user.dto';
+import { ResponseUserDTO } from '@/modules/user/presentation/dto/output/response-user.dto';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
 

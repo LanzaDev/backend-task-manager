@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
-import { IVerificationTokenRepository } from '../../domain/repositories/password.repository';
-import { IUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
+import { AbstractVerificationTokenRepository } from '../../domain/repositories/password.repository';
+import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
 
 export enum EmailVerificationStatus {
   INVALID = 'invalid',
@@ -10,10 +10,10 @@ export enum EmailVerificationStatus {
 }
 
 @Injectable()
-export class EmailVerificationUseCase {
+export class VerifyEmailUseCase {
   constructor(
-    private readonly userWriteRepository: IUserWriteRepository,
-    private readonly verificationTokenRepository: IVerificationTokenRepository,
+    private readonly userWriteRepository: AbstractUserWriteRepository,
+    private readonly verificationTokenRepository: AbstractVerificationTokenRepository,
   ) {}
 
   async verifyEmailToken(token: string) {
@@ -26,7 +26,7 @@ export class EmailVerificationUseCase {
     if (!record) {
       return EmailVerificationStatus.INVALID;
     }
-    if (record.used) {
+    if (record.isUsed) {
       return EmailVerificationStatus.ALREADY_VERIFIED;
     }
     if (record.expiresAt < new Date()) {

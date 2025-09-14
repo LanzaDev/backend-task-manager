@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 
-import { IUserReadRepository } from './domain/repositories/user.read-repository';
-import { IUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
+import { AbstractUserReadRepository } from './domain/repositories/user.read-repository';
+import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
 import { PrismaUserQueryRepository } from './infra/repositories/database/prisma-user.query.repository';
 import { PrismaUserCommandRepository } from './infra/repositories/database/prisma-user.command.repository';
 
@@ -26,11 +26,11 @@ import { CheckEmailHandler } from './application/use-cases/query/handlers/check-
     GetUserByIdHandler,
     CheckEmailHandler,
     {
-      provide: IUserWriteRepository,
+      provide: AbstractUserWriteRepository,
       useClass: PrismaUserCommandRepository,
     },
     {
-      provide: IUserReadRepository,
+      provide: AbstractUserReadRepository,
       useClass: PrismaUserQueryRepository,
     },
   ],

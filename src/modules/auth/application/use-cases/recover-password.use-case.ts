@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { addHours, addMinutes } from 'date-fns';
+import { addHours } from 'date-fns';
 
-import { IUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
-import { IVerificationTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
-import { ForgotYourPasswordDTO } from '@/modules/auth/application/dto/input/forgot-your-password.dto';
+import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
+import { AbstractVerificationTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
+import { ForgotYourPasswordDTO } from '@/modules/auth/presentation/dto/input/forgot-your-password.dto';
 
 import type { IEmailService } from '@/modules/mail/domain/services/email.service';
 import { Email } from '@/shared/domain/value-objects/email.vo';
@@ -14,8 +14,8 @@ import { Token } from '@/shared/domain/value-objects/token.vo';
 export class RecoverPasswordUseCase {
   constructor(
     @Inject('IEmailService') private readonly emailService: IEmailService,
-    private readonly userReadRepository: IUserReadRepository,
-    private readonly tokenRepository: IVerificationTokenRepository,
+    private readonly userReadRepository: AbstractUserReadRepository,
+    private readonly tokenRepository: AbstractVerificationTokenRepository,
   ) {}
 
   async execute(dto: ForgotYourPasswordDTO): Promise<void> {
@@ -33,7 +33,7 @@ export class RecoverPasswordUseCase {
       userId: user.getId(),
       token,
       expiresAt,
-      used: false,
+      isUsed: false,
     });
 
     const resetLink = `http://localhost:5173/recover?token=${token}`;

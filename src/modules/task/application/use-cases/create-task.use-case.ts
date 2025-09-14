@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Task } from '@/modules/task/domain/entities/task.entity';
-import { ITaskWriteRepository } from '@/modules/task/domain/repositories/task.write-repository';
-import { CreateTaskDTO } from '@/modules/task/application/dto/input/create-task.dto';
+import { AbstractTaskWriteRepository } from '@/modules/task/domain/repositories/task.write-repository';
+import { CreateTaskDTO } from '@/modules/task/presentation/dto/input/create-task.dto';
 
 @Injectable()
 export class CreateTaskUseCase {
-  constructor(private readonly taskWriteRepository: ITaskWriteRepository) {}
+  constructor(private readonly taskWriteRepository: AbstractTaskWriteRepository) {}
 
   async execute(dto: CreateTaskDTO, userId: string): Promise<Task> {
     const task = new Task({

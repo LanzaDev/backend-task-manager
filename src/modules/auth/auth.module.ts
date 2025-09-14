@@ -3,21 +3,21 @@ import { JwtModule } from '@nestjs/jwt';
 import { env } from '@/config/env';
 
 import { AuthController } from '@/modules/auth/presentation/controllers/auth.controller';
-import { JwtStrategy } from '@/common/strategies/jwt-strategy';
+import { JwtStrategy } from '@/modules/auth/infra/strategies/jwt-strategy';
 
 import { SignInUseCase } from '@/modules/auth/application/use-cases/sign-in.use-case';
 import { SignUpUseCase } from '@/modules/auth/application/use-cases/sign-up.use-case';
 import { RecoverPasswordUseCase } from '@/modules/auth/application/use-cases/recover-password.use-case';
 import { ResetPasswordUseCase } from '@/modules/auth/application/use-cases/reset-password.use-case';
 import { SignOutUseCase } from '@/modules/auth/application/use-cases/sign-out.use-case';
-import { EmailVerificationUseCase } from './application/use-cases/email-verification.use-case';
+import { VerifyEmailUseCase } from './application/use-cases/verify-email.use-case';
 
-import { IUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
-import { IUserReadRepository } from '../user/domain/repositories/user.read-repository';
-import { AuthTokenCacheReadRepository } from './domain/repositories/auth-token-cache.read-repository';
-import { AuthTokenCacheWriteRepository } from './domain/repositories/auth-token-cache.write-repository';
+import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
+import { AbstractUserReadRepository } from '../user/domain/repositories/user.read-repository';
+import { AbstractAuthTokenCacheReadRepository } from './domain/repositories/auth-token-cache.read-repository';
+import { AbstractAuthTokenCacheWriteRepository } from './domain/repositories/auth-token-cache.write-repository';
 
-import { IVerificationTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
+import { AbstractVerificationTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
 import { RedisAuthTokenCacheQueryRepository } from './infra/repositories/cache/redis-auth.query.repository';
 import { RedisAuthTokenCommandCacheRepository } from './infra/repositories/cache/redis-auth.command.repository';
 
@@ -45,25 +45,25 @@ import { CacheModule } from '@/shared/infra/cache/cache.module';
     RecoverPasswordUseCase,
     ResetPasswordUseCase,
     SignOutUseCase,
-    EmailVerificationUseCase,
+    VerifyEmailUseCase,
     {
-      provide: IUserWriteRepository,
+      provide: AbstractUserWriteRepository,
       useClass: PrismaUserCommandRepository,
     },
     {
-      provide: IUserReadRepository,
+      provide: AbstractUserReadRepository,
       useClass: PrismaUserQueryRepository,
     },
     {
-      provide: IVerificationTokenRepository,
+      provide: AbstractVerificationTokenRepository,
       useClass: PrismaPasswordResetTokenRepository,
     },
     {
-      provide: AuthTokenCacheReadRepository,
+      provide: AbstractAuthTokenCacheReadRepository,
       useClass: RedisAuthTokenCacheQueryRepository,
     },
     {
-      provide: AuthTokenCacheWriteRepository,
+      provide: AbstractAuthTokenCacheWriteRepository,
       useClass: RedisAuthTokenCommandCacheRepository,
     },
   ],

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { User } from '@/modules/user/domain/entities/user.entity';
-import { IUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
+import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 
 import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
 
@@ -10,7 +10,7 @@ import { Password } from '@/shared/domain/value-objects/password.vo';
 import { Role } from '@/shared/types/role.type';
 
 @Injectable()
-export class PrismaUserQueryRepository implements IUserReadRepository {
+export class PrismaUserQueryRepository implements AbstractUserReadRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findById(id: string): Promise<User | null> {
