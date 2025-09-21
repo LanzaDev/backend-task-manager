@@ -1,20 +1,18 @@
-import {
-  Controller,
-  Get,
-  HttpException,
-  HttpStatus,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
   ApiOkResponse,
   ApiServiceUnavailableResponse,
   ApiInternalServerErrorResponse,
+  getSchemaPath,
+  ApiExtraModels,
 } from '@nestjs/swagger';
 import { CheckHealthUseCase } from '@/modules/app/application/use-cases/check-health.use-case';
+import { ResponseHealthDTO } from '../dto/output/response-health.dto';
 
 @ApiTags('Health')
+@ApiExtraModels(ResponseHealthDTO)
 @Controller()
 export class CheckApiHealthController {
   constructor(private readonly checkHealthUseCase: CheckHealthUseCase) {}
@@ -23,22 +21,57 @@ export class CheckApiHealthController {
   @ApiOperation({
     summary: 'Check application health',
     description:
-      'Returns the health status of the app and its dependencies (PostgreSQL).',
+      'Returns the health status of the app and its dependencies (API, Database, Cache).',
   })
   @ApiOkResponse({
     description: 'Application and dependencies are healthy',
+    type: ResponseHealthDTO,
   })
   @ApiServiceUnavailableResponse({
-    description: 'One or more dependencies are down',
+    description: 'Degraded mode: cache dependencies are down',
+    content: {
+      'application/json': {
+        schema: { $ref: getSchemaPath(ResponseHealthDTO) },
+        example: {
+          cacheDown: {
+            summary: 'Cache offline',
+            value: {
+              status: 'unhealthy',
+              cache: 'unhealthy',
+              database: 'healthy',
+              timestamp: '2025-09-21T12:00:00.000Z',
+            },
+          },
+        },
+      },
+    },
   })
   @ApiInternalServerErrorResponse({
-    description: 'Unexpected internal error occurred',
-    schema: {
-      example: {
-        status: 'unhealthy',
-        database: 'unhealthy',
-        cache: 'unhealthy',
-        timestamp: new Date().toISOString(),
+    description:
+      'Critical failure: database is down or all dependencies are down',
+    content: {
+      'application/json': {
+        schema: { $ref: getSchemaPath(ResponseHealthDTO) },
+        examples: {
+          databaseDown: {
+            summary: 'Database offline (API unavailable)',
+            value: {
+              status: 'unhealthy',
+              cache: 'healthy',
+              database: 'unhealthy',
+              timestamp: '2025-09-21T12:00:00.000Z',
+            },
+          },
+          allDown: {
+            summary: 'All dependencies offline',
+            value: {
+              status: 'unhealthy',
+              cache: 'unhealthy',
+              database: 'unhealthy',
+              timestamp: '2025-09-21T12:00:00.000Z',
+            },
+          },
+        },
       },
     },
   })

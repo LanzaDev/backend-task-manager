@@ -9,6 +9,15 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
@@ -22,7 +31,10 @@ import { CreateUserCommand } from '../../application/use-cases/commands/implemen
 
 import { GetUserByIdQuery } from '../../application/use-cases/query/implements/get-user-by-id.query';
 import { GetAllUsersQuery } from '../../application/use-cases/query/implements/get-all-users.query';
+import { ResponseAdminDTO } from '../dto/output/response-admin.dto';
 
+@ApiTags('Admin')
+@ApiBearerAuth('access-token')
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
@@ -33,6 +45,12 @@ export class AdminController {
   ) {}
 
   @Get('all')
+  @ApiOkResponse({
+    description: 'Returns all users in the system',
+    type: ResponseAdminDTO,
+    isArray: true,
+  })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
   async getAllUsers(@Request() req) {
     const { sub: requesterId, role: requesterRole } = req.user;
 
@@ -42,6 +60,12 @@ export class AdminController {
   }
 
   @Get(':id')
+  @ApiOkResponse({
+    description: 'Returns a specific user by ID',
+    type: ResponseAdminDTO,
+  })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
   async getUserById(@Param('id') targetUserId: string, @Request() req) {
     const { sub: requesterId, role: requesterRole } = req.user;
 
@@ -55,6 +79,12 @@ export class AdminController {
   }
 
   @Post('add')
+  @ApiCreatedResponse({
+    description: 'User created successfully',
+    type: ResponseAdminDTO,
+  })
+  @ApiBadRequestResponse({ description: 'Invalid input data' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
   async createUser(@Body() createData) {
     const command = new CreateUserCommand(
       createData.name,
@@ -66,6 +96,13 @@ export class AdminController {
   }
 
   @Patch(':id')
+  @ApiOkResponse({
+    description: 'User updated successfully',
+    type: ResponseAdminDTO,
+  })
+  @ApiBadRequestResponse({ description: 'Invalid input data' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
+  @ApiNotFoundResponse({ description: 'User not found' })
   async updateUser(
     @Param('id') targetUserId: string,
     @Body() updateData,
@@ -84,6 +121,9 @@ export class AdminController {
   }
 
   @Delete(':id')
+  @ApiOkResponse({ description: 'User deleted successfully' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
+  @ApiNotFoundResponse({ description: 'User not found' })
   async deleteUser(@Param('id') targetUserId: string, @Request() req) {
     const { sub: requesterId, role: requesterRole } = req.user;
 
