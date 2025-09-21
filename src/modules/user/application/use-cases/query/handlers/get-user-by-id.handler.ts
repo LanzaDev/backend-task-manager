@@ -1,19 +1,48 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { GetUserByIdQuery } from '../implements/get-user-by-id.query';
-import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
-import { ResponseUserDTO } from '../../../../presentation/dto/output/response-user.dto';
-import { NotFoundException } from '@nestjs/common';
 
+import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
+
+import { ResponseUserDTO } from '../../../../presentation/dto/output/response-user.dto';
+import { ResponseAdminDTO } from '@/modules/user/presentation/dto/output/response-admin.dto';
+
+import { GetUserByIdQuery } from '../implements/get-user-by-id.query';
+import { Role } from '@/shared/types/role.type';
+
+@Injectable()
 @QueryHandler(GetUserByIdQuery)
 export class GetUserByIdHandler implements IQueryHandler<GetUserByIdQuery> {
-  constructor(private readonly userReadRepository: AbstractUserReadRepository) {}
+  constructor(
+    private readonly userReadRepository: AbstractUserReadRepository,
+  ) {}
 
-  async execute(query: GetUserByIdQuery): Promise<ResponseUserDTO> {
-    const user = await this.userReadRepository.findById(query.id);
-    if (!user) {
-      throw new NotFoundException('User not found');
+  async execute(
+    query: GetUserByIdQuery,
+  ): Promise<ResponseUserDTO | ResponseAdminDTO> {
+    const requester = await this.userReadRepository.findById(query.requesterId);
+    if (!requester) {
+      throw new NotFoundException('Requester not found');
     }
 
-    return new ResponseUserDTO(user);
+    const targetUser = await this.userReadRepository.findById(
+      query.targetUserId,
+    );
+    if (!targetUser) {
+      throw new NotFoundException('Target user not found');
+    }
+
+    if (
+      query.requesterRole === Role.USER &&
+      query.targetUserId !== query.requesterId
+    ) {
+      throw new NotFoundException('Cannot see other users profile');
+    }
+
+    const dto =
+      query.requesterRole === Role.ADMIN
+        ? new ResponseAdminDTO(targetUser)
+        : new ResponseUserDTO(targetUser);
+
+    return dto;
   }
 }

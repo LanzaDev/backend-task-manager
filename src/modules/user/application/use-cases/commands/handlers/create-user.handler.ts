@@ -5,10 +5,10 @@ import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/
 import { UserMapper } from '@/modules/user/application/mappers/user.mapper';
 import { ResponseAdminDTO } from '@/modules/user/presentation/dto/output/response-admin.dto';
 
-import { Email } from '@/shared/domain/value-objects/email.vo';
-
 import { CheckEmailQuery } from '../../query/implements/check-email.query';
 import { CreateUserCommand } from '../implements/create-user.command';
+
+import { Email } from '@/shared/domain/value-objects/email.vo';
 
 @Injectable()
 @CommandHandler(CreateUserCommand)

@@ -6,7 +6,8 @@ import { TaskModule } from '@/modules/task/task.module';
 import { UserModule } from '@/modules/user/user.module';
 import { SharedModule } from '@/shared/shared.module';
 
-import { HealthRepository } from '@/modules/app/domain/repositories/health.repository';
+import { CacheHealthRepository } from '@/modules/app/domain/repositories/cache-health.repository';
+import { DatabaseHealthRepository } from './domain/repositories/database-health.repository';
 import { RedisHealthRepository } from '@/modules/app/infra/repositories/redis-health.provider';
 import { PrismaHealthRepository } from '@/modules/app/infra/repositories/prisma-health.provider';
 
@@ -19,11 +20,11 @@ import { CheckApiHealthController } from '@/modules/app/presentation/controllers
   providers: [
     CheckHealthUseCase,
     {
-      provide: HealthRepository,
+      provide: CacheHealthRepository,
       useClass: RedisHealthRepository,
     },
     {
-      provide: HealthRepository,
+      provide: DatabaseHealthRepository,
       useClass: PrismaHealthRepository,
     },
   ],

@@ -20,7 +20,7 @@ export class User {
   constructor(props: UserSchema, id?: string) {
     this.props = {
       ...props,
-      role: props.role ?? 'USER',
+      role: props.role ?? Role.USER,
       isVerified: props.isVerified ?? false,
       createdAt: props.createdAt ?? new Date(),
       updatedAt: props.updatedAt ?? new Date(),
@@ -72,10 +72,10 @@ export class User {
 
   // role
   getRole(): Role {
-    return this.props.role ?? 'USER';
+    return this.props.role ?? Role.USER;
   }
-  canBeDeleted(): boolean {
-    return this.props.role !== 'ADMIN';
+  isDeletable(): boolean {
+    return this.props.role === Role.USER;
   }
   setRole(newRole: Role) {
     this.props.role = newRole;

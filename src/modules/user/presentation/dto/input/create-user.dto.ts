@@ -1,4 +1,4 @@
-import { RoleEnum } from '@/shared/types/role.type';
+import { Role } from '@/shared/types/role.type';
 import {
   IsEmail,
   IsEnum,
@@ -19,6 +19,6 @@ export class CreateUserDTO {
   password!: string;
 
   @IsOptional()
-  @IsEnum(RoleEnum)
-  role?: RoleEnum;
+  @IsEnum(Role)
+  role?: Role;
 }

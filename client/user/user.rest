@@ -10,7 +10,7 @@ Content-Type: application/json
 Authorization: Bearer
 
 {
-  "name": "Lucas"
+  "newName": "Lucas"
 }
 
 ### User delete
@@ -19,5 +19,5 @@ Content-Type: application/json
 Authorization: Bearer 
 
 {
-  "password": "560065"
+  "currentPassword": "560065"
 }

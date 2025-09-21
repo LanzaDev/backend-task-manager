@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
 
 import { AbstractUserReadRepository } from './domain/repositories/user.read-repository';
 import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
@@ -12,9 +13,9 @@ import { DeleteUserHandler } from '@/modules/user/application/use-cases/commands
 import { UserController } from '@/modules/user/presentation/controllers/user.controller';
 import { AdminController } from '@/modules/user/presentation/controllers/admin.controller';
 
-import { CqrsModule } from '@nestjs/cqrs';
 import { GetUserByIdHandler } from './application/use-cases/query/handlers/get-user-by-id.handler';
 import { CheckEmailHandler } from './application/use-cases/query/handlers/check-email.handler';
+import { GetAllUsersHandler } from './application/use-cases/query/handlers/get-all-users.handler';
 
 @Module({
   imports: [CqrsModule],
@@ -24,6 +25,7 @@ import { CheckEmailHandler } from './application/use-cases/query/handlers/check-
     UpdateUserHandler,
     DeleteUserHandler,
     GetUserByIdHandler,
+    GetAllUsersHandler,
     CheckEmailHandler,
     {
       provide: AbstractUserWriteRepository,

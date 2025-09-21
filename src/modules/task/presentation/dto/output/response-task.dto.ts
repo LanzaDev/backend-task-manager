@@ -1,18 +1,19 @@
 import { Task, TaskStatus } from '@/modules/task/domain/entities/task.entity';
 import { Expose } from 'class-transformer';
-import {
-  IsDate,
-  IsEnum,
-  IsInt,
-  IsString,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsDate, IsEnum, IsInt, IsString, Max, Min } from 'class-validator';
 
 export class ResponseTaskDTO {
   @IsString()
   @Expose()
-  title?: string;
+  id: string;
+
+  @IsString()
+  @Expose()
+  userId: string;
+
+  @IsString()
+  @Expose()
+  title: string;
 
   @IsString()
   @Expose()
@@ -44,15 +45,18 @@ export class ResponseTaskDTO {
   @Expose()
   completedAt?: Date;
 
-  constructor(task?: Task) {
-    if(!task) return;
-    this.title = task.getTitle();
-    this.description = task.getDescription();
-    this.status = task.getStatus();
-    this.priority = task.getPriority();
-    this.dueDate = task.getDueDate();
-    this.createdAt = task.getCreatedAt();
-    this.updatedAt = task.getUpdatedAt();
-    this.completedAt = task.getCompletedAt();
+  constructor(data: {
+    id: string;
+    userId: string;
+    title: string;
+    description?: string;
+    status?: TaskStatus;
+    priority?: number;
+    dueDate?: Date;
+    completedAt?: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }) {
+    Object.assign(this, data);
   }
 }

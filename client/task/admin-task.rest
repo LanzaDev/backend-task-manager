@@ -1,7 +1,7 @@
 ### -={ Admin | Task }=- ###
 
 ### Admin find all task
-GET http://localhost:3000/admin/task/all/
+GET http://localhost:3000/admin/task/all
 Authorization: Bearer
 
 ### Admin find all task by user | (userId)

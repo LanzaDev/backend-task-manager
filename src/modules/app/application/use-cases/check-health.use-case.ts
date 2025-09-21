@@ -1,52 +1,28 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ResponseHealthDTO } from '@/modules/app/presentation/dto/output/response-health.dto';
-import { HealthRepository } from '@/modules/app/domain/repositories/health.repository';
-import { HealthStatus } from '@/shared/types/health-status.type';
+import { CacheHealthRepository } from '../../domain/repositories/cache-health.repository';
+import { DatabaseHealthRepository } from '../../domain/repositories/database-health.repository';
 
 @Injectable()
 export class CheckHealthUseCase {
-  private readonly logger = new Logger(CheckHealthUseCase.name);
-
-  constructor(private readonly healthRepository: HealthRepository) {}
+  constructor(
+    private readonly databaseHealthRepository: DatabaseHealthRepository,
+    private readonly cacheHealthRepository: CacheHealthRepository,
+  ) {}
 
   async execute(): Promise<ResponseHealthDTO> {
-    let dbStatus: HealthStatus = 'unhealthy';
-    let cacheStatus: HealthStatus = 'unhealthy';
+    const [isDbOnline, isCacheOnline] = await Promise.all([
+      this.databaseHealthRepository.checkConnection(),
+      this.cacheHealthRepository.checkConnection(),
+    ]);
 
-    try {
-      if (await this.healthRepository.checkConnection()) {
-        dbStatus = 'healthy';
-      }
-    } catch (error) {
-      this.logger.error(
-        `DB connection failed: ${error.message}`,
-        error instanceof Error ? error.stack : String(error),
-      );
-    }
-
-    try {
-      if (await this.healthRepository.checkConnection()) {
-        cacheStatus = 'healthy';
-      }
-    } catch (error) {
-      this.logger.error(
-        `Cache connection failed: ${error.message}`,
-        error instanceof Error ? error.stack : String(error),
-      );
-    }
-
-    const overallStatus: HealthStatus =
-      dbStatus === 'healthy' && cacheStatus === 'healthy'
-        ? 'healthy'
-        : 'unhealthy';
-
-    return {
-      status: overallStatus,
-      cache: cacheStatus,
-      database: dbStatus,
-      timestamp: new Date().toLocaleString('pt-br', {
-        timeZone: 'America/Sao_paulo',
-      }),
+     const response: ResponseHealthDTO = {
+      status: isDbOnline && isCacheOnline ? 'healthy' : 'unhealthy',
+      database: isDbOnline ? 'healthy' : 'unhealthy',
+      cache: isCacheOnline ? 'healthy' : 'unhealthy',
+      timestamp: new Date().toISOString(),
     };
+
+    return response;
   }
 }

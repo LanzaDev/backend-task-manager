@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { HealthRepository } from '@/modules/app/domain/repositories/health.repository';
+import { DatabaseHealthRepository } from '../../domain/repositories/database-health.repository';
 import { RedisService } from '@/shared/infra/cache/redis/redis.service';
 
 @Injectable()
-export class RedisHealthRepository implements HealthRepository {
+export class RedisHealthRepository implements DatabaseHealthRepository {
   constructor(private readonly redis: RedisService) {}
   async checkConnection(): Promise<boolean> {
     try {
-      await this.redis.ping();
-      return true;
+      const result = await this.redis.ping();
+      return result === 'PONG';
     } catch (error) {
       console.log(
         'cache connection error: ',

@@ -60,7 +60,7 @@ export class PrismaUserQueryRepository implements AbstractUserReadRepository {
             name: user.name,
             email: new Email(user.email),
             password: Password.fromHashed(user.password),
-            role: user.role,
+            role: user.role as Role,
             isVerified: user.isVerified,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt,

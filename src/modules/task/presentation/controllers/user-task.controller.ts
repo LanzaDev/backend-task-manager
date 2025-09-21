@@ -9,65 +9,100 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { AbstractTaskReadRepository } from '../../domain/repositories/task.read-repository';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
 import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
-import { CreateTaskDTO } from '../dto/input/create-task.dto';
-import { UpdateTaskDTO } from '../dto/input/update-task.dto';
-import { ResponseTaskDTO } from '../dto/output/response-task.dto';
+import { CreateTaskCommand } from '../../application/use-cases/commands/implements/create-task.command';
+import { DeleteTaskCommand } from '../../application/use-cases/commands/implements/delete-task.command';
+import { UpdateTaskCommand } from '../../application/use-cases/commands/implements/update-task.command';
 
-import { CreateTaskUseCase } from '../../application/use-cases/create-task.use-case';
-import { DeleteTaskUseCase } from '../../application/use-cases/delete-task.use-case';
-import { UpdateTaskUseCase } from '../../application/use-cases/update-task.use-case';
+import { GetAllTasksByUserIdQuery } from '../../application/use-cases/query/implements/get-all-tasks-by-user-id.query';
+import { GetTaskByIdQuery } from '../../application/use-cases/query/implements/get-task-by-id.query';
 
 @Controller('user/task/')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.USER)
 export class UserTaskController {
   constructor(
-    private readonly taskReadRepository: AbstractTaskReadRepository,
-    private readonly createTaskUseCase: CreateTaskUseCase,
-    private readonly updateTaskUseCase: UpdateTaskUseCase,
-    private readonly deleteTaskUseCase: DeleteTaskUseCase,
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Get()
   async getMyTasks(@Request() req) {
-    const tasks = await this.taskReadRepository.findAllByUser(req.user.sub);
-    return tasks;
+    const { sub: requesterId, role: requesterRole } = req.user;
+
+    const query = new GetAllTasksByUserIdQuery(
+      requesterId,
+      requesterRole,
+      requesterId,
+    );
+
+    return this.queryBus.execute(query);
+  }
+
+  @Get(':taskId')
+  async getTaskById(@Param('taskId') taskId: string, @Request() req) {
+    const { sub: requesterId, role: requesterRole } = req.user;
+
+    const query = new GetTaskByIdQuery(requesterId, requesterRole, taskId);
+
+    return this.queryBus.execute(query);
   }
 
   @Post()
-  async createTask(@Request() req, @Body() dto: CreateTaskDTO) {
-    const task = await this.createTaskUseCase.execute(dto, req.user.sub);
-    return new ResponseTaskDTO(task);
+  async createTask(@Request() req, @Body() createData) {
+    const { sub: requesterId, role: requesterRole } = req.user;
+
+    const command = new CreateTaskCommand(
+      requesterId,
+      requesterRole,
+      requesterId,
+      createData.title,
+      createData.description,
+      createData.status,
+      createData.priority,
+      createData.dueDate,
+      createData.completedAt,
+    );
+
+    return this.commandBus.execute(command);
   }
 
   @Patch(':taskId')
   async updateTask(
     @Param('taskId') taskId: string,
-    @Body() dto: UpdateTaskDTO,
+    @Body() updateData,
     @Request() req,
   ) {
-    const updatedTask = await this.updateTaskUseCase.execute(taskId, dto, {
-      id: req.user.sub,
-      role: req.user.role,
-    });
+    const { sub: requesterId, role: requesterRole } = req.user;
 
-    return new ResponseTaskDTO(updatedTask);
+    const command = new UpdateTaskCommand(
+      updateData,
+      requesterId,
+      requesterRole,
+      taskId,
+      requesterId,
+    );
+
+    return this.commandBus.execute(command);
   }
 
   @Delete(':taskId')
   async deleteTask(@Param('taskId') taskId: string, @Request() req) {
-    await this.deleteTaskUseCase.execute(
-      { taskId },
-      { id: req.user.sub, role: req.user.role },
+    const { sub: requesterId, role: requesterRole } = req.user;
+
+    const command = new DeleteTaskCommand(
+      requesterId,
+      taskId,
+      requesterRole,
+      requesterId,
     );
 
-    return { message: 'Task deleted successfully' };
+    return this.commandBus.execute(command);
   }
 }

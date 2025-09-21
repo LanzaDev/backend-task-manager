@@ -36,28 +36,13 @@ export class CheckApiHealthController {
     schema: {
       example: {
         status: 'unhealthy',
-        message: 'INTERNAL SERVER ERROR',
-        timestamp: '11/07/2025 15:42:21',
+        database: 'unhealthy',
+        cache: 'unhealthy',
+        timestamp: new Date().toISOString(),
       },
     },
   })
   async checkHealth() {
-    try {
-      const healthStatus = await this.checkHealthUseCase.execute();
-
-      if (healthStatus.status === 'unhealthy') {
-        throw new HttpException(healthStatus, HttpStatus.SERVICE_UNAVAILABLE);
-      }
-
-      return healthStatus;
-    } catch {
-      throw new InternalServerErrorException({
-        status: 'unhealthy',
-        message: 'INTERNAL SERVER ERROR',
-        timestamp: new Date().toLocaleString('pt-br', {
-          timeZone: 'America/Sao_paulo',
-        }),
-      });
-    }
+    return await this.checkHealthUseCase.execute();
   }
 }

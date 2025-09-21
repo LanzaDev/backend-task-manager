@@ -1,19 +1,23 @@
-import { RoleEnum } from '@/shared/types/role.type';
+import { Role } from '@/shared/types/role.type';
 import { IsEmail, IsEnum, IsOptional, MinLength } from 'class-validator';
 
 export class UpdateUserDTO {
   @IsOptional()
-  name?: string;
+  newName?: string;
 
   @IsOptional()
   @IsEmail()
-  email?: string;
+  newEmail?: string;
 
   @IsOptional()
   @MinLength(6)
-  password?: string;
+  newPassword?: string;
 
   @IsOptional()
-  @IsEnum(RoleEnum)
-  role?: RoleEnum;
+  @MinLength(6)
+  confirmNewPassword?: string;
+
+  @IsOptional()
+  @IsEnum(Role)
+  role?: Role;
 }

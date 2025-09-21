@@ -11,7 +11,7 @@ Authorization: Bearer
 ### Admin create new user
 POST http://localhost:3000/admin/add
 Content-Type: application/json
-Authorization: Bearer
+Authorization: Bearer 
 
 {
   "name": "TEST2",
@@ -26,7 +26,7 @@ Content-Type: application/json
 Authorization: Bearer
 
 {
-  "role": "USER"
+  "newName": "USER"
 }
 
 

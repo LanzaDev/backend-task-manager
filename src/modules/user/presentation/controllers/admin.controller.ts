@@ -3,94 +3,96 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Patch,
   Post,
   Request,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
-import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
 import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
-import { CreateUserDTO } from '@/modules/user/presentation/dto/input/create-user.dto';
-import { UpdateUserDTO } from '@/modules/user/presentation/dto/input/update-user.dto';
-import { ResponseAdminDTO } from '@/modules/user/presentation/dto/output/response-admin.dto';
-
-import { UserMapper } from '@/modules/user/application/mappers/user.mapper';
-
-import { CreateUserHandler } from '@/modules/user/application/use-cases/commands/handlers/create-user.handler';
 import { UpdateUserCommand } from '../../application/use-cases/commands/implements/update-user.command';
 import { DeleteUserCommand } from '../../application/use-cases/commands/implements/delete-user.command';
+import { CreateUserCommand } from '../../application/use-cases/commands/implements/create-user.command';
+
+import { GetUserByIdQuery } from '../../application/use-cases/query/implements/get-user-by-id.query';
+import { GetAllUsersQuery } from '../../application/use-cases/query/implements/get-all-users.query';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
 export class AdminController {
   constructor(
-    private readonly userReadRepository: AbstractUserReadRepository,
-    private readonly createUserHandler: CreateUserHandler,
     private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Get('all')
-  async getAllUsers() {
-    const users = await this.userReadRepository.findAll();
-    return users.map((user) => UserMapper.toDTO(user));
+  async getAllUsers(@Request() req) {
+    const { sub: requesterId, role: requesterRole } = req.user;
+
+    const query = new GetAllUsersQuery(requesterId, requesterRole);
+
+    return this.queryBus.execute(query);
   }
 
   @Get(':id')
-  async getUserById(@Param('id') id: string) {
-    const user = await this.userReadRepository.findById(id);
-    if (!user) throw new NotFoundException('User not found');
+  async getUserById(@Param('id') targetUserId: string, @Request() req) {
+    const { sub: requesterId, role: requesterRole } = req.user;
 
-    return UserMapper.toDTO(user);
+    const query = new GetUserByIdQuery(
+      requesterId,
+      requesterRole,
+      targetUserId,
+    );
+
+    return this.queryBus.execute(query);
   }
 
   @Post('add')
-  async createUser(@Body() dto: CreateUserDTO): Promise<ResponseAdminDTO> {
-    return this.createUserHandler.execute(dto);
+  async createUser(@Body() createData) {
+    const command = new CreateUserCommand(
+      createData.name,
+      createData.email,
+      createData.password,
+    );
+
+    return this.commandBus.execute(command);
   }
 
   @Patch(':id')
   async updateUser(
-    @Param('id') id: string,
-    @Body() updateData: UpdateUserDTO,
+    @Param('id') targetUserId: string,
+    @Body() updateData,
     @Request() req,
   ) {
+    const { sub: requesterId, role: requesterRole } = req.user;
+
     const command = new UpdateUserCommand(
       updateData,
-      req.user.sub,
-      req.user.role,
-      id,
+      requesterId,
+      requesterRole,
+      targetUserId,
     );
 
-    await this.commandBus.execute(command);
-
-    return { message: 'User successfully updated' };
+    return this.commandBus.execute(command);
   }
 
   @Delete(':id')
   async deleteUser(@Param('id') targetUserId: string, @Request() req) {
-    if (!req.user?.sub || !req.user?.role) {
-      throw new UnauthorizedException('User not authenticated');
-    }
+    const { sub: requesterId, role: requesterRole } = req.user;
 
     const command = new DeleteUserCommand(
-      req.user.sub,
-      req.user.role,
+      requesterId,
+      requesterRole,
       targetUserId,
     );
 
-    await this.commandBus.execute(command);
-    return {
-      message: 'User successfully deleted',
-    };
+    return this.commandBus.execute(command);
   }
 }

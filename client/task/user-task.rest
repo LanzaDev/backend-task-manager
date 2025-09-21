@@ -1,13 +1,17 @@
 ### -={ User | Task }=- ###
 
 ### User find all task
+GET http://localhost:3000/user/task
+Authorization: Bearer
+
+### User find task by id | (taskId)
 GET http://localhost:3000/user/task/
 Authorization: Bearer
 
 ### User create task
 POST http://localhost:3000/user/task
 Content-Type: application/json
-Authorization: Bearer
+Authorization: Bearer 
 
 {
   "title": "user test"
@@ -19,7 +23,7 @@ Content-Type: application/json
 Authorization: Bearer
 
 {
-  "title": "user tests"
+  "title": "nuclear craft"
 }
 
 ### User delete task | (taskId)

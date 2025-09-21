@@ -3,94 +3,124 @@ import {
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Param,
   Patch,
   Post,
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { AbstractTaskReadRepository } from '@/modules/task/domain/repositories/task.read-repository';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
 import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
-import { CreateTaskDTO } from '@/modules/task/presentation/dto/input/create-task.dto';
 import { UpdateTaskDTO } from '@/modules/task/presentation/dto/input/update-task.dto';
-import { DeleteTaskDTO } from '@/modules/task/presentation/dto/input/delete-task.dto';
 import { ResponseTaskDTO } from '@/modules/task/presentation/dto/output/response-task.dto';
 
-import { CreateTaskUseCase } from '@/modules/task/application/use-cases/create-task.use-case';
-import { DeleteTaskUseCase } from '@/modules/task/application/use-cases/delete-task.use-case';
-import { UpdateTaskUseCase } from '@/modules/task/application/use-cases/update-task.use-case';
+import { CreateTaskCommand } from '../../application/use-cases/commands/implements/create-task.command';
+import { DeleteTaskCommand } from '../../application/use-cases/commands/implements/delete-task.command';
+import { UpdateTaskCommand } from '../../application/use-cases/commands/implements/update-task.command';
+
+import { GetAllTasksByUserIdQuery } from '../../application/use-cases/query/implements/get-all-tasks-by-user-id.query';
+import { GetAllTasksQuery } from '../../application/use-cases/query/implements/get-all-tasks.query';
+import { GetTaskByIdQuery } from '../../application/use-cases/query/implements/get-task-by-id.query';
 
 @Controller('admin/task/')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
 export class AdminTaskController {
   constructor(
-    private readonly taskReadRepository: AbstractTaskReadRepository,
-    private readonly createTaskUseCase: CreateTaskUseCase,
-    private readonly updateTaskUseCase: UpdateTaskUseCase,
-    private readonly deleteTaskUseCase: DeleteTaskUseCase,
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Get('all')
-  async getAllTasks() {
-    const tasks = await this.taskReadRepository.findAllTasks();
-    return tasks;
+  async getAllTasks(@Request() req) {
+    const { sub: requesterId, role: requesterRole } = req.user;
+
+    const query = new GetAllTasksQuery(requesterId, requesterRole);
+
+    return this.queryBus.execute(query);
   }
 
   @Get('all/:userId')
-  async getAllTasksByUser(@Param('userid') userId: string) {
-    const tasks = await this.taskReadRepository.findAllByUser(userId);
-    return tasks;
+  async getAllTasksByUser(
+    @Param('userId') targetUserId: string,
+    @Request() req,
+  ) {
+    const { sub: requesterId, role: requesterRole } = req.user;
+
+    const query = new GetAllTasksByUserIdQuery(
+      requesterId,
+      requesterRole,
+      targetUserId,
+    );
+
+    return this.queryBus.execute(query);
   }
 
   @Get(':taskId')
-  async getTaskById(@Param('taskId') taskId: string) {
-    const task = await this.taskReadRepository.findById(taskId);
-    if (!task) throw new NotFoundException('Task not found');
+  async getTaskById(@Param('taskId') taskId: string, @Request() req) {
+    const { sub: requesterId, role: requesterRole } = req.user;
 
-    return task;
+    const query = new GetTaskByIdQuery(requesterId, requesterRole, taskId);
+
+    return this.queryBus.execute(query);
   }
 
   @Post(':userId')
   async createTaskForUser(
-    @Param('userId') userId: string,
-    @Body() dto: CreateTaskDTO,
-  ): Promise<ResponseTaskDTO> {
-    await this.createTaskUseCase.execute(dto, userId);
+    @Param('userId') targetUserId: string,
+    @Request() req,
+    @Body() createTaskData,
+  ) {
+    const { sub: requesterId, role: requesterRole } = req.user;
 
-    return new ResponseTaskDTO();
+    const command = new CreateTaskCommand(
+      requesterId,
+      requesterRole,
+      targetUserId,
+      createTaskData.title,
+      createTaskData.description,
+      createTaskData.status,
+      createTaskData.priority,
+      createTaskData.dueDate,
+      createTaskData.completedAt,
+    );
+
+    return this.commandBus.execute(command);
   }
 
   @Patch(':taskId')
   async updateTaskForUser(
     @Param('taskId') taskId: string,
-    @Body() dto: UpdateTaskDTO,
+    @Body() updateData: UpdateTaskDTO,
     @Request() req,
   ): Promise<ResponseTaskDTO> {
-    const task = await this.updateTaskUseCase.execute(taskId, dto, {
-      id: req.user.sub,
-      role: req.user.role,
-    });
+    const userId = req.user.sub;
+    const requesterRole = req.user.role;
 
-    return new ResponseTaskDTO(task);
+    const command = new UpdateTaskCommand(
+      updateData,
+      userId,
+      requesterRole,
+      taskId,
+    );
+
+    return this.commandBus.execute(command);
   }
 
   @Delete(':taskId')
   async deleteTaskForUser(@Param('taskId') taskId: string, @Request() req) {
-    const dto = new DeleteTaskDTO();
-    dto.taskId = taskId;
+    const userId = req.user.sub;
+    const requesterRole = req.user.role;
 
-    await this.deleteTaskUseCase.execute(dto, {
-      id: req.user.sub,
-      role: req.user.role,
-    });
+    const command = new DeleteTaskCommand(userId, taskId, requesterRole);
 
-    return { message: 'Task successfully deleted' };
+    await this.commandBus.execute(command);
+
+    return { message: 'Task deleted successfully' };
   }
 }

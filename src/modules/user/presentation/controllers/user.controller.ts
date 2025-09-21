@@ -1,74 +1,76 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
-  NotFoundException,
   Patch,
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
-import { AbstractUserReadRepository } from '../../domain/repositories/user.read-repository';
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
 import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
-import { UpdateUserDTO } from '../dto/input/update-user.dto';
-
-import { UserMapper } from '../../application/mappers/user.mapper';
-
 import { DeleteUserCommand } from '../../application/use-cases/commands/implements/delete-user.command';
 import { UpdateUserCommand } from '../../application/use-cases/commands/implements/update-user.command';
+
+import { GetUserByIdQuery } from '../../application/use-cases/query/implements/get-user-by-id.query';
 
 @Controller('user')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.USER)
 export class UserController {
   constructor(
-    private readonly userReadRepository: AbstractUserReadRepository,
     private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Get('profile')
   async getProfile(@Request() req) {
-    const user = await this.userReadRepository.findById(req.user.sub);
-    if (!user) throw new NotFoundException('User not found');
+    const { sub: requesterId, role: requesterRole } = req.user;
 
-    return UserMapper.toDTO(user);
+    const query = new GetUserByIdQuery(
+      requesterId,
+      requesterRole,
+      requesterId,
+    );
+
+    return this.queryBus.execute(query);
   }
 
   @Patch('profile')
-  async updateProfile(@Request() req, @Body() updateData: UpdateUserDTO) {
-    console.log(req.user);
+  async updateProfile(
+    @Request() req,
+    @Body() updateData,
+    @Body('currentPassword') currentPassword: string,
+  ) {
+    const { sub: requesterId, role: requesterRole } = req.user;
 
     const command = new UpdateUserCommand(
       updateData,
-      req.user.sub,
-      req.user.role,
-      req.user.sub,
+      requesterId,
+      requesterRole,
+      requesterId,
+      currentPassword,
     );
 
-    await this.commandBus.execute(command);
-
-    return { message: 'Your profile has been successfully updated.' };
+    return this.commandBus.execute(command);
   }
 
   @Delete('profile')
-  async deleteProfile(@Body('password') password: string, @Request() req) {
-    if (!req.user?.sub) throw new BadRequestException('User not found');
+  async deleteProfile(@Body('currentPassword') currentPassword: string, @Request() req) {
+    const { sub: requesterId, role: requesterRole } = req.user;
 
     const command = new DeleteUserCommand(
-      req.user.sub,
-      req.user.role,
-      req.user.sub,
-      password,
+      requesterId,
+      requesterRole,
+      requesterId,
+      currentPassword,
     );
 
-    await this.commandBus.execute(command);
-    return { message: 'User successfully deleted' };
+    return this.commandBus.execute(command);
   }
 }

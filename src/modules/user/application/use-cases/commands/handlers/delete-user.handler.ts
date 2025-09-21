@@ -3,10 +3,13 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+
 import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
 import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
+
 import { DeleteUserCommand } from '../implements/delete-user.command';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { Role } from '@/shared/types/role.type';
 
 @Injectable()
 @CommandHandler(DeleteUserCommand)
@@ -17,34 +20,38 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
   ) {}
 
   async execute(command: DeleteUserCommand): Promise<void> {
-    const targetUser = await this.userReadRepository.findById(
-      command.targetUserId,
-    );
-    if (!targetUser) throw new NotFoundException('User not found');
-
     const requesterUser = await this.userReadRepository.findById(
       command.requesterId,
     );
-    if (!requesterUser) throw new NotFoundException('User not found');
+    if (!requesterUser) {
+      throw new NotFoundException('Requester not found');
+    }
 
-    if (command.requesterRole === 'USER') {
-      if (command.requesterId !== command.targetUserId) {
+    const targetUser = await this.userReadRepository.findById(
+      command.targetUserId,
+    );
+    if (!targetUser) {
+      throw new NotFoundException('Target user not found');
+    }
+
+    if (command.requesterRole === Role.USER) {
+      if (command.targetUserId !== command.requesterId) {
         throw new BadRequestException('Cannot delete other user');
       }
 
-      if (!command.password) {
+      if (!command.currentPassword) {
         throw new Error('Password is required to delete your own account');
       }
 
       const isPasswordValid = await requesterUser.comparePassword(
-        command.password,
+        command.currentPassword,
       );
       if (!isPasswordValid) {
         throw new BadRequestException('Invalid password');
       }
     }
 
-    if (command.requesterRole === 'ADMIN' && !targetUser.canBeDeleted()) {
+    if (!targetUser.isDeletable()) {
       throw new BadRequestException('Cannot delete admin');
     }
 

@@ -1,9 +1,9 @@
 import { Role } from "@/shared/types/role.type";
 
-export class GetUserByIdQuery {
+export class GetAllTasksByUserIdQuery {
   constructor(
     public readonly requesterId: string,
     public readonly requesterRole: Role,
-    public readonly targetUserId: string
+    public readonly targetUserId: string,
   ) {}
 }

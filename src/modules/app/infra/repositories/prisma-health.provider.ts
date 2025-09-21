@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { HealthRepository } from '../../domain/repositories/health.repository';
+import { DatabaseHealthRepository } from '../../domain/repositories/database-health.repository';
 import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
 
 @Injectable()
-export class PrismaHealthRepository implements HealthRepository {
+export class PrismaHealthRepository implements DatabaseHealthRepository {
   constructor(private readonly prisma: PrismaService) {}
   async checkConnection(): Promise<boolean> {
     try {

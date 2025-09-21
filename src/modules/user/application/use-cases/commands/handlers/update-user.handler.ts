@@ -1,16 +1,20 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+
 import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
+import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
+
+import { UpdateUserCommand } from '../implements/update-user.command';
+import { UpdateUserDTO } from '../../../../presentation/dto/input/update-user.dto';
 
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
-import { CommandHandler, ICommandHandler, QueryBus } from '@nestjs/cqrs';
-import { UpdateUserCommand } from '../implements/update-user.command';
-import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
-import { UpdateUserDTO } from '../../../../presentation/dto/input/update-user.dto';
+import { Role } from '@/shared/types/role.type';
 
 @Injectable()
 @CommandHandler(UpdateUserCommand)
@@ -21,32 +25,60 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
   ) {}
 
   async execute(command: UpdateUserCommand): Promise<void> {
-    const user = await this.userReadRepository.findById(command.targetUserId);
-    if (!user) {
-      throw new NotFoundException('User not found');
+    const requesterUser = await this.userReadRepository.findById(
+      command.requesterId,
+    );
+    if (!requesterUser) {
+      throw new NotFoundException('Requester not found');
+    }
+
+    const targetUser = await this.userReadRepository.findById(
+      command.targetUserId,
+    );
+    if (!targetUser) {
+      throw new NotFoundException('Target user not found');
     }
 
     if (
-      command.requesterRole === 'USER' &&
-      command.requesterId !== command.targetUserId
+      command.requesterRole === Role.USER &&
+      command.targetUserId !== command.requesterId
     ) {
       throw new ForbiddenException('You can only update your own profile');
     }
 
     const updateData: Partial<UpdateUserDTO> = { ...command.updateData };
 
-    if (command.requesterRole === 'USER') {
+    if (command.requesterRole === Role.USER) {
       delete updateData.role;
     }
 
-    if (updateData.name) user.setName(updateData.name);
-    if (updateData.email) user.setEmail(new Email(updateData.email));
-    if (updateData.password) {
-      const newPassword = await Password.create(updateData.password);
-      user.setPassword(newPassword);
-    }
-    if (updateData.role) user.setRole(updateData.role);
+    if (updateData.newName) targetUser.setName(updateData.newName);
+    if (updateData.newEmail)
+      targetUser.setEmail(new Email(updateData.newEmail));
+    if (updateData.newPassword) {
+      if (command.requesterRole === Role.USER) {
+        if (!command.currentPassword) {
+          throw new Error('Password is required to update password');
+        }
 
-    await this.userWriteRepository.update(user);
+        const isPasswordValid = await requesterUser.comparePassword(
+          command.currentPassword,
+        );
+        if (!isPasswordValid) {
+          throw new ForbiddenException('Invalid password');
+        }
+
+        if (updateData.newPassword !== updateData.confirmNewPassword) {
+          throw new BadRequestException(
+            'New password confirmation does not match',
+          );
+        }
+      }
+      const newPassword = await Password.create(updateData.newPassword);
+      targetUser.setPassword(newPassword);
+    }
+    if (updateData.role) targetUser.setRole(updateData.role);
+
+    await this.userWriteRepository.update(targetUser);
   }
 }

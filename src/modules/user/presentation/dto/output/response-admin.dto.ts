@@ -1,4 +1,5 @@
 import { User } from '@/modules/user/domain/entities/user.entity';
+import { Role } from '@/shared/types/role.type';
 import { Expose } from 'class-transformer';
 import { IsDate, IsEmail, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 
@@ -15,9 +16,9 @@ export class ResponseAdminDTO {
   @Expose()
   readonly email: string;
 
-  @IsEnum(['USER', 'ADMIN'])
   @Expose()
-  readonly role: string;
+  @IsEnum(Role)
+  readonly role: Role;
 
   @IsOptional()
   @IsDate()
