@@ -5,12 +5,9 @@ import { env } from '@/config/env';
 import { AuthController } from '@/modules/auth/presentation/controllers/auth.controller';
 import { JwtStrategy } from '@/modules/auth/infra/strategies/jwt-strategy';
 
-import { SignInUseCase } from '@/modules/auth/application/use-cases/sign-in.use-case';
-import { SignUpUseCase } from '@/modules/auth/application/use-cases/sign-up.use-case';
-import { RecoverPasswordUseCase } from '@/modules/auth/application/use-cases/recover-password.use-case';
-import { ResetPasswordUseCase } from '@/modules/auth/application/use-cases/reset-password.use-case';
-import { SignOutUseCase } from '@/modules/auth/application/use-cases/sign-out.use-case';
-import { VerifyEmailUseCase } from './application/use-cases/verify-email.use-case';
+import { RequestPasswordResetHandler } from '@/modules/auth/application/use-cases/commands/handlers/request-password-reset.handler';
+import { ResetPasswordHandler } from '@/modules/auth/application/use-cases/commands/handlers/reset-password.handler';
+import { LogoutUserHandler } from '@/modules/auth/application/use-cases/commands/handlers/logout.handler';
 
 import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
 import { AbstractUserReadRepository } from '../user/domain/repositories/user.read-repository';
@@ -27,9 +24,15 @@ import { PrismaPasswordResetTokenRepository } from '@/modules/auth/infra/reposit
 
 import { EmailModule } from '@/modules/mail/email.module';
 import { CacheModule } from '@/shared/infra/cache/cache.module';
+import { ValidateUserCredentialsHandler } from './application/use-cases/query/handlers/validate-user-credentials.handler';
+import { CreateUserSessionHandler } from './application/use-cases/commands/handlers/create-user-session.handler';
+import { CqrsModule } from '@nestjs/cqrs';
+import { VerifyEmailTokenHandler } from './application/use-cases/commands/handlers/verify-email-token.handler';
+import { CreateAccountHandler } from './application/use-cases/commands/handlers/create-account.handler';
 
 @Module({
   imports: [
+    CqrsModule,
     JwtModule.register({
       secret: env.JWT_SECRET,
       signOptions: { expiresIn: env.ACCESS_TOKEN_EXP },
@@ -40,12 +43,13 @@ import { CacheModule } from '@/shared/infra/cache/cache.module';
   controllers: [AuthController],
   providers: [
     JwtStrategy,
-    SignInUseCase,
-    SignUpUseCase,
-    RecoverPasswordUseCase,
-    ResetPasswordUseCase,
-    SignOutUseCase,
-    VerifyEmailUseCase,
+    CreateAccountHandler,
+    RequestPasswordResetHandler,
+    LogoutUserHandler,
+    ResetPasswordHandler,
+    VerifyEmailTokenHandler,
+    ValidateUserCredentialsHandler,
+    CreateUserSessionHandler,
     {
       provide: AbstractUserWriteRepository,
       useClass: PrismaUserCommandRepository,

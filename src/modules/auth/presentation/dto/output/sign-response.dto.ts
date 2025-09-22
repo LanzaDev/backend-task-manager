@@ -9,5 +9,11 @@ export class SignResponseDTO {
   accessToken: string;
 
   @Expose()
-  refreshToken!: string;
+  refreshToken: string;
+
+  constructor(user: ResponseUserDTO, accessToken: string, refreshToken: string) {
+    this.user = user;
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+  }
 }

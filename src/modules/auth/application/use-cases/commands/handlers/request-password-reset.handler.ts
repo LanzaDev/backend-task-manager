@@ -1,25 +1,28 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { randomUUID } from 'crypto';
 import { addHours } from 'date-fns';
 
 import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { AbstractVerificationTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
-import { ForgotYourPasswordDTO } from '@/modules/auth/presentation/dto/input/forgot-your-password.dto';
 
-import type { IEmailService } from '@/modules/mail/domain/services/email.service';
+import { RequestPasswordResetCommand } from '../implements/request-password-reset.command';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Token } from '@/shared/domain/value-objects/token.vo';
+import type { IEmailService } from '@/modules/mail/domain/services/email.service';
 
 @Injectable()
-export class RecoverPasswordUseCase {
+@CommandHandler(RequestPasswordResetCommand)
+export class RequestPasswordResetHandler implements ICommandHandler<RequestPasswordResetCommand> {
   constructor(
-    @Inject('IEmailService') private readonly emailService: IEmailService,
+    @Inject('IEmailService')
+    private readonly emailService: IEmailService,
     private readonly userReadRepository: AbstractUserReadRepository,
     private readonly tokenRepository: AbstractVerificationTokenRepository,
   ) {}
 
-  async execute(dto: ForgotYourPasswordDTO): Promise<void> {
-    const email = new Email(dto.email);
+  async execute(command: RequestPasswordResetCommand): Promise<void> {
+    const email = new Email(command.email);
     const user = await this.userReadRepository.findByEmail(email);
     if (!user) {
       return;

@@ -1,21 +1,22 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { randomUUID } from 'crypto';
 
 import { User } from '@/modules/user/domain/entities/user.entity';
 import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
-import { AbstractVerificationTokenRepository } from '../../domain/repositories/password.repository';
+import { AbstractVerificationTokenRepository } from '../../../../domain/repositories/password.repository';
 
 import { IEmailService } from '@/modules/mail/domain/services/email.service';
+import { CreateAccountCommand } from '../implements/create-account.command';
 
-import { RegisterDTO } from '../../presentation/dto/input/register.dto';
-
-import { Token } from '@/shared/domain/value-objects/token.vo';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
+import { Token } from '@/shared/domain/value-objects/token.vo';
 
 @Injectable()
-export class SignUpUseCase {
+@CommandHandler(CreateAccountCommand)
+export class CreateAccountHandler implements ICommandHandler<CreateAccountCommand> {
   constructor(
     @Inject('IEmailService') private readonly emailService: IEmailService,
     private readonly userWriteRepository: AbstractUserWriteRepository,
@@ -23,7 +24,8 @@ export class SignUpUseCase {
     private readonly verificationTokenRepository: AbstractVerificationTokenRepository,
   ) {}
 
-  async execute(dto: RegisterDTO): Promise<string> {
+  async execute(command: CreateAccountCommand): Promise<string> {
+    const { dto } = command;
     const email = new Email(dto.email);
 
     const existingUser = await this.userReadRepository.findByEmail(email);

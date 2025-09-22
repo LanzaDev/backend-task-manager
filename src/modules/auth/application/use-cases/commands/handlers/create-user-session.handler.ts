@@ -1,45 +1,37 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { randomUUID } from 'crypto';
 import { env } from '@/config/env';
 
-import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { AbstractAuthTokenCacheWriteRepository } from '@/modules/auth/domain/repositories/auth-token-cache.write-repository';
+import { CreateUserSessionCommand } from '../implements/create-user-session.command';
 
-import { LoginDTO } from '@/modules/auth/presentation/dto/input/login.dto';
-import { ResponseUserDTO } from '@/modules/user/presentation/dto/output/response-user.dto';
 import { SignResponseDTO } from '@/modules/auth/presentation/dto/output/sign-response.dto';
 
 import { Token } from '@/shared/domain/value-objects/token.vo';
+import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { Email } from '@/shared/domain/value-objects/email.vo';
+import { ResponseUserDTO } from '@/modules/user/presentation/dto/output/response-user.dto';
 
 @Injectable()
-export class SignInUseCase {
+@CommandHandler(CreateUserSessionCommand)
+export class CreateUserSessionHandler
+  implements ICommandHandler<CreateUserSessionCommand>
+{
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userReadRepository: AbstractUserReadRepository,
     private readonly authTokenCacheWriteRepository: AbstractAuthTokenCacheWriteRepository,
+    private readonly userReadRepository: AbstractUserReadRepository,
   ) {}
 
-  async execute(dto: LoginDTO): Promise<SignResponseDTO> {
-    const email = new Email(dto.email);
+  async execute(command: CreateUserSessionCommand): Promise<SignResponseDTO> {
+    const email = new Email(command.responseUserDTO.email);
 
     const user = await this.userReadRepository.findByEmail(email);
     if (!user) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException('Invalid credentials');
     }
-
-    const valid = await user.comparePassword(dto.password);
-
-    if (!valid) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
-    }
-
     if (!user.isVerified()) {
       throw new UnauthorizedException('Email not verified');
     }
@@ -65,10 +57,10 @@ export class SignInUseCase {
       ),
     );
 
-    return {
-      user: new ResponseUserDTO(user),
-      accessToken: accessToken.getValue(),
+    return new SignResponseDTO(
+      new ResponseUserDTO(user),
+      accessToken.getValue(),
       refreshToken,
-    };
+    );
   }
 }

@@ -1,83 +1,60 @@
-import {
-  Body,
-  Controller,
-  HttpException,
-  HttpStatus,
-  Post,
-  Query,
-} from '@nestjs/common';
-import { LoginDTO } from '@/modules/auth/presentation/dto/input/login.dto';
-import { RegisterDTO } from '@/modules/auth/presentation/dto/input/register.dto';
+import { Body, Controller, Post } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { SignResponseDTO } from '@/modules/auth/presentation/dto/output/sign-response.dto';
-import { ForgotYourPasswordDTO } from '@/modules/auth/presentation/dto/input/forgot-your-password.dto';
 import { ResetPasswordDTO } from '@/modules/auth/presentation/dto/input/reset-password.dto';
 
-import { SignInUseCase } from '@/modules/auth/application/use-cases/sign-in.use-case';
-import { SignUpUseCase } from '@/modules/auth/application/use-cases/sign-up.use-case';
-import { ResetPasswordUseCase } from '@/modules/auth/application/use-cases/reset-password.use-case';
-import { RecoverPasswordUseCase } from '@/modules/auth/application/use-cases/recover-password.use-case';
-import { SignOutUseCase } from '@/modules/auth/application/use-cases/sign-out.use-case';
-import { VerifyEmailUseCase } from '../../application/use-cases/verify-email.use-case';
+import { VerifyEmailTokenCommand } from '../../application/use-cases/commands/implements/verify-email-token.command';
+import { CreateUserSessionCommand } from '../../application/use-cases/commands/implements/create-user-session.command';
+import { CreateAccountCommand } from '../../application/use-cases/commands/implements/create-account.command';
+import { LogoutUserCommand } from '../../application/use-cases/commands/implements/logout-user.command';
+
+import { ValidateUserCredentialsQuery } from '../../application/use-cases/query/implements/validate-user-credentials.query';
+import { RequestPasswordResetCommand } from '../../application/use-cases/commands/implements/request-password-reset.command';
+import { ResetPasswordCommand } from '../../application/use-cases/commands/implements/reset-password.command';
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly recoverPasswordUseCase: RecoverPasswordUseCase,
-    private readonly resetPasswordUseCase: ResetPasswordUseCase,
-    private readonly signInUseCase: SignInUseCase,
-    private readonly signUpUseCase: SignUpUseCase,
-    private readonly signOutUseCase: SignOutUseCase,
-    private readonly verifyEmailUseCase: VerifyEmailUseCase,
+    private readonly queryBus: QueryBus,
+    private readonly commandBus: CommandBus,
   ) {}
 
-  @Post('signIn')
-  async signIn(@Body() dto: LoginDTO): Promise<SignResponseDTO> {
-    try {
-      const { accessToken, refreshToken, user } =
-        await this.signInUseCase.execute(dto);
-      return { accessToken, refreshToken, user };
-    } catch (err) {
-      throw new HttpException(
-        err.message || 'Unauthorized',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
+  @Post('login')
+  async signIn(@Body() credentials): Promise<SignResponseDTO> {
+    const user = await this.queryBus.execute(
+      new ValidateUserCredentialsQuery(credentials.email, credentials.password),
+    );
+
+    return this.commandBus.execute(new CreateUserSessionCommand(user));
   }
 
-  @Post('signUp')
-  async signUp(@Body() dto: RegisterDTO): Promise<string> {
-    try {
-      const user = await this.signUpUseCase.execute(dto);
-      return user;
-    } catch (err) {
-      throw new HttpException(
-        err.message || 'Bad Request',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+  @Post('register')
+  async signUp(@Body() userData): Promise<string> {
+    return this.commandBus.execute(new CreateAccountCommand(userData));
   }
 
-  @Post('forgot-password')
-  async forgotPassword(@Body() dto: ForgotYourPasswordDTO) {
-    await this.recoverPasswordUseCase.execute(dto);
-    return { message: 'Recovery email sent if the email is registered' };
+  @Post('request-password-reset')
+  async forgotPassword(@Body() dto) {
+    return this.commandBus.execute(new RequestPasswordResetCommand(dto.email));
   }
 
-  @Post('recover')
+  @Post('reset-password')
   async resetPassword(@Body() dto: ResetPasswordDTO) {
-    await this.resetPasswordUseCase.execute(dto);
-    return { message: 'Password successfully reset' };
+    const command = new ResetPasswordCommand(
+      dto.token,
+      dto.password,
+      dto.confirmPassword,
+    );
+    return this.commandBus.execute(command);
   }
 
   @Post('verify-email')
-  async verifyEmail(@Query('token') token: string) {
-    const result = await this.verifyEmailUseCase.verifyEmailToken(token);
-    return result;
+  async verifyEmail(@Body('token') token: string) {
+    return this.commandBus.execute(new VerifyEmailTokenCommand(token));
   }
 
   @Post('logout')
   async logoutSession(@Body('refreshToken') refreshToken: string) {
-    const success = await this.signOutUseCase.execute(refreshToken);
-    return { message: success ? 'Logout successful' : 'No active session' };
+    return this.commandBus.execute(new LogoutUserCommand(refreshToken));
   }
 }

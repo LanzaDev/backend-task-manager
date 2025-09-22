@@ -1,8 +1,8 @@
 ### -={ Auth }=- ###
 
 ### Auth SignIn
-POST http://localhost:3000/auth/signIn
-Content-Type: application/json  
+POST http://localhost:3000/auth/login
+Content-Type: application/json
 
 {
   "email": "lucas1511gll@gmail.com",
@@ -10,7 +10,7 @@ Content-Type: application/json
 }
 
 ### Auth SignUp
-POST http://localhost:3000/auth/signUp
+POST http://localhost:3000/auth/register
 Content-Type: application/json
 
 {
@@ -20,19 +20,19 @@ Content-Type: application/json
 }
 
 ### Auth forgot password
-POST http://localhost:3000/auth/forgot-password
+POST http://localhost:3000/auth/request-password-reset
 Content-Type: application/json
 
 {
-  "email": ""
+  "email": "lucas1511gll@gmail.com"
 }
 
 ### Auth reset password
-POST http://localhost:3000/auth/recover
+POST http://localhost:3000/auth/reset-password
 Content-Type: application/json
 
 {
-  "token": "d870d6c8-bfe4-416f-943a-c81124150d7c",
+  "token": "3dc984bd-6c5c-4b32-8504-3820b90a90a1",
   "password": "123456",
   "confirmPassword": "123456"
 }
@@ -42,7 +42,7 @@ POST http://localhost:3000/auth/verify-email
 Content-Type: application/json
 
 {
-  "token": "1e04f574-fdd6-4bbf-8720-8f0bf95575c9"
+  "token": "282b1da8-2013-4187-8923-ec29adedfc98"
 }
 
 ### Auth logout
@@ -50,7 +50,7 @@ POST http://localhost:3000/auth/logout
 Content-Type: application/json
 
 {
-  "refreshToken": ""
+  "refreshToken": "4d75ea5c-7b83-458e-a6cd-f3e4508f4343"
 }
 
 

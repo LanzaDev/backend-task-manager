@@ -4,21 +4,24 @@ import { AbstractVerificationTokenRepository } from '@/modules/auth/domain/repos
 import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
 
-import { ResetPasswordDTO } from '../../presentation/dto/input/reset-password.dto';
+import { ResetPasswordDTO } from '../../../../presentation/dto/input/reset-password.dto';
 import { Password } from '@/shared/domain/value-objects/password.vo';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { ResetPasswordCommand } from '../implements/reset-password.command';
 
 @Injectable()
-export class ResetPasswordUseCase {
+@CommandHandler(ResetPasswordCommand)
+export class ResetPasswordHandler implements ICommandHandler<ResetPasswordCommand> {
   constructor(
     private readonly userWriteRepository: AbstractUserWriteRepository,
     private readonly userReadRepository: AbstractUserReadRepository,
     private readonly tokenRepository: AbstractVerificationTokenRepository,
   ) {}
 
-  async execute(dto: ResetPasswordDTO): Promise<void> {
-    const tokenRecord = await this.tokenRepository.findByToken(dto.token);
+  async execute(command: ResetPasswordCommand): Promise<void> {
+    const tokenRecord = await this.tokenRepository.findByToken(command.token);
 
-    if (dto.password !== dto.confirmPassword) {
+    if (command.password !== command.confirmPassword) {
       throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
     }
 
@@ -38,7 +41,7 @@ export class ResetPasswordUseCase {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const newPassword = await Password.create(dto.password);
+    const newPassword = await Password.create(command.password);
 
     await user.setPassword(newPassword);
     await this.userWriteRepository.update(user);
