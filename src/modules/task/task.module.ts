@@ -17,6 +17,7 @@ import { UserTaskController } from '@/modules/task/presentation/controllers/user
 import { AdminTaskController } from '@/modules/task/presentation/controllers/admin-task.controller';
 import { GetAllTasksHandler } from './application/use-cases/query/handlers/get-all-tasks.handler';
 import { GetTaskByIdHandler } from './application/use-cases/query/handlers/get-task-by-id.handler';
+import { SearchTasksHandler } from './application/use-cases/query/handlers/search-tasks.handler';
 
 @Module({
   imports: [CqrsModule],
@@ -28,6 +29,7 @@ import { GetTaskByIdHandler } from './application/use-cases/query/handlers/get-t
     GetAllTaskByUserIdHandler,
     GetAllTasksHandler,
     GetTaskByIdHandler,
+    SearchTasksHandler,
     {
       provide: AbstractUserReadRepository,
       useClass: PrismaUserQueryRepository,

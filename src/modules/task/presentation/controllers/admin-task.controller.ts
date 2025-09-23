@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -16,6 +17,8 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 
@@ -37,6 +40,7 @@ import { GetTaskByIdQuery } from '../../application/use-cases/query/implements/g
 import { DeleteTaskDTO } from '../dto/input/delete-task.dto';
 import { MessageResponseDTO } from '@/core/presentation/dto/message-response.dto';
 import { CreateTaskDTO } from '../dto/input/create-task.dto';
+import { SearchTasksQuery } from '../../application/use-cases/query/implements/search-tasks.query';
 
 @ApiTags('Admin Task')
 @ApiBearerAuth('access-token')
@@ -101,6 +105,57 @@ export class AdminTaskController {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const query = new GetTaskByIdQuery(requesterId, requesterRole, taskId);
+
+    return this.queryBus.execute(query);
+  }
+
+  @Get('search')
+  @Get('search')
+  @ApiOperation({ summary: 'Search tasks with fuzzy matching (admin only)' })
+  @ApiQuery({
+    name: 'q',
+    required: true,
+    description:
+      'Search term. Supports fuzzy matching (e.g., typos will still match tasks).',
+  })
+  @ApiQuery({
+    name: 'targetUserId',
+    required: false,
+    description:
+      'Optional. Admins can specify a userId to search tasks of a specific user. Ignored for regular users.',
+  })
+  @ApiOkResponse({
+    description: 'List of tasks matching the search term.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad Request. Invalid query parameters.',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized. Authentication required.',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden. Only admins can filter by userId.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Not Found. No tasks match the search term.',
+  })
+  async search(
+    @Query('q') q: string,
+    @Query('targetUserId') targetUserId: string,
+    @Request() req,
+  ): Promise<ResponseTaskDTO[]> {
+    const { sub: requesterId, role: requesterRole } = req.user;
+
+    const query = new SearchTasksQuery(
+      requesterId,
+      requesterRole,
+      q,
+      targetUserId,
+    );
 
     return this.queryBus.execute(query);
   }

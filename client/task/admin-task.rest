@@ -12,6 +12,10 @@ Authorization: Bearer
 GET http://localhost:3000/admin/task/
 Authorization: Bearer
 
+### Admin search task | (searchText)
+GET http://localhost:3000/admin/task/search?q=testar%20api
+Authorization: Bearer 
+
 ### Admin create task for user | (userId)
 POST http://localhost:3000/admin/task/
 Content-Type: application/json

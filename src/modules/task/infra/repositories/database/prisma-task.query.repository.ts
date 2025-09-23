@@ -3,6 +3,7 @@ import { Task } from '@/modules/task/domain/entities/task.entity';
 import { TaskStatus } from '@/modules/task/domain/entities/task.entity';
 import { AbstractTaskReadRepository } from '@/modules/task/domain/repositories/task.read-repository';
 import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
+import { Role } from '@/shared/types/role.type';
 
 @Injectable()
 export class PrismaTaskQueryRepository implements AbstractTaskReadRepository {
@@ -64,6 +65,53 @@ export class PrismaTaskQueryRepository implements AbstractTaskReadRepository {
           },
           task.id,
         ),
+    );
+  }
+
+  async searchByUser(userId: string, searchText: string) {
+    const terms = searchText.trim().split(/\s+/);
+
+    const ilikeConditions = terms
+      .map((_, i) => `"title" ILIKE '%' || $${i + 3} || '%'`)
+      .join(' OR ');
+
+    return this.prisma.$queryRawUnsafe<any[]>(
+      `
+    SELECT *
+    FROM "Task"
+    WHERE "userId" = $1
+      AND (
+        SIMILARITY("title"::text, $2::text) > 0.1
+        OR (${ilikeConditions})
+      )
+    ORDER BY SIMILARITY("title"::text, $2::text) DESC
+    LIMIT 10
+    `,
+      userId,
+      searchText,
+      ...terms,
+    );
+  }
+
+  async searchGlobal(searchText: string) {
+    const terms = searchText.trim().split(/\s+/);
+    const ilikeConditions = terms
+      .map((_, i) => `"title" ILIKE '%' || $${i + 2} || '%'`)
+      .join(' OR ');
+
+    return this.prisma.$queryRawUnsafe<any[]>(
+      `
+    SELECT *
+    FROM "Task"
+    WHERE (
+      SIMILARITY("title"::text, $1::text) > 0.1
+      OR (${ilikeConditions})
+    )
+    ORDER BY SIMILARITY("title"::text, $1::text) DESC
+    LIMIT 20
+    `,
+      searchText,
+      ...terms,
     );
   }
 

@@ -11,7 +11,7 @@ Authorization: Bearer
 ### Admin create new user
 POST http://localhost:3000/admin/add
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzNTAwMzQ3YS1hYjJhLTQ2YjItYjQ4Yy1lNGEyNDRjMmNhMzkiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NTg1ODUxNDEsImV4cCI6MTc1ODU4NjA0MX0.JbKZ2KInvgbpwZLz75oSXNqRHajckibQlttvZgsAmqw
+Authorization: Bearer 
 
 {
   "name": "TEST2",

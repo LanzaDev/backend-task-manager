@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -16,6 +17,8 @@ import {
   ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiQuery,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 
@@ -36,6 +39,7 @@ import { UpdateTaskDTO } from '../dto/input/update-task.dto';
 import { ResponseTaskDTO } from '../dto/output/response-task.dto';
 import { DeleteTaskDTO } from '../dto/input/delete-task.dto';
 import { MessageResponseDTO } from '@/core/presentation/dto/message-response.dto';
+import { SearchTasksQuery } from '../../application/use-cases/query/implements/search-tasks.query';
 
 @ApiTags('User Task')
 @ApiBearerAuth('access-token')
@@ -73,6 +77,38 @@ export class UserTaskController {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const query = new GetTaskByIdQuery(requesterId, requesterRole, taskId);
+
+    return this.queryBus.execute(query);
+  }
+
+  @Get('search')
+  @ApiOperation({ summary: 'Search tasks with fuzzy matching' })
+  @ApiQuery({
+    name: 'q',
+    required: true,
+    description:
+      'Search term. Supports fuzzy matching (e.g., typos will still match tasks).',
+  })
+  @ApiOkResponse({
+    description: 'List of tasks matching the search term.',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized. Authentication required.',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden. Only admins can filter by userId.',
+  })
+  async search(@Query('q') q: string, @Request() req): Promise<ResponseTaskDTO[]> {
+    const { sub: requesterId, role: requesterRole } = req.user;
+
+    const query = new SearchTasksQuery(
+      requesterId,
+      requesterRole,
+      q,
+      requesterId,
+    );
 
     return this.queryBus.execute(query);
   }

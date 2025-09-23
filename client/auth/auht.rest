@@ -6,7 +6,7 @@ Content-Type: application/json
 
 {
   "email": "lucas1511gll@gmail.com",
-  "password": "123456"
+  "password": "560065"
 }
 
 ### Auth SignUp

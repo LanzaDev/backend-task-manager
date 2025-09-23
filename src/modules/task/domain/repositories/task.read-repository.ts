@@ -5,5 +5,7 @@ export abstract class AbstractTaskReadRepository {
   abstract findById(taskId: string): Promise<Task | null>;
   abstract findAllTasks(): Promise<Task[]>
   abstract findAllByUser(userId: string): Promise<Task[]>;
+  abstract searchByUser(targetUserId: string, searchText: string): Promise<Task[]>;
+  abstract searchGlobal(searchText: string): Promise<Task[]>;
   abstract findByStatus(userId: string, status: TaskStatus): Promise<Task[]>;
 }
