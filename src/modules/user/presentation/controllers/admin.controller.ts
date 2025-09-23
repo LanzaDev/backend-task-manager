@@ -33,11 +33,10 @@ import { CreateUserCommand } from '../../application/use-cases/commands/implemen
 
 import { GetUserByIdQuery } from '../../application/use-cases/query/implements/get-user-by-id.query';
 import { GetAllUsersQuery } from '../../application/use-cases/query/implements/get-all-users.query';
+
 import { ResponseAdminDTO } from '../dto/output/response-admin.dto';
 import { MessageResponseDTO } from '@/core/presentation/dto/message-response.dto';
 import { CreateUserDTO } from '../dto/input/create-user.dto';
-import { UpdateUserDTO } from '../dto/input/update-user.dto';
-import { DeleteUserDTO } from '../dto/input/delete-user.dto';
 
 @ApiTags('Admin')
 @ApiBearerAuth('access-token')
@@ -110,7 +109,9 @@ export class AdminController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update a user by ID (admin only, update without password)' })
+  @ApiOperation({
+    summary: 'Update a user by ID (admin only, update without password)',
+  })
   @ApiOkResponse({
     description: 'User updated successfully',
     type: MessageResponseDTO,

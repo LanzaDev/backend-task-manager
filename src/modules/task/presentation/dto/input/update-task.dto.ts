@@ -1,30 +1,48 @@
 import { TaskStatus } from '@/modules/task/domain/entities/task.entity';
-import { IsDate, IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import {
+  IsDate,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class UpdateTaskDTO {
-  @IsOptional()
   @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({ example: 'Finish task manager project' })
   title?: string;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
+  @ApiPropertyOptional({ example: 'Complete the task manager project' })
   description?: string;
 
   @IsOptional()
   @IsEnum(TaskStatus)
+  @ApiPropertyOptional({ enum: TaskStatus, default: TaskStatus.PENDING })
   status?: TaskStatus;
 
-  @IsOptional()
-  @IsInt()
   @Min(1)
   @Max(3)
+  @IsInt()
+  @IsOptional()
+  @ApiPropertyOptional({ example: 1, minimum: 1, maximum: 3 })
   priority?: number;
 
-  @IsOptional()
   @IsDate()
+  @IsOptional()
+  @Type(() => Date)
+  @ApiPropertyOptional({ example: '2025-09-30T23:59:59Z', type: String })
   dueDate?: Date;
 
-  @IsOptional()
   @IsDate()
-  completedAt?: Date
+  @IsOptional()
+  @Type(() => Date)
+  @ApiPropertyOptional({ example: '2025-09-25T12:00:00Z', type: String })
+  completedAt?: Date;
 }

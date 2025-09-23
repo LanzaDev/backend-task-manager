@@ -10,6 +10,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
@@ -26,7 +34,12 @@ import { UpdateTaskCommand } from '../../application/use-cases/commands/implemen
 import { GetAllTasksByUserIdQuery } from '../../application/use-cases/query/implements/get-all-tasks-by-user-id.query';
 import { GetAllTasksQuery } from '../../application/use-cases/query/implements/get-all-tasks.query';
 import { GetTaskByIdQuery } from '../../application/use-cases/query/implements/get-task-by-id.query';
+import { DeleteTaskDTO } from '../dto/input/delete-task.dto';
+import { MessageResponseDTO } from '@/core/presentation/dto/message-response.dto';
+import { CreateTaskDTO } from '../dto/input/create-task.dto';
 
+@ApiTags('Admin Task')
+@ApiBearerAuth('access-token')
 @Controller('admin/task/')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
@@ -37,7 +50,13 @@ export class AdminTaskController {
   ) {}
 
   @Get('all')
-  async getAllTasks(@Request() req) {
+  @ApiOperation({ summary: 'Retrieve all tasks in the system (admin only)' })
+  @ApiOkResponse({
+    description: 'List of all tasks',
+    type: ResponseTaskDTO,
+    isArray: true,
+  })
+  async getAllTasks(@Request() req): Promise<ResponseTaskDTO[]> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const query = new GetAllTasksQuery(requesterId, requesterRole);
@@ -46,10 +65,18 @@ export class AdminTaskController {
   }
 
   @Get('all/:userId')
+  @ApiOperation({
+    summary: 'Retrieve all tasks of a specific user (admin only)',
+  })
+  @ApiOkResponse({
+    description: 'List of tasks for the specified user',
+    type: ResponseTaskDTO,
+    isArray: true,
+  })
   async getAllTasksByUser(
     @Param('userId') targetUserId: string,
     @Request() req,
-  ) {
+  ): Promise<ResponseTaskDTO[]> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const query = new GetAllTasksByUserIdQuery(
@@ -62,7 +89,15 @@ export class AdminTaskController {
   }
 
   @Get(':taskId')
-  async getTaskById(@Param('taskId') taskId: string, @Request() req) {
+  @ApiOperation({ summary: 'Retrieve a specific task by ID (admin only)' })
+  @ApiOkResponse({
+    description: 'The task details',
+    type: ResponseTaskDTO,
+  })
+  async getTaskById(
+    @Param('taskId') taskId: string,
+    @Request() req,
+  ): Promise<ResponseTaskDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const query = new GetTaskByIdQuery(requesterId, requesterRole, taskId);
@@ -71,6 +106,17 @@ export class AdminTaskController {
   }
 
   @Post(':userId')
+  @ApiOperation({
+    summary: 'Create a new task for a specific user (admin only)',
+  })
+  @ApiBody({
+    description: 'Data to create the new task',
+    type: CreateTaskDTO,
+  })
+  @ApiCreatedResponse({
+    description: 'Task created successfully',
+    type: ResponseTaskDTO,
+  })
   async createTaskForUser(
     @Param('userId') targetUserId: string,
     @Request() req,
@@ -94,6 +140,17 @@ export class AdminTaskController {
   }
 
   @Patch(':taskId')
+  @ApiOperation({
+    summary: 'Update a task by ID for a specific user (admin only)',
+  })
+  @ApiBody({
+    description: 'Data to update the task',
+    type: UpdateTaskDTO,
+  })
+  @ApiOkResponse({
+    description: 'Task updated successfully',
+    type: MessageResponseDTO,
+  })
   async updateTaskForUser(
     @Param('taskId') taskId: string,
     @Body() updateData: UpdateTaskDTO,
@@ -113,6 +170,15 @@ export class AdminTaskController {
   }
 
   @Delete(':taskId')
+  @ApiOperation({ summary: 'Delete a task by ID (admin only)' })
+  @ApiBody({
+    description: 'ID of the task to delete',
+    type: DeleteTaskDTO,
+  })
+  @ApiOkResponse({
+    description: 'Task deleted successfully',
+    type: MessageResponseDTO,
+  })
   async deleteTaskForUser(@Param('taskId') taskId: string, @Request() req) {
     const userId = req.user.sub;
     const requesterRole = req.user.role;

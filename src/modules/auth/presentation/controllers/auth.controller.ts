@@ -1,4 +1,10 @@
-import { ApiBody, ApiOkResponse, ApiOperation, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { Body, Controller, Post } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { SignResponseDTO } from '@/modules/auth/presentation/dto/output/sign-response.dto';
@@ -12,6 +18,7 @@ import { ResetPasswordCommand } from '../../application/use-cases/commands/imple
 import { RequestPasswordResetCommand } from '../../application/use-cases/commands/implements/request-password-reset.command';
 
 import { ValidateUserCredentialsQuery } from '../../application/use-cases/query/implements/validate-user-credentials.query';
+
 import { RegisterDTO } from '../dto/input/register.dto';
 import { LogoutDTO } from '../dto/input/logout.dto';
 import { LoginDTO } from '../dto/input/login.dto';
@@ -83,7 +90,9 @@ export class AuthController {
     description: 'Password reset successfully',
     type: MessageResponseDTO,
   })
-  @ApiUnauthorizedResponse({ description: 'Invalid token or password mismatch' })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid token or password mismatch',
+  })
   async resetPassword(
     @Body() dto: ResetPasswordDTO,
   ): Promise<MessageResponseDTO> {

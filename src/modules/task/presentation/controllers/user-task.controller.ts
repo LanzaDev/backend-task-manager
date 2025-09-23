@@ -10,6 +10,14 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
@@ -23,6 +31,14 @@ import { UpdateTaskCommand } from '../../application/use-cases/commands/implemen
 import { GetAllTasksByUserIdQuery } from '../../application/use-cases/query/implements/get-all-tasks-by-user-id.query';
 import { GetTaskByIdQuery } from '../../application/use-cases/query/implements/get-task-by-id.query';
 
+import { CreateTaskDTO } from '../dto/input/create-task.dto';
+import { UpdateTaskDTO } from '../dto/input/update-task.dto';
+import { ResponseTaskDTO } from '../dto/output/response-task.dto';
+import { DeleteTaskDTO } from '../dto/input/delete-task.dto';
+import { MessageResponseDTO } from '@/core/presentation/dto/message-response.dto';
+
+@ApiTags('User Task')
+@ApiBearerAuth('access-token')
 @Controller('user/task/')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.USER)
@@ -33,7 +49,9 @@ export class UserTaskController {
   ) {}
 
   @Get()
-  async getMyTasks(@Request() req) {
+  @ApiOperation({ summary: 'Get all tasks of the authenticated user' })
+  @ApiBody({ type: ResponseTaskDTO, isArray: true })
+  async getMyTasks(@Request() req): Promise<ResponseTaskDTO[]> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const query = new GetAllTasksByUserIdQuery(
@@ -46,7 +64,12 @@ export class UserTaskController {
   }
 
   @Get(':taskId')
-  async getTaskById(@Param('taskId') taskId: string, @Request() req) {
+  @ApiOperation({ summary: 'Get a task by its ID' })
+  @ApiBody({ type: ResponseTaskDTO })
+  async getTaskById(
+    @Param('taskId') taskId: string,
+    @Request() req,
+  ): Promise<ResponseTaskDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const query = new GetTaskByIdQuery(requesterId, requesterRole, taskId);
@@ -55,7 +78,16 @@ export class UserTaskController {
   }
 
   @Post()
-  async createTask(@Request() req, @Body() createData) {
+  @ApiOperation({ summary: 'Create a new task' })
+  @ApiBody({ type: CreateTaskDTO })
+  @ApiCreatedResponse({
+    description: 'Task created successfully',
+    type: MessageResponseDTO,
+  })
+  async createTask(
+    @Request() req,
+    @Body() createData,
+  ): Promise<MessageResponseDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const command = new CreateTaskCommand(
@@ -70,15 +102,22 @@ export class UserTaskController {
       createData.completedAt,
     );
 
-    return this.commandBus.execute(command);
+    await this.commandBus.execute(command);
+    return { message: 'Task created successfully' };
   }
 
   @Patch(':taskId')
+  @ApiOperation({ summary: 'Update a task by its ID' })
+  @ApiBody({ type: UpdateTaskDTO })
+  @ApiOkResponse({
+    description: 'Task updated successfully',
+    type: MessageResponseDTO,
+  })
   async updateTask(
     @Param('taskId') taskId: string,
     @Body() updateData,
     @Request() req,
-  ) {
+  ): Promise<MessageResponseDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const command = new UpdateTaskCommand(
@@ -89,11 +128,21 @@ export class UserTaskController {
       requesterId,
     );
 
-    return this.commandBus.execute(command);
+    await this.commandBus.execute(command);
+    return { message: 'Task updated successfully' };
   }
 
   @Delete(':taskId')
-  async deleteTask(@Param('taskId') taskId: string, @Request() req) {
+  @ApiOperation({ summary: 'Delete a task by its ID' })
+  @ApiBody({ type: DeleteTaskDTO })
+  @ApiOkResponse({
+    description: 'Task deleted successfully',
+    type: MessageResponseDTO,
+  })
+  async deleteTask(
+    @Param('taskId') taskId: string,
+    @Request() req,
+  ): Promise<MessageResponseDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const command = new DeleteTaskCommand(
@@ -103,6 +152,7 @@ export class UserTaskController {
       requesterId,
     );
 
-    return this.commandBus.execute(command);
+    await this.commandBus.execute(command);
+    return { message: 'Task deleted successfully' };
   }
 }
