@@ -13,7 +13,9 @@ import type { IEmailService } from '@/modules/mail/domain/services/email.service
 
 @Injectable()
 @CommandHandler(RequestPasswordResetCommand)
-export class RequestPasswordResetHandler implements ICommandHandler<RequestPasswordResetCommand> {
+export class RequestPasswordResetHandler
+  implements ICommandHandler<RequestPasswordResetCommand>
+{
   constructor(
     @Inject('IEmailService')
     private readonly emailService: IEmailService,

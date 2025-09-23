@@ -25,17 +25,16 @@ export class CreateAccountHandler implements ICommandHandler<CreateAccountComman
   ) {}
 
   async execute(command: CreateAccountCommand): Promise<string> {
-    const { dto } = command;
-    const email = new Email(dto.email);
+    const email = new Email(command.email);
 
     const existingUser = await this.userReadRepository.findByEmail(email);
     if (existingUser) {
       throw new ConflictException('Email already in use');
     }
 
-    const password = await Password.create(dto.password);
+    const password = await Password.create(command.password);
     const user = new User({
-      name: dto.name,
+      name: command.name,
       email,
       password,
       isVerified: false,

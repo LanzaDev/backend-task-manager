@@ -17,6 +17,8 @@ export class LogoutUserHandler implements ICommandHandler<LogoutUserCommand> {
   ) {}
 
   async execute(command: LogoutUserCommand) {
+    const { userId, refreshToken } = command;
+
     const lockKey = `logout-lock:${command.refreshToken}`;
 
     const gotLock = await this.client.set(lockKey, '1', 'EX', 5, 'NX');
@@ -24,17 +26,14 @@ export class LogoutUserHandler implements ICommandHandler<LogoutUserCommand> {
       return false;
     }
 
-    const userId = await this.authTokenCacheReadRepository.getUserIdByToken(
-      command.refreshToken,
-    );
+    const storedUserId =
+      await this.authTokenCacheReadRepository.getUserIdByToken(refreshToken);
 
-    if (!userId) {
+    if (!storedUserId || storedUserId !== userId) {
       return false;
     }
 
-    await this.authTokenCacheWriteRepository.deleteRefreshToken(
-      command.refreshToken,
-    );
+    await this.authTokenCacheWriteRepository.deleteRefreshToken(refreshToken);
     await this.authTokenCacheWriteRepository.deleteSession(userId);
     await this.client.del(lockKey);
 

@@ -7,7 +7,7 @@ import { JwtStrategy } from '@/modules/auth/infra/strategies/jwt-strategy';
 
 import { RequestPasswordResetHandler } from '@/modules/auth/application/use-cases/commands/handlers/request-password-reset.handler';
 import { ResetPasswordHandler } from '@/modules/auth/application/use-cases/commands/handlers/reset-password.handler';
-import { LogoutUserHandler } from '@/modules/auth/application/use-cases/commands/handlers/logout.handler';
+import { LogoutUserHandler } from '@/modules/auth/application/use-cases/commands/handlers/logout-user.handler';
 
 import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
 import { AbstractUserReadRepository } from '../user/domain/repositories/user.read-repository';

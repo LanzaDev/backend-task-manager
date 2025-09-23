@@ -12,9 +12,11 @@ import {
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiBody,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiOperation,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -32,6 +34,10 @@ import { CreateUserCommand } from '../../application/use-cases/commands/implemen
 import { GetUserByIdQuery } from '../../application/use-cases/query/implements/get-user-by-id.query';
 import { GetAllUsersQuery } from '../../application/use-cases/query/implements/get-all-users.query';
 import { ResponseAdminDTO } from '../dto/output/response-admin.dto';
+import { MessageResponseDTO } from '@/core/presentation/dto/message-response.dto';
+import { CreateUserDTO } from '../dto/input/create-user.dto';
+import { UpdateUserDTO } from '../dto/input/update-user.dto';
+import { DeleteUserDTO } from '../dto/input/delete-user.dto';
 
 @ApiTags('Admin')
 @ApiBearerAuth('access-token')
@@ -45,13 +51,14 @@ export class AdminController {
   ) {}
 
   @Get('all')
+  @ApiOperation({ summary: 'Get all users (admin only)' })
   @ApiOkResponse({
     description: 'Returns all users in the system',
     type: ResponseAdminDTO,
     isArray: true,
   })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
-  async getAllUsers(@Request() req) {
+  async getAllUsers(@Request() req): Promise<ResponseAdminDTO[]> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const query = new GetAllUsersQuery(requesterId, requesterRole);
@@ -60,13 +67,17 @@ export class AdminController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Get a user by ID (admin only)' })
   @ApiOkResponse({
     description: 'Returns a specific user by ID',
     type: ResponseAdminDTO,
   })
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
-  async getUserById(@Param('id') targetUserId: string, @Request() req) {
+  async getUserById(
+    @Param('id') targetUserId: string,
+    @Request() req,
+  ): Promise<ResponseAdminDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const query = new GetUserByIdQuery(
@@ -79,26 +90,30 @@ export class AdminController {
   }
 
   @Post('add')
+  @ApiOperation({ summary: 'Create a new user (admin only, already verified)' })
+  @ApiBody({ type: CreateUserDTO })
   @ApiCreatedResponse({
-    description: 'User created successfully',
-    type: ResponseAdminDTO,
+    description: 'User created successfully (already verified, no email sent)',
+    type: MessageResponseDTO,
   })
   @ApiBadRequestResponse({ description: 'Invalid input data' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
-  async createUser(@Body() createData) {
+  async createUser(@Body() createData): Promise<MessageResponseDTO> {
     const command = new CreateUserCommand(
       createData.name,
       createData.email,
       createData.password,
     );
 
-    return this.commandBus.execute(command);
+    await this.commandBus.execute(command);
+    return { message: 'User created successfully' };
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Update a user by ID (admin only, update without password)' })
   @ApiOkResponse({
     description: 'User updated successfully',
-    type: ResponseAdminDTO,
+    type: MessageResponseDTO,
   })
   @ApiBadRequestResponse({ description: 'Invalid input data' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
@@ -107,7 +122,7 @@ export class AdminController {
     @Param('id') targetUserId: string,
     @Body() updateData,
     @Request() req,
-  ) {
+  ): Promise<MessageResponseDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const command = new UpdateUserCommand(
@@ -117,14 +132,22 @@ export class AdminController {
       targetUserId,
     );
 
-    return this.commandBus.execute(command);
+    await this.commandBus.execute(command);
+    return { message: 'User updated successfully' };
   }
 
   @Delete(':id')
-  @ApiOkResponse({ description: 'User deleted successfully' })
+  @ApiOperation({ summary: 'Delete a user by ID (admin only)' })
+  @ApiOkResponse({
+    description: 'User deleted successfully',
+    type: MessageResponseDTO,
+  })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
   @ApiNotFoundResponse({ description: 'User not found' })
-  async deleteUser(@Param('id') targetUserId: string, @Request() req) {
+  async deleteUser(
+    @Param('id') targetUserId: string,
+    @Request() req,
+  ): Promise<MessageResponseDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const command = new DeleteUserCommand(
@@ -133,6 +156,7 @@ export class AdminController {
       targetUserId,
     );
 
-    return this.commandBus.execute(command);
+    await this.commandBus.execute(command);
+    return { message: 'User deleted successfully' };
   }
 }

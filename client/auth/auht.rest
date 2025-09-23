@@ -6,7 +6,7 @@ Content-Type: application/json
 
 {
   "email": "lucas1511gll@gmail.com",
-  "password": "560065"
+  "password": "123456"
 }
 
 ### Auth SignUp
@@ -50,7 +50,8 @@ POST http://localhost:3000/auth/logout
 Content-Type: application/json
 
 {
-  "refreshToken": "4d75ea5c-7b83-458e-a6cd-f3e4508f4343"
+  "userId": "3500347a-ab2a-46b2-b48c-e4a244c2ca39",
+  "refreshToken": "44c7ff2e-d146-4553-813b-a431eb9555f8"
 }
 
 

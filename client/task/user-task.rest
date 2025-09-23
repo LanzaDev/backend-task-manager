@@ -2,7 +2,7 @@
 
 ### User find all task
 GET http://localhost:3000/user/task
-Authorization: Bearer 
+Authorization: Bearer
 
 ### User find task by id | (taskId)
 GET http://localhost:3000/user/task/
@@ -11,7 +11,7 @@ Authorization: Bearer
 ### User create task
 POST http://localhost:3000/user/task
 Content-Type: application/json
-Authorization: Bearer
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzNTAwMzQ3YS1hYjJhLTQ2YjItYjQ4Yy1lNGEyNDRjMmNhMzkiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc1ODU0MzIyNSwiZXhwIjoxNzU4NTQ0MTI1fQ.IYSRrm_HDIM07ibvYSM4B2jOQTyC6lkqmW47yD1xGWg
 
 {
   "title": "user test"
