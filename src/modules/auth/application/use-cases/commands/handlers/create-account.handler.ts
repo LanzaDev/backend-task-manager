@@ -3,17 +3,17 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { randomUUID } from 'crypto';
 
 import { User } from '@/modules/user/domain/entities/user.entity';
+import { IEmailService } from '@/modules/mail/domain/services/email.service';
 import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
 import { AbstractVerificationRepository } from '../../../../domain/repositories/verify.repository';
 
-import { IEmailService } from '@/modules/mail/domain/services/email.service';
 import { CreateAccountCommand } from '../implements/create-account.command';
 
+import { GenerateVerificationCode } from '@/shared/utils/generate-verification-code';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
 import { Token } from '@/shared/domain/value-objects/token.vo';
-import { GenerateVerificationCode } from '@/shared/utils/generate-verification-code';
 import { env } from '@/config/env';
 
 @Injectable()

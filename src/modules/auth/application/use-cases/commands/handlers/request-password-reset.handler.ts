@@ -3,14 +3,14 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { randomUUID } from 'crypto';
 import { addHours } from 'date-fns';
 
+import type { IEmailService } from '@/modules/mail/domain/services/email.service';
 import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { AbstractVerificationRepository } from '@/modules/auth/domain/repositories/verify.repository';
 
 import { RequestPasswordResetCommand } from '../implements/request-password-reset.command';
+import { GenerateVerificationCode } from '@/shared/utils/generate-verification-code';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Token } from '@/shared/domain/value-objects/token.vo';
-import type { IEmailService } from '@/modules/mail/domain/services/email.service';
-import { GenerateVerificationCode } from '@/shared/utils/generate-verification-code';
 
 @Injectable()
 @CommandHandler(RequestPasswordResetCommand)

@@ -1,11 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { AbstractVerificationRepository } from '@/modules/auth/domain/repositories/verify.repository';
 import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
 
 import { Password } from '@/shared/domain/value-objects/password.vo';
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ResetPasswordTokenCommand } from '../implements/reset-password-token.command';
 
 @Injectable()

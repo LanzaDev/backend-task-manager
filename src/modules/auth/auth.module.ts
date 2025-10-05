@@ -28,9 +28,8 @@ import { CacheModule } from '@/shared/infra/cache/cache.module';
 import { ValidateUserCredentialsHandler } from './application/use-cases/query/handlers/validate-user-credentials.handler';
 import { CreateUserSessionHandler } from './application/use-cases/commands/handlers/create-user-session.handler';
 import { CqrsModule } from '@nestjs/cqrs';
-import { VerifyEmailTokenHandler } from './application/use-cases/commands/handlers/verify-email-token.handler';
+import { VerifyEmailHandler } from './application/use-cases/commands/handlers/verify.email.handler';
 import { CreateAccountHandler } from './application/use-cases/commands/handlers/create-account.handler';
-import { VerifyEmailCodeHandler } from './application/use-cases/commands/handlers/verify-email-code.handler';
 
 @Module({
   imports: [
@@ -44,16 +43,15 @@ import { VerifyEmailCodeHandler } from './application/use-cases/commands/handler
   ],
   controllers: [AuthController],
   providers: [
+    VerifyEmailHandler,
     JwtStrategy,
     CreateAccountHandler,
     RequestPasswordResetHandler,
     LogoutUserHandler,
     ResetPasswordCodeHandler,
     ResetPasswordTokenHandler,
-    VerifyEmailTokenHandler,
     ValidateUserCredentialsHandler,
     CreateUserSessionHandler,
-    VerifyEmailCodeHandler,
     {
       provide: AbstractUserWriteRepository,
       useClass: PrismaUserCommandRepository,

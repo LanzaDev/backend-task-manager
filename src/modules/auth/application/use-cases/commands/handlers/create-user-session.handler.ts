@@ -1,18 +1,18 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { JwtService } from '@nestjs/jwt';
 import { randomUUID } from 'crypto';
 import { env } from '@/config/env';
 
+import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { AbstractAuthTokenCacheWriteRepository } from '@/modules/auth/domain/repositories/auth-token-cache.write-repository';
 import { CreateUserSessionCommand } from '../implements/create-user-session.command';
 
 import { SignResponseDTO } from '@/modules/auth/presentation/dto/output/sign-response.dto';
+import { ResponseUserDTO } from '@/modules/user/presentation/dto/output/response-user.dto';
 
 import { Token } from '@/shared/domain/value-objects/token.vo';
-import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { Email } from '@/shared/domain/value-objects/email.vo';
-import { ResponseUserDTO } from '@/modules/user/presentation/dto/output/response-user.dto';
 
 @Injectable()
 @CommandHandler(CreateUserSessionCommand)

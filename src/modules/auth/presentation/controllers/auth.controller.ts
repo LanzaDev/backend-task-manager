@@ -8,14 +8,12 @@ import {
 import { Body, Controller, Post } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
-import { VerifyEmailTokenCommand } from '../../application/use-cases/commands/implements/verify-email-token.command';
 import { CreateUserSessionCommand } from '../../application/use-cases/commands/implements/create-user-session.command';
 import { CreateAccountCommand } from '../../application/use-cases/commands/implements/create-account.command';
 import { LogoutUserCommand } from '../../application/use-cases/commands/implements/logout-user.command';
 import { ResetPasswordTokenCommand } from '../../application/use-cases/commands/implements/reset-password-token.command';
 import { ResetPasswordCodeCommand } from '../../application/use-cases/commands/implements/reset-password-code.command';
 import { RequestPasswordResetCommand } from '../../application/use-cases/commands/implements/request-password-reset.command';
-import { VerifyEmailCodeCommand } from '../../application/use-cases/commands/implements/verify-email-code.command';
 
 import { ValidateUserCredentialsQuery } from '../../application/use-cases/query/implements/validate-user-credentials.query';
 
@@ -30,6 +28,7 @@ import { VerifyEmailCodeDTO } from '../dto/input/verify-email-code';
 import { SignResponseDTO } from '@/modules/auth/presentation/dto/output/sign-response.dto';
 import { MessageResponseDTO } from '../../../../core/presentation/dto/message-response.dto';
 import { ResetPasswordCodeDTO } from '../dto/input/reset-password-code.dto';
+import { VerifyEmailCommand } from '../../application/use-cases/commands/implements/verify-email.command';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -148,7 +147,7 @@ export class AuthController {
   async verifyEmailToken(
     @Body() dto: VerifyEmailTokenDTO,
   ): Promise<MessageResponseDTO> {
-    await this.commandBus.execute(new VerifyEmailTokenCommand(dto.token));
+    await this.commandBus.execute(new VerifyEmailCommand(dto.token));
     return new MessageResponseDTO('Email verified successfully.');
   }
 
@@ -163,7 +162,7 @@ export class AuthController {
   async verifyEmailCode(
     @Body() dto: VerifyEmailCodeDTO,
   ): Promise<MessageResponseDTO> {
-    await this.commandBus.execute(new VerifyEmailCodeCommand(dto.code));
+    await this.commandBus.execute(new VerifyEmailCommand(undefined, dto.code));
     return new MessageResponseDTO('Email verified successfully.');
   }
 
