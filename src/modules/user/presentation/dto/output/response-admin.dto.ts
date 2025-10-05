@@ -31,7 +31,7 @@ export class ResponseAdminDTO {
   @Expose()
   @IsEmail()
   @ApiProperty({
-    example: 'lanzadev1@gmail.com',
+    example: 'user@example.com',
     description: 'Email address of the user',
   })
   readonly email: string;

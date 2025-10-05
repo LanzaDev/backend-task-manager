@@ -28,11 +28,11 @@ export class CreateUserSessionHandler
   async execute(command: CreateUserSessionCommand): Promise<SignResponseDTO> {
     const email = new Email(command.responseUserDTO.email);
 
-    const user = await this.userReadRepository.findByEmail(email);
-    if (!user) {
+    const existingUser = await this.userReadRepository.findByEmail(email);
+    if (!existingUser) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    if (!user.isVerified()) {
+    if (!existingUser.isVerified()) {
       throw new UnauthorizedException('Email not verified');
     }
 
@@ -40,25 +40,25 @@ export class CreateUserSessionHandler
 
     await this.authTokenCacheWriteRepository.setRefreshToken(
       refreshToken,
-      user.getId(),
+      existingUser.getId(),
       env.REFRESH_TOKEN_EXP,
     );
 
     await this.authTokenCacheWriteRepository.setSession(
-      user.getId(),
+      existingUser.getId(),
       { refreshToken },
       env.REFRESH_TOKEN_EXP,
     );
 
     const accessToken = new Token(
       this.jwtService.sign(
-        { sub: user.getId(), role: user.getRole() },
+        { sub: existingUser.getId(), role: existingUser.getRole() },
         { expiresIn: env.ACCESS_TOKEN_EXP },
       ),
     );
 
     return new SignResponseDTO(
-      new ResponseUserDTO(user),
+      new ResponseUserDTO(existingUser),
       accessToken.getValue(),
       refreshToken,
     );

@@ -17,21 +17,21 @@ export class ValidateUserCredentialsHandler
 
   async execute(query: ValidateUserCredentialsQuery): Promise<ResponseUserDTO> {
     const email = new Email(query.email);
-    const user = await this.userReadRepository.findByEmail(email);
+    const existingUser = await this.userReadRepository.findByEmail(email);
 
-    if (!user) {
+    if (!existingUser) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const valid = await user.comparePassword(query.password);
+    const valid = await existingUser.comparePassword(query.password);
     if (!valid) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    if (!user.isVerified()) {
+    if (!existingUser.isVerified()) {
       throw new UnauthorizedException('Email not verified');
     }
 
-    return new ResponseUserDTO(user);
+    return new ResponseUserDTO(existingUser);
   }
 }

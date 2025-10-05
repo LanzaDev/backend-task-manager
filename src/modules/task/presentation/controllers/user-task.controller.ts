@@ -23,9 +23,10 @@ import {
 } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
+import { JwtUser } from '@/modules/auth/domain/repositories/jwt.repository';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
 import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+import { Role } from '@/shared/types/role.type';
 
 import { CreateTaskCommand } from '../../application/use-cases/commands/implements/create-task.command';
 import { DeleteTaskCommand } from '../../application/use-cases/commands/implements/delete-task.command';
@@ -33,13 +34,14 @@ import { UpdateTaskCommand } from '../../application/use-cases/commands/implemen
 
 import { GetAllTasksByUserIdQuery } from '../../application/use-cases/query/implements/get-all-tasks-by-user-id.query';
 import { GetTaskByIdQuery } from '../../application/use-cases/query/implements/get-task-by-id.query';
+import { SearchTasksQuery } from '../../application/use-cases/query/implements/search-tasks.query';
 
 import { CreateTaskDTO } from '../dto/input/create-task.dto';
 import { UpdateTaskDTO } from '../dto/input/update-task.dto';
-import { ResponseTaskDTO } from '../dto/output/response-task.dto';
 import { DeleteTaskDTO } from '../dto/input/delete-task.dto';
+
+import { ResponseTaskDTO } from '../dto/output/response-task.dto';
 import { MessageResponseDTO } from '@/core/presentation/dto/message-response.dto';
-import { SearchTasksQuery } from '../../application/use-cases/query/implements/search-tasks.query';
 
 @ApiTags('User Task')
 @ApiBearerAuth('access-token')
@@ -55,7 +57,9 @@ export class UserTaskController {
   @Get()
   @ApiOperation({ summary: 'Get all tasks of the authenticated user' })
   @ApiBody({ type: ResponseTaskDTO, isArray: true })
-  async getMyTasks(@Request() req): Promise<ResponseTaskDTO[]> {
+  async getMyTasks(
+    @Request() req: { user: JwtUser },
+  ): Promise<ResponseTaskDTO[]> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const query = new GetAllTasksByUserIdQuery(
@@ -72,7 +76,7 @@ export class UserTaskController {
   @ApiBody({ type: ResponseTaskDTO })
   async getTaskById(
     @Param('taskId') taskId: string,
-    @Request() req,
+    @Request() req: { user: JwtUser },
   ): Promise<ResponseTaskDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
@@ -100,7 +104,10 @@ export class UserTaskController {
     status: 403,
     description: 'Forbidden. Only admins can filter by userId.',
   })
-  async search(@Query('q') q: string, @Request() req): Promise<ResponseTaskDTO[]> {
+  async search(
+    @Query('q') q: string,
+    @Request() req: { user: JwtUser },
+  ): Promise<ResponseTaskDTO[]> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const query = new SearchTasksQuery(
@@ -121,8 +128,8 @@ export class UserTaskController {
     type: MessageResponseDTO,
   })
   async createTask(
-    @Request() req,
-    @Body() createData,
+    @Request() req: { user: JwtUser },
+    @Body() createUserDTO: CreateTaskDTO,
   ): Promise<MessageResponseDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
@@ -130,12 +137,12 @@ export class UserTaskController {
       requesterId,
       requesterRole,
       requesterId,
-      createData.title,
-      createData.description,
-      createData.status,
-      createData.priority,
-      createData.dueDate,
-      createData.completedAt,
+      createUserDTO.title,
+      createUserDTO.description,
+      createUserDTO.status,
+      createUserDTO.priority,
+      createUserDTO.dueDate,
+      createUserDTO.completedAt,
     );
 
     await this.commandBus.execute(command);
@@ -151,13 +158,13 @@ export class UserTaskController {
   })
   async updateTask(
     @Param('taskId') taskId: string,
-    @Body() updateData,
-    @Request() req,
+    @Body() updateTaskDTO: UpdateTaskDTO,
+    @Request() req: { user: JwtUser },
   ): Promise<MessageResponseDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const command = new UpdateTaskCommand(
-      updateData,
+      updateTaskDTO,
       requesterId,
       requesterRole,
       taskId,
@@ -177,7 +184,7 @@ export class UserTaskController {
   })
   async deleteTask(
     @Param('taskId') taskId: string,
-    @Request() req,
+    @Request() req: { user: JwtUser },
   ): Promise<MessageResponseDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 

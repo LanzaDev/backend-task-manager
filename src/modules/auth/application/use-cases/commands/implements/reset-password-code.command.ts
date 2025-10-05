@@ -1,6 +1,6 @@
-export class ResetPasswordCommand {
+export class ResetPasswordCodeCommand {
   constructor(
-    public readonly token: string,
+    public readonly code: string,
     public readonly password: string,
     public readonly confirmPassword: string,
   ) {}

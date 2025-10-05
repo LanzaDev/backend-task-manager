@@ -1,7 +1,16 @@
-import { TaskStatus } from '@/modules/task/domain/entities/task.entity';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsDate,
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 import { Transform, Type } from 'class-transformer';
-import { IsDate, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator';
+import { TaskStatus } from '@/modules/task/domain/entities/task.entity';
 
 export class CreateTaskDTO {
   @IsString()
@@ -16,7 +25,7 @@ export class CreateTaskDTO {
 
   @IsOptional()
   @IsEnum(TaskStatus)
-  @Transform(({ value }) => value ?? TaskStatus.PENDING)
+  @Transform(({ value }) => (value ?? TaskStatus.PENDING) as TaskStatus)
   @ApiPropertyOptional({ enum: TaskStatus, default: TaskStatus.PENDING })
   status?: TaskStatus;
 
@@ -37,5 +46,5 @@ export class CreateTaskDTO {
   @IsOptional()
   @Type(() => Date)
   @ApiPropertyOptional({ example: '2025-09-25T12:00:00Z', type: String })
-  completedAt?: Date
+  completedAt?: Date;
 }

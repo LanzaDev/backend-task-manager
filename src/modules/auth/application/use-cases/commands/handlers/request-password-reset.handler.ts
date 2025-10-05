@@ -10,6 +10,7 @@ import { RequestPasswordResetCommand } from '../implements/request-password-rese
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Token } from '@/shared/domain/value-objects/token.vo';
 import type { IEmailService } from '@/modules/mail/domain/services/email.service';
+import { GenerateVerificationCode } from '@/shared/utils/generate-verification-code';
 
 @Injectable()
 @CommandHandler(RequestPasswordResetCommand)
@@ -25,32 +26,32 @@ export class RequestPasswordResetHandler
 
   async execute(command: RequestPasswordResetCommand): Promise<void> {
     const email = new Email(command.email);
-    const user = await this.userReadRepository.findByEmail(email);
-    if (!user) {
+    const existingUser = await this.userReadRepository.findByEmail(email);
+    if (!existingUser) {
       return;
     }
 
     const rawToken = randomUUID();
     const token = new Token(rawToken);
     const expiresAt = addHours(new Date(), 1);
-    const code = '1';
+    const verificationCode = GenerateVerificationCode(6);
 
     await this.verificationRepository.create({
-      userId: user.getId(),
+      userId: existingUser.getId(),
       token: token.toString(),
-      code: code,
+      code: verificationCode,
       expiresAt,
       isUsed: false,
     });
 
-    const resetLink = `http://localhost:5173/recover?token=${token.getValue()}`;
+    const resetLink = `http://localhost:5173/recover?token=${token.getValue()}&code=${verificationCode}`;
 
     await this.emailService.sendEmail({
-      to: [user.getEmailValue()],
+      to: [existingUser.getEmailValue()],
       subject: 'Recuperação de senha',
       html: `
         <div style="font-family: Arial, sans-serif; color: #333333; font-size: 16px; line-height: 1.5;">
-        <p>Olá ${user.getName()},</p>
+        <p>Olá ${existingUser.getName()},</p>
         <p>Você solicitou a recuperação da sua senha. Clique no botão abaixo:</p>
 
         <table cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 20px 0;">

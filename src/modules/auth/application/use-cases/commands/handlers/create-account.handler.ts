@@ -14,6 +14,7 @@ import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
 import { Token } from '@/shared/domain/value-objects/token.vo';
 import { GenerateVerificationCode } from '@/shared/utils/generate-verification-code';
+import { env } from '@/config/env';
 
 @Injectable()
 @CommandHandler(CreateAccountCommand)
@@ -60,42 +61,50 @@ export class CreateAccountHandler
       isUsed: false,
     });
 
-    const redirect_url = `http://localhost:5173/verify-email?token=${verificationToken.getValue()}`;
+    const redirect_url = `http://localhost:5173/verify-email?token=${verificationToken.getValue()}&code=${verificationCode}`;
 
     await this.emailService.sendEmail({
       to: [user.getEmailValue()],
       subject: 'Verifique seu e-mail',
-      html: `<div style="font-family: Arial, sans-serif; color: #333333; font-size: 16px; line-height: 1.5;">
-        <p>Olá ${user.getName()},</p>
-        <p>Você se cadastrou no TaskManager, verifique seu e-mail.  Você pode usar o código abaixo ou clicar no botão para redefinir:</p>
+      html: `
+        <div style="font-family: Arial, sans-serif; font-size: 16px; line-height: 1.5; color: #333333;">
+          <p style="color: #333333; text-decoration: none;">Olá ${user.getName()},</p>
+          <p style="color: #333333; text-decoration: none;">
+            Você se cadastrou no ${env.APP_NAME}. Verifique seu e-mail.
+            Você pode usar o código( ${verificationCode} ) abaixo ou clicar no botão para redefinir:
+          </p>
 
-        <div style="font-size: 24px; font-weight: bold; color: #3803f6; margin: 20px 0; text-align: center;">
-          ${verificationCode}
-        </div>
-
-        <table cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 20px 0;">
-          <tr>
-            <td align="center" bgcolor="#3803f6" style="border-radius: 8px;">
-              <a href="${redirect_url}"
-                target="_blank"
-                style="font-size: 16px;
+          <!-- Bloco do código -->
+          <table cellspacing="0" cellpadding="0" border="0" align="center" style="margin: 20px 0;">
+            <tr>
+              <td align="center">
+                <p style="font-size: 24px; font-weight: bold; color: #3803f6; margin-bottom: 20px;">
+                  ${verificationCode}
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td align="center" bgcolor="#3803f6" style="border-radius: 8px;">
+                <a href="${redirect_url}"
+                  target="_blank"
+                  style="font-size: 16px;
                         font-weight: bold;
                         font-family: Arial, sans-serif;
                         color: #ffffff;
                         text-decoration: none;
                         padding: 14px 28px;
                         display: inline-block;">
-                Clique aqui para verificar
-              </a>
-            </td>
-          </tr>
-        </table>
+                  Clique aqui para verificar
+                </a>
+              </td>
+            </tr>
+          </table>
 
-        <p style="color: #333333; text-decoration: none; margin-top: 20px;">
-          Se você não se cadastrou na nossa plataforma, pode ignorar este e-mail.
-        </p>
-      </div>
-    `,
+          <p style="margin-top: 20px; color: #333333; text-decoration: none; font-size: 16px; line-height: 1.5;">
+            Se você não se cadastrou na nossa plataforma, pode ignorar este e-mail.
+          </p>
+        </div>
+      `,
     });
 
     return 'Registration successful';

@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto";
+import { randomUUID } from 'crypto';
 
 export enum TaskStatus {
   PENDING = 'PENDING',
@@ -24,7 +24,7 @@ export class Task {
   private readonly props: TaskSchema;
   private updatedAt: Date;
 
-constructor(props: TaskSchema, id?: string) {
+  constructor(props: TaskSchema, id?: string) {
     this.id = id || randomUUID();
     this.props = {
       ...props,

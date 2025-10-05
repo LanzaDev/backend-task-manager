@@ -6,7 +6,8 @@ import { AuthController } from '@/modules/auth/presentation/controllers/auth.con
 import { JwtStrategy } from '@/modules/auth/infra/strategies/jwt-strategy';
 
 import { RequestPasswordResetHandler } from '@/modules/auth/application/use-cases/commands/handlers/request-password-reset.handler';
-import { ResetPasswordHandler } from '@/modules/auth/application/use-cases/commands/handlers/reset-password.handler';
+import { ResetPasswordCodeHandler } from './application/use-cases/commands/handlers/reset-password-code.handler';
+import { ResetPasswordTokenHandler } from '@/modules/auth/application/use-cases/commands/handlers/reset-password-token.handler';
 import { LogoutUserHandler } from '@/modules/auth/application/use-cases/commands/handlers/logout-user.handler';
 
 import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
@@ -47,7 +48,8 @@ import { VerifyEmailCodeHandler } from './application/use-cases/commands/handler
     CreateAccountHandler,
     RequestPasswordResetHandler,
     LogoutUserHandler,
-    ResetPasswordHandler,
+    ResetPasswordCodeHandler,
+    ResetPasswordTokenHandler,
     VerifyEmailTokenHandler,
     ValidateUserCredentialsHandler,
     CreateUserSessionHandler,

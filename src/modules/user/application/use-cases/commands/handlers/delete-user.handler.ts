@@ -20,10 +20,10 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
   ) {}
 
   async execute(command: DeleteUserCommand): Promise<void> {
-    const requesterUser = await this.userReadRepository.findById(
+    const requester = await this.userReadRepository.findById(
       command.requesterId,
     );
-    if (!requesterUser) {
+    if (!requester) {
       throw new NotFoundException('Requester not found');
     }
 
@@ -43,7 +43,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
         throw new Error('Password is required to delete your own account');
       }
 
-      const isPasswordValid = await requesterUser.comparePassword(
+      const isPasswordValid = await requester.comparePassword(
         command.currentPassword,
       );
       if (!isPasswordValid) {

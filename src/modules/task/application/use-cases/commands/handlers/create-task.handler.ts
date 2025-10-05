@@ -74,8 +74,8 @@ export class CreateTaskHandler implements ICommandHandler<CreateTaskCommand> {
         metadata: { source: 'NestJS API' },
       };
       await axios.post('http://localhost:8001/process-task', taskForMCP);
-    } catch (err) {
-      console.warn('MCP offline, skipping task processing');
+    } catch (error) {
+      console.warn('MCP offline, skipping task processing', error);
     }
 
     return createdTask;

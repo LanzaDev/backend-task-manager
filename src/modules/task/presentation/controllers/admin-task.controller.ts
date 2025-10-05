@@ -23,12 +23,10 @@ import {
 } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
+import { JwtUser } from '@/modules/auth/domain/repositories/jwt.repository';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
 import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
-import { Role } from '@prisma/client';
-
-import { UpdateTaskDTO } from '@/modules/task/presentation/dto/input/update-task.dto';
-import { ResponseTaskDTO } from '@/modules/task/presentation/dto/output/response-task.dto';
+import { Role } from '@/shared/types/role.type';
 
 import { CreateTaskCommand } from '../../application/use-cases/commands/implements/create-task.command';
 import { DeleteTaskCommand } from '../../application/use-cases/commands/implements/delete-task.command';
@@ -37,10 +35,14 @@ import { UpdateTaskCommand } from '../../application/use-cases/commands/implemen
 import { GetAllTasksByUserIdQuery } from '../../application/use-cases/query/implements/get-all-tasks-by-user-id.query';
 import { GetAllTasksQuery } from '../../application/use-cases/query/implements/get-all-tasks.query';
 import { GetTaskByIdQuery } from '../../application/use-cases/query/implements/get-task-by-id.query';
-import { DeleteTaskDTO } from '../dto/input/delete-task.dto';
-import { MessageResponseDTO } from '@/core/presentation/dto/message-response.dto';
-import { CreateTaskDTO } from '../dto/input/create-task.dto';
 import { SearchTasksQuery } from '../../application/use-cases/query/implements/search-tasks.query';
+
+import { CreateTaskDTO } from '../dto/input/create-task.dto';
+import { DeleteTaskDTO } from '../dto/input/delete-task.dto';
+import { UpdateTaskDTO } from '@/modules/task/presentation/dto/input/update-task.dto';
+
+import { ResponseTaskDTO } from '@/modules/task/presentation/dto/output/response-task.dto';
+import { MessageResponseDTO } from '@/core/presentation/dto/message-response.dto';
 
 @ApiTags('Admin Task')
 @ApiBearerAuth('access-token')
@@ -60,7 +62,9 @@ export class AdminTaskController {
     type: ResponseTaskDTO,
     isArray: true,
   })
-  async getAllTasks(@Request() req): Promise<ResponseTaskDTO[]> {
+  async getAllTasks(
+    @Request() req: { user: JwtUser },
+  ): Promise<ResponseTaskDTO[]> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const query = new GetAllTasksQuery(requesterId, requesterRole);
@@ -79,7 +83,7 @@ export class AdminTaskController {
   })
   async getAllTasksByUser(
     @Param('userId') targetUserId: string,
-    @Request() req,
+    @Request() req: { user: JwtUser },
   ): Promise<ResponseTaskDTO[]> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
@@ -100,7 +104,7 @@ export class AdminTaskController {
   })
   async getTaskById(
     @Param('taskId') taskId: string,
-    @Request() req,
+    @Request() req: { user: JwtUser },
   ): Promise<ResponseTaskDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
@@ -146,7 +150,7 @@ export class AdminTaskController {
   async search(
     @Query('q') q: string,
     @Query('targetUserId') targetUserId: string,
-    @Request() req,
+    @Request() req: { user: JwtUser },
   ): Promise<ResponseTaskDTO[]> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
@@ -174,8 +178,8 @@ export class AdminTaskController {
   })
   async createTaskForUser(
     @Param('userId') targetUserId: string,
-    @Request() req,
-    @Body() createTaskData,
+    @Request() req: { user: JwtUser },
+    @Body() createTaskDTO: CreateTaskDTO,
   ) {
     const { sub: requesterId, role: requesterRole } = req.user;
 
@@ -183,12 +187,12 @@ export class AdminTaskController {
       requesterId,
       requesterRole,
       targetUserId,
-      createTaskData.title,
-      createTaskData.description,
-      createTaskData.status,
-      createTaskData.priority,
-      createTaskData.dueDate,
-      createTaskData.completedAt,
+      createTaskDTO.title,
+      createTaskDTO.description,
+      createTaskDTO.status,
+      createTaskDTO.priority,
+      createTaskDTO.dueDate,
+      createTaskDTO.completedAt,
     );
 
     return this.commandBus.execute(command);
@@ -208,15 +212,14 @@ export class AdminTaskController {
   })
   async updateTaskForUser(
     @Param('taskId') taskId: string,
-    @Body() updateData: UpdateTaskDTO,
-    @Request() req,
+    @Body() updateTaskDTO: UpdateTaskDTO,
+    @Request() req: { user: JwtUser },
   ): Promise<ResponseTaskDTO> {
-    const userId = req.user.sub;
-    const requesterRole = req.user.role;
+    const { sub: requesterId, role: requesterRole } = req.user;
 
     const command = new UpdateTaskCommand(
-      updateData,
-      userId,
+      updateTaskDTO,
+      requesterId,
       requesterRole,
       taskId,
     );
@@ -234,14 +237,13 @@ export class AdminTaskController {
     description: 'Task deleted successfully',
     type: MessageResponseDTO,
   })
-  async deleteTaskForUser(@Param('taskId') taskId: string, @Request() req) {
-    const userId = req.user.sub;
-    const requesterRole = req.user.role;
-
-    const command = new DeleteTaskCommand(userId, taskId, requesterRole);
-
+  async deleteTaskForUser(
+    @Param('taskId') taskId: string,
+    @Request() req: { user: JwtUser },
+  ) {
+    const { sub: requesterId, role: requesterRole } = req.user;
+    const command = new DeleteTaskCommand(requesterId, taskId, requesterRole);
     await this.commandBus.execute(command);
-
     return { message: 'Task deleted successfully' };
   }
 }

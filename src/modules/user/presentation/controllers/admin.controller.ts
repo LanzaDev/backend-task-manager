@@ -23,9 +23,10 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
+import { JwtUser } from '@/modules/auth/domain/repositories/jwt.repository';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
 import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+import { Role } from '@/shared/types/role.type';
 
 import { UpdateUserCommand } from '../../application/use-cases/commands/implements/update-user.command';
 import { DeleteUserCommand } from '../../application/use-cases/commands/implements/delete-user.command';
@@ -34,9 +35,11 @@ import { CreateUserCommand } from '../../application/use-cases/commands/implemen
 import { GetUserByIdQuery } from '../../application/use-cases/query/implements/get-user-by-id.query';
 import { GetAllUsersQuery } from '../../application/use-cases/query/implements/get-all-users.query';
 
-import { ResponseAdminDTO } from '../dto/output/response-admin.dto';
-import { MessageResponseDTO } from '@/core/presentation/dto/message-response.dto';
 import { CreateUserDTO } from '../dto/input/create-user.dto';
+import { UpdateUserDTO } from '../dto/input/update-user.dto';
+
+import { MessageResponseDTO } from '@/core/presentation/dto/message-response.dto';
+import { ResponseAdminDTO } from '../dto/output/response-admin.dto';
 
 @ApiTags('Admin')
 @ApiBearerAuth('access-token')
@@ -57,7 +60,9 @@ export class AdminController {
     isArray: true,
   })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
-  async getAllUsers(@Request() req): Promise<ResponseAdminDTO[]> {
+  async getAllUsers(
+    @Request() req: { user: JwtUser },
+  ): Promise<ResponseAdminDTO[]> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const query = new GetAllUsersQuery(requesterId, requesterRole);
@@ -75,7 +80,7 @@ export class AdminController {
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
   async getUserById(
     @Param('id') targetUserId: string,
-    @Request() req,
+    @Request() req: { user: JwtUser },
   ): Promise<ResponseAdminDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
@@ -97,11 +102,13 @@ export class AdminController {
   })
   @ApiBadRequestResponse({ description: 'Invalid input data' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
-  async createUser(@Body() createData): Promise<MessageResponseDTO> {
+  async createUser(
+    @Body() createUserDTO: CreateUserDTO,
+  ): Promise<MessageResponseDTO> {
     const command = new CreateUserCommand(
-      createData.name,
-      createData.email,
-      createData.password,
+      createUserDTO.name,
+      createUserDTO.email,
+      createUserDTO.password,
     );
 
     await this.commandBus.execute(command);
@@ -121,13 +128,13 @@ export class AdminController {
   @ApiNotFoundResponse({ description: 'User not found' })
   async updateUser(
     @Param('id') targetUserId: string,
-    @Body() updateData,
-    @Request() req,
+    @Body() updateUserDTO: UpdateUserDTO,
+    @Request() req: { user: JwtUser },
   ): Promise<MessageResponseDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const command = new UpdateUserCommand(
-      updateData,
+      updateUserDTO,
       requesterId,
       requesterRole,
       targetUserId,
@@ -147,7 +154,7 @@ export class AdminController {
   @ApiNotFoundResponse({ description: 'User not found' })
   async deleteUser(
     @Param('id') targetUserId: string,
-    @Request() req,
+    @Request() req: { user: JwtUser },
   ): Promise<MessageResponseDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 

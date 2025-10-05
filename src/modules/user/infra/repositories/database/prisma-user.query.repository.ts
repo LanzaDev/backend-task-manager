@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 
 import { User } from '@/modules/user/domain/entities/user.entity';
 import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
-
 import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
 
 import { Email } from '@/shared/domain/value-objects/email.vo';

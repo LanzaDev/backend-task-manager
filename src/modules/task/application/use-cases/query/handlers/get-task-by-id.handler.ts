@@ -8,7 +8,7 @@ import { GetTaskByIdQuery } from '../implements/get-task-by-id.query';
 import { ResponseTaskDTO } from '@/modules/task/presentation/dto/output/response-task.dto';
 import { TaskMapper } from '../../../mapper/task.mapper';
 
-import { Role } from '@prisma/client';
+import { Role } from '@/shared/types/role.type';
 
 @Injectable()
 @QueryHandler(GetTaskByIdQuery)

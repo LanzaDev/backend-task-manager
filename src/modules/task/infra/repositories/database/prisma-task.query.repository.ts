@@ -3,7 +3,6 @@ import { Task } from '@/modules/task/domain/entities/task.entity';
 import { TaskStatus } from '@/modules/task/domain/entities/task.entity';
 import { AbstractTaskReadRepository } from '@/modules/task/domain/repositories/task.read-repository';
 import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
-import { Role } from '@/shared/types/role.type';
 
 @Injectable()
 export class PrismaTaskQueryRepository implements AbstractTaskReadRepository {

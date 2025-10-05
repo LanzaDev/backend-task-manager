@@ -10,23 +10,29 @@ import { CreateUserHandler } from '@/modules/user/application/use-cases/commands
 import { UpdateUserHandler } from '@/modules/user/application/use-cases/commands/handlers/update-user.handler';
 import { DeleteUserHandler } from '@/modules/user/application/use-cases/commands/handlers/delete-user.handler';
 
-import { UserController } from '@/modules/user/presentation/controllers/user.controller';
-import { AdminController } from '@/modules/user/presentation/controllers/admin.controller';
-
 import { GetUserByIdHandler } from './application/use-cases/query/handlers/get-user-by-id.handler';
 import { CheckEmailHandler } from './application/use-cases/query/handlers/check-email.handler';
 import { GetAllUsersHandler } from './application/use-cases/query/handlers/get-all-users.handler';
+
+import { UserController } from '@/modules/user/presentation/controllers/user.controller';
+import { AdminController } from '@/modules/user/presentation/controllers/admin.controller';
+
+const CommandHandlers = [
+  CreateUserHandler,
+  DeleteUserHandler,
+  UpdateUserHandler,
+];
+
+const QueryHandlers = [
+  GetUserByIdHandler,
+  GetAllUsersHandler,
+  CheckEmailHandler,
+];
 
 @Module({
   imports: [CqrsModule],
   controllers: [UserController, AdminController],
   providers: [
-    CreateUserHandler,
-    UpdateUserHandler,
-    DeleteUserHandler,
-    GetUserByIdHandler,
-    GetAllUsersHandler,
-    CheckEmailHandler,
     {
       provide: AbstractUserWriteRepository,
       useClass: PrismaUserCommandRepository,
@@ -35,6 +41,8 @@ import { GetAllUsersHandler } from './application/use-cases/query/handlers/get-a
       provide: AbstractUserReadRepository,
       useClass: PrismaUserQueryRepository,
     },
+    ...CommandHandlers,
+    ...QueryHandlers,
   ],
 })
 export class UserModule {}

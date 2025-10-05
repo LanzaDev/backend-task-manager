@@ -1,4 +1,4 @@
-import { Role } from "@/shared/types/role.type";
+import { Role } from '@/shared/types/role.type';
 
 export class GetTaskByIdQuery {
   constructor(

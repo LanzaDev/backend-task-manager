@@ -7,26 +7,29 @@ import {
 } from '@nestjs/swagger';
 import { Body, Controller, Post } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { SignResponseDTO } from '@/modules/auth/presentation/dto/output/sign-response.dto';
-import { ResetPasswordDTO } from '@/modules/auth/presentation/dto/input/reset-password.dto';
 
 import { VerifyEmailTokenCommand } from '../../application/use-cases/commands/implements/verify-email-token.command';
 import { CreateUserSessionCommand } from '../../application/use-cases/commands/implements/create-user-session.command';
 import { CreateAccountCommand } from '../../application/use-cases/commands/implements/create-account.command';
 import { LogoutUserCommand } from '../../application/use-cases/commands/implements/logout-user.command';
-import { ResetPasswordCommand } from '../../application/use-cases/commands/implements/reset-password.command';
+import { ResetPasswordTokenCommand } from '../../application/use-cases/commands/implements/reset-password-token.command';
+import { ResetPasswordCodeCommand } from '../../application/use-cases/commands/implements/reset-password-code.command';
 import { RequestPasswordResetCommand } from '../../application/use-cases/commands/implements/request-password-reset.command';
+import { VerifyEmailCodeCommand } from '../../application/use-cases/commands/implements/verify-email-code.command';
 
 import { ValidateUserCredentialsQuery } from '../../application/use-cases/query/implements/validate-user-credentials.query';
 
+import { LoginDTO } from '../dto/input/login.dto';
 import { RegisterDTO } from '../dto/input/register.dto';
 import { LogoutDTO } from '../dto/input/logout.dto';
-import { LoginDTO } from '../dto/input/login.dto';
+import { ResetPasswordDTO } from '@/modules/auth/presentation/dto/input/reset-password.dto';
 import { RequestPasswordResetDTO } from '../dto/input/request-password-reset.dto';
-import { MessageResponseDTO } from '../../../../core/presentation/dto/message-response.dto';
 import { VerifyEmailTokenDTO } from '../dto/input/verify-email-token.dto';
-import { VerifyEmailCodeCommand } from '../../application/use-cases/commands/implements/verify-email-code.command';
 import { VerifyEmailCodeDTO } from '../dto/input/verify-email-code';
+
+import { SignResponseDTO } from '@/modules/auth/presentation/dto/output/sign-response.dto';
+import { MessageResponseDTO } from '../../../../core/presentation/dto/message-response.dto';
+import { ResetPasswordCodeDTO } from '../dto/input/reset-password-code.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -45,10 +48,11 @@ export class AuthController {
   })
   @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
   async signIn(@Body() dto: LoginDTO): Promise<SignResponseDTO> {
-    const user = await this.queryBus.execute(
-      new ValidateUserCredentialsQuery(dto.email, dto.password),
-    );
-    return this.commandBus.execute(new CreateUserSessionCommand(user));
+    return await this.queryBus
+      .execute(new ValidateUserCredentialsQuery(dto.email, dto.password))
+      .then((user) =>
+        this.commandBus.execute(new CreateUserSessionCommand(user)),
+      );
   }
 
   @Post('register')
@@ -89,6 +93,26 @@ export class AuthController {
     return new MessageResponseDTO('Password reset email sent successfully.');
   }
 
+  @Post('reset-password-code')
+  @ApiOperation({ summary: 'Reset user password using code' })
+  @ApiBody({ type: ResetPasswordCodeDTO })
+  @ApiOkResponse({
+    description: 'Password reset successfully',
+    type: MessageResponseDTO,
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid code or password mismatch',
+  })
+  async resetPasswordCode(
+    @Body() dto: ResetPasswordCodeDTO,
+  ): Promise<MessageResponseDTO> {
+    await this.commandBus.execute(
+      new ResetPasswordCodeCommand(dto.code, dto.password, dto.confirmPassword),
+    );
+
+    return new MessageResponseDTO('Password reset successfully.');
+  }
+
   @Post('reset-password')
   @ApiOperation({ summary: 'Reset user password using token' })
   @ApiBody({ type: ResetPasswordDTO })
@@ -99,11 +123,15 @@ export class AuthController {
   @ApiUnauthorizedResponse({
     description: 'Invalid token or password mismatch',
   })
-  async resetPassword(
+  async resetPasswordToken(
     @Body() dto: ResetPasswordDTO,
   ): Promise<MessageResponseDTO> {
     await this.commandBus.execute(
-      new ResetPasswordCommand(dto.token, dto.password, dto.confirmPassword),
+      new ResetPasswordTokenCommand(
+        dto.token,
+        dto.password,
+        dto.confirmPassword,
+      ),
     );
 
     return new MessageResponseDTO('Password reset successfully.');

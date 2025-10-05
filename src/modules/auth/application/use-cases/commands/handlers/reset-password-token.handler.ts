@@ -6,12 +6,12 @@ import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/
 
 import { Password } from '@/shared/domain/value-objects/password.vo';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ResetPasswordCommand } from '../implements/reset-password.command';
+import { ResetPasswordTokenCommand } from '../implements/reset-password-token.command';
 
 @Injectable()
-@CommandHandler(ResetPasswordCommand)
-export class ResetPasswordHandler
-  implements ICommandHandler<ResetPasswordCommand>
+@CommandHandler(ResetPasswordTokenCommand)
+export class ResetPasswordTokenHandler
+  implements ICommandHandler<ResetPasswordTokenCommand>
 {
   constructor(
     private readonly userWriteRepository: AbstractUserWriteRepository,
@@ -19,7 +19,7 @@ export class ResetPasswordHandler
     private readonly verificationRepository: AbstractVerificationRepository,
   ) {}
 
-  async execute(command: ResetPasswordCommand): Promise<void> {
+  async execute(command: ResetPasswordTokenCommand): Promise<void> {
     const tokenRecord = await this.verificationRepository.findByToken(
       command.token,
     );

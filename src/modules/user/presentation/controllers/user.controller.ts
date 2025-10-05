@@ -20,9 +20,10 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
 import { JwtAuthGuard } from '@/modules/auth/infra/guards/jwt.guard';
+import { JwtUser } from '@/modules/auth/domain/repositories/jwt.repository';
 import { RolesGuard } from '@/modules/auth/infra/guards/roles.guard';
 import { Roles } from '@/modules/auth/infra/decorators/roles.decorator';
-import { Role } from '@prisma/client';
+import { Role } from '@/shared/types/role.type';
 
 import { DeleteUserCommand } from '../../application/use-cases/commands/implements/delete-user.command';
 import { UpdateUserCommand } from '../../application/use-cases/commands/implements/update-user.command';
@@ -32,6 +33,7 @@ import { GetUserByIdQuery } from '../../application/use-cases/query/implements/g
 import { ResponseUserDTO } from '../dto/output/response-user.dto';
 import { UpdateUserDTO } from '../dto/input/update-user.dto';
 import { DeleteUserDTO } from '../dto/input/delete-user.dto';
+
 import { MessageResponseDTO } from '@/core/presentation/dto/message-response.dto';
 
 @ApiTags('User')
@@ -53,7 +55,9 @@ export class UserController {
   })
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
-  async getProfile(@Request() req): Promise<ResponseUserDTO> {
+  async getProfile(
+    @Request() req: { user: JwtUser },
+  ): Promise<ResponseUserDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
     const query = new GetUserByIdQuery(requesterId, requesterRole, requesterId);
@@ -71,7 +75,7 @@ export class UserController {
   @ApiBadRequestResponse({ description: 'Invalid input data' })
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
   async updateProfile(
-    @Request() req,
+    @Request() req: { user: JwtUser },
     @Body() updateData: UpdateUserDTO,
     @Body('currentPassword') currentPassword: string,
   ): Promise<MessageResponseDTO> {
@@ -100,7 +104,7 @@ export class UserController {
   @ApiUnauthorizedResponse({ description: 'Missing or invalid token' })
   async deleteProfile(
     @Body('currentPassword') dto: DeleteUserDTO,
-    @Request() req,
+    @Request() req: { user: JwtUser },
   ): Promise<MessageResponseDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
