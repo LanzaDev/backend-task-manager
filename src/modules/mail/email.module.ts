@@ -10,8 +10,9 @@ import { FakeEmailService } from './infra/services/fake-email.service';
       provide: 'IEmailService',
       useFactory: (configService: ConfigService) => {
         const emailFake = configService.get<string>('EMAIL_FAKE') === 'true';
-        if (emailFake) return new FakeEmailService();
-        return new NodemailerEmailService(configService);
+        return emailFake
+          ? new FakeEmailService()
+          : new NodemailerEmailService(configService);
       },
       inject: [ConfigService],
     },

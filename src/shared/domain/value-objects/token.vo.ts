@@ -1,9 +1,9 @@
 export class Token {
-  private readonly value: string
+  private readonly value: string;
 
   constructor(value: string) {
     if (!value || value.trim() === '') {
-      throw new Error("Invalid token")
+      throw new Error('Invalid token');
     }
     this.value = value;
   }

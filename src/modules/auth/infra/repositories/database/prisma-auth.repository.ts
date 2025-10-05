@@ -1,39 +1,46 @@
 import { Injectable } from '@nestjs/common';
-import { VerificationToken } from '@prisma/client';
-import { AbstractVerificationTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
+import { AbstractVerificationRepository } from '@/modules/auth/domain/repositories/verify.repository';
 import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
-import { Token } from '@/shared/domain/value-objects/token.vo';
+import { Verification } from '@/shared/domain/value-objects/verify.vo';
 
 @Injectable()
 export class PrismaPasswordResetTokenRepository
-  implements AbstractVerificationTokenRepository
+  implements AbstractVerificationRepository
 {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: {
     userId: string;
-    token: Token;
+    token: string;
+    code: string;
     expiresAt: Date;
     isUsed: boolean;
   }): Promise<void> {
-    await this.prisma.verificationToken.create({
+    await this.prisma.verification.create({
       data: {
         userId: data.userId,
-        token: data.token.getValue(),
+        token: data.token,
+        code: data.code,
         expiresAt: data.expiresAt,
         isUsed: data.isUsed,
       },
     });
   }
 
-  async findByToken(token: string): Promise<VerificationToken | null> {
-    return this.prisma.verificationToken.findUnique({
+  async findByToken(token: string): Promise<Verification | null> {
+    return this.prisma.verification.findUnique({
       where: { token },
     });
   }
 
+  async findByCode(code: string): Promise<Verification | null> {
+    return this.prisma.verification.findUnique({
+      where: { code },
+    });
+  }
+
   async markAsUsed(id: string): Promise<void> {
-    await this.prisma.verificationToken.update({
+    await this.prisma.verification.update({
       where: { id },
       data: {
         isUsed: true,
@@ -43,7 +50,7 @@ export class PrismaPasswordResetTokenRepository
   }
 
   async deleteExpired(): Promise<void> {
-    await this.prisma.verificationToken.deleteMany({
+    await this.prisma.verification.deleteMany({
       where: {
         expiresAt: { lt: new Date() },
         isUsed: false,

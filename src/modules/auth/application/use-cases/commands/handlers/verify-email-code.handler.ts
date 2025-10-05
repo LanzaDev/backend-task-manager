@@ -1,15 +1,15 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { AbstractVerificationRepository } from '@/modules/auth/domain/repositories/verify.repository';
 import { EmailVerificationStatus } from '@/shared/types/email-status.type';
-import { VerifyEmailTokenCommand } from '../implements/verify-email-token.command';
 import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
+import { VerifyEmailCodeCommand } from '../implements/verify-email-code.command';
+import { AbstractVerificationRepository } from '@/modules/auth/domain/repositories/verify.repository';
 
 @Injectable()
-@CommandHandler(VerifyEmailTokenCommand)
-export class VerifyEmailTokenHandler
-  implements ICommandHandler<VerifyEmailTokenCommand>
+@CommandHandler(VerifyEmailCodeCommand)
+export class VerifyEmailCodeHandler
+  implements ICommandHandler<VerifyEmailCodeCommand>
 {
   constructor(
     private readonly verificationRepository: AbstractVerificationRepository,
@@ -17,13 +17,13 @@ export class VerifyEmailTokenHandler
   ) {}
 
   async execute(
-    command: VerifyEmailTokenCommand,
+    command: VerifyEmailCodeCommand,
   ): Promise<EmailVerificationStatus> {
-    if (!command.token) {
-      throw new HttpException('Token is required', HttpStatus.BAD_REQUEST);
+    if (!command.code) {
+      throw new HttpException('Code is required', HttpStatus.BAD_REQUEST);
     }
 
-    const record = await this.verificationRepository.findByToken(command.token);
+    const record = await this.verificationRepository.findByCode(command.code);
 
     if (!record) return EmailVerificationStatus.INVALID;
     if (record.isUsed) return EmailVerificationStatus.ALREADY_VERIFIED;

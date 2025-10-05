@@ -16,7 +16,7 @@ export class CheckHealthUseCase {
       this.cacheHealthRepository.checkConnection(),
     ]);
 
-     const response: ResponseHealthDTO = {
+    const response: ResponseHealthDTO = {
       status: isDbOnline && isCacheOnline ? 'healthy' : 'unhealthy',
       database: isDbOnline ? 'healthy' : 'unhealthy',
       cache: isCacheOnline ? 'healthy' : 'unhealthy',

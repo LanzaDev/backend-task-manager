@@ -21,16 +21,16 @@ enum TaskStatus {
 }
 
 model User {
-  id                String              @id @default(uuid())
-  name              String
-  email             String              @unique
-  password          String
-  role              Role                @default(USER)
-  isVerified        Boolean             @default(false)
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  tasks             Task[]
-  VerificationToken VerificationToken[]
+  id           String         @id @default(uuid())
+  name         String
+  email        String         @unique
+  password     String
+  role         Role           @default(USER)
+  isVerified   Boolean        @default(false)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  tasks        Task[]
+  Verification Verification[]
 }
 
 model Task {
@@ -47,11 +47,12 @@ model Task {
   completedAt DateTime?
 }
 
-model VerificationToken {
+model Verification {
   id        String    @id @default(uuid())
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  token     String    @unique
+  token     String   @unique
+  code      String   @unique
   expiresAt DateTime
   isUsed    Boolean   @default(false)
   createdAt DateTime  @default(now())
@@ -59,4 +60,5 @@ model VerificationToken {
 
   @@index([userId])
   @@index([token])
+  @@index([code])
 }

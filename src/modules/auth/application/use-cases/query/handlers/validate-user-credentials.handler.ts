@@ -1,10 +1,4 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
 import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
@@ -37,7 +31,7 @@ export class ValidateUserCredentialsHandler
     if (!user.isVerified()) {
       throw new UnauthorizedException('Email not verified');
     }
-    
+
     return new ResponseUserDTO(user);
   }
 }

@@ -1,25 +1,28 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
-import { AbstractVerificationTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
+import { AbstractVerificationRepository } from '@/modules/auth/domain/repositories/verify.repository';
 import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { AbstractUserWriteRepository } from '@/modules/user/domain/repositories/user.write-repository';
 
-import { ResetPasswordDTO } from '../../../../presentation/dto/input/reset-password.dto';
 import { Password } from '@/shared/domain/value-objects/password.vo';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ResetPasswordCommand } from '../implements/reset-password.command';
 
 @Injectable()
 @CommandHandler(ResetPasswordCommand)
-export class ResetPasswordHandler implements ICommandHandler<ResetPasswordCommand> {
+export class ResetPasswordHandler
+  implements ICommandHandler<ResetPasswordCommand>
+{
   constructor(
     private readonly userWriteRepository: AbstractUserWriteRepository,
     private readonly userReadRepository: AbstractUserReadRepository,
-    private readonly tokenRepository: AbstractVerificationTokenRepository,
+    private readonly verificationRepository: AbstractVerificationRepository,
   ) {}
 
   async execute(command: ResetPasswordCommand): Promise<void> {
-    const tokenRecord = await this.tokenRepository.findByToken(command.token);
+    const tokenRecord = await this.verificationRepository.findByToken(
+      command.token,
+    );
 
     if (command.password !== command.confirmPassword) {
       throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
@@ -43,8 +46,8 @@ export class ResetPasswordHandler implements ICommandHandler<ResetPasswordComman
 
     const newPassword = await Password.create(command.password);
 
-    await user.setPassword(newPassword);
+    user.setPassword(newPassword);
     await this.userWriteRepository.update(user);
-    await this.tokenRepository.markAsUsed(tokenRecord.id);
+    await this.verificationRepository.markAsUsed(tokenRecord.id);
   }
 }

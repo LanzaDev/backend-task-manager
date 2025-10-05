@@ -14,7 +14,7 @@ import { AbstractUserReadRepository } from '../user/domain/repositories/user.rea
 import { AbstractAuthTokenCacheReadRepository } from './domain/repositories/auth-token-cache.read-repository';
 import { AbstractAuthTokenCacheWriteRepository } from './domain/repositories/auth-token-cache.write-repository';
 
-import { AbstractVerificationTokenRepository } from '@/modules/auth/domain/repositories/password.repository';
+import { AbstractVerificationRepository } from '@/modules/auth/domain/repositories/verify.repository';
 import { RedisAuthTokenCacheQueryRepository } from './infra/repositories/cache/redis-auth.query.repository';
 import { RedisAuthTokenCommandCacheRepository } from './infra/repositories/cache/redis-auth.command.repository';
 
@@ -29,6 +29,7 @@ import { CreateUserSessionHandler } from './application/use-cases/commands/handl
 import { CqrsModule } from '@nestjs/cqrs';
 import { VerifyEmailTokenHandler } from './application/use-cases/commands/handlers/verify-email-token.handler';
 import { CreateAccountHandler } from './application/use-cases/commands/handlers/create-account.handler';
+import { VerifyEmailCodeHandler } from './application/use-cases/commands/handlers/verify-email-code.handler';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { CreateAccountHandler } from './application/use-cases/commands/handlers/
     VerifyEmailTokenHandler,
     ValidateUserCredentialsHandler,
     CreateUserSessionHandler,
+    VerifyEmailCodeHandler,
     {
       provide: AbstractUserWriteRepository,
       useClass: PrismaUserCommandRepository,
@@ -59,7 +61,7 @@ import { CreateAccountHandler } from './application/use-cases/commands/handlers/
       useClass: PrismaUserQueryRepository,
     },
     {
-      provide: AbstractVerificationTokenRepository,
+      provide: AbstractVerificationRepository,
       useClass: PrismaPasswordResetTokenRepository,
     },
     {
@@ -69,6 +71,10 @@ import { CreateAccountHandler } from './application/use-cases/commands/handlers/
     {
       provide: AbstractAuthTokenCacheWriteRepository,
       useClass: RedisAuthTokenCommandCacheRepository,
+    },
+    {
+      provide: AbstractVerificationRepository,
+      useClass: PrismaPasswordResetTokenRepository,
     },
   ],
   exports: [],

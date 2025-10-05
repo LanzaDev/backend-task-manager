@@ -24,7 +24,9 @@ import { LogoutDTO } from '../dto/input/logout.dto';
 import { LoginDTO } from '../dto/input/login.dto';
 import { RequestPasswordResetDTO } from '../dto/input/request-password-reset.dto';
 import { MessageResponseDTO } from '../../../../core/presentation/dto/message-response.dto';
-import { VerifyEmailDTO } from '../dto/input/verify-email.dto';
+import { VerifyEmailTokenDTO } from '../dto/input/verify-email-token.dto';
+import { VerifyEmailCodeCommand } from '../../application/use-cases/commands/implements/verify-email-code.command';
+import { VerifyEmailCodeDTO } from '../dto/input/verify-email-code';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -46,7 +48,6 @@ export class AuthController {
     const user = await this.queryBus.execute(
       new ValidateUserCredentialsQuery(dto.email, dto.password),
     );
-
     return this.commandBus.execute(new CreateUserSessionCommand(user));
   }
 
@@ -60,7 +61,12 @@ export class AuthController {
   @ApiUnauthorizedResponse({ description: 'Invalid input data' })
   async signUp(@Body() dto: RegisterDTO): Promise<MessageResponseDTO> {
     await this.commandBus.execute(
-      new CreateAccountCommand(dto.name, dto.email, dto.password),
+      new CreateAccountCommand(
+        dto.name,
+        dto.email,
+        dto.password,
+        dto.confirmPassword,
+      ),
     );
 
     return new MessageResponseDTO(
@@ -103,16 +109,33 @@ export class AuthController {
     return new MessageResponseDTO('Password reset successfully.');
   }
 
-  @Post('verify-email')
+  @Post('verify-email-token')
   @ApiOperation({ summary: 'Verify user email using token' })
-  @ApiBody({ type: VerifyEmailDTO })
+  @ApiBody({ type: VerifyEmailTokenDTO })
   @ApiOkResponse({
     description: 'Email verified successfully',
     type: MessageResponseDTO,
   })
   @ApiUnauthorizedResponse({ description: 'Invalid or expired token' })
-  async verifyEmail(@Body() dto: VerifyEmailDTO): Promise<MessageResponseDTO> {
+  async verifyEmailToken(
+    @Body() dto: VerifyEmailTokenDTO,
+  ): Promise<MessageResponseDTO> {
     await this.commandBus.execute(new VerifyEmailTokenCommand(dto.token));
+    return new MessageResponseDTO('Email verified successfully.');
+  }
+
+  @Post('verify-email-code')
+  @ApiOperation({ summary: 'Verify user email using code' })
+  @ApiBody({ type: VerifyEmailCodeDTO })
+  @ApiOkResponse({
+    description: 'Email verified successfully',
+    type: MessageResponseDTO,
+  })
+  @ApiUnauthorizedResponse({ description: 'Invalid or expired token' })
+  async verifyEmailCode(
+    @Body() dto: VerifyEmailCodeDTO,
+  ): Promise<MessageResponseDTO> {
+    await this.commandBus.execute(new VerifyEmailCodeCommand(dto.code));
     return new MessageResponseDTO('Email verified successfully.');
   }
 
