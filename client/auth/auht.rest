@@ -1,8 +1,8 @@
 ### -={ Auth }=- ###
 
 ### Auth SignIn
-POST http://localhost:3000/auth/signIn
-Content-Type: application/json  
+POST http://localhost:3000/auth/login
+Content-Type: application/json
 
 {
   "email": "lucas1511gll@gmail.com",
@@ -10,31 +10,42 @@ Content-Type: application/json
 }
 
 ### Auth SignUp
-POST http://localhost:3000/auth/signUp
+POST http://localhost:3000/auth/register
 Content-Type: application/json
 
 {
   "name": "Lanza",
-  "email": "lucas1511gll@gmail.com",
-  "password": "560065"
+  "email": "lucas1511gll1@gmail.com",
+  "password": "560065",
+  "confirmPassword": "560065"
 }
 
 ### Auth forgot password
-POST http://localhost:3000/auth/forgot-password
+POST http://localhost:3000/auth/request-password-reset
 Content-Type: application/json
 
 {
-  "email": ""
+  "email": "lucas1511gll@gmail.com"
 }
 
 ### Auth reset password
-POST http://localhost:3000/auth/recover
+POST http://localhost:3000/auth/reset-password/verify
 Content-Type: application/json
 
 {
-  "token": "d870d6c8-bfe4-416f-943a-c81124150d7c",
-  "password": "123456",
-  "confirmPassword": "123456"
+  "token": "",
+  "code": ""
+}
+
+### Auth reset password
+POST http://localhost:3000/auth/reset-password/confirm
+Content-Type: application/json
+
+{
+  "password": "560065",
+  "confirmPassword": "560065",
+  "token": "ec5fd3fa-1040-4e7d-9949-8eec8fd3f3ad",
+  "code": ""
 }
 
 ### Auth verify email
@@ -42,7 +53,8 @@ POST http://localhost:3000/auth/verify-email
 Content-Type: application/json
 
 {
-  "token": "1e04f574-fdd6-4bbf-8720-8f0bf95575c9"
+  "token": "df9a0a9b-211c-478b-9d2c-398a310b1a3a",
+  "code": ""
 }
 
 ### Auth logout
@@ -50,7 +62,8 @@ POST http://localhost:3000/auth/logout
 Content-Type: application/json
 
 {
-  "refreshToken": ""
+  "userId": "3500347a-ab2a-46b2-b48c-e4a244c2ca39",
+  "refreshToken": "44c7ff2e-d146-4553-813b-a431eb9555f8"
 }
 
 

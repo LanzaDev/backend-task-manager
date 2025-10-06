@@ -1,46 +1,38 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 import { randomUUID } from 'crypto';
 import { env } from '@/config/env';
 
 import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/user.read-repository';
 import { AbstractAuthTokenCacheWriteRepository } from '@/modules/auth/domain/repositories/auth-token-cache.write-repository';
+import { CreateUserSessionCommand } from '../implements/create-user-session.command';
 
-import { LoginDTO } from '@/modules/auth/presentation/dto/input/login.dto';
-import { ResponseUserDTO } from '@/modules/user/presentation/dto/output/response-user.dto';
 import { SignResponseDTO } from '@/modules/auth/presentation/dto/output/sign-response.dto';
+import { ResponseUserDTO } from '@/modules/user/presentation/dto/output/response-user.dto';
 
 import { Token } from '@/shared/domain/value-objects/token.vo';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 
 @Injectable()
-export class SignInUseCase {
+@CommandHandler(CreateUserSessionCommand)
+export class CreateUserSessionHandler
+  implements ICommandHandler<CreateUserSessionCommand>
+{
   constructor(
     private readonly jwtService: JwtService,
-    private readonly userReadRepository: AbstractUserReadRepository,
     private readonly authTokenCacheWriteRepository: AbstractAuthTokenCacheWriteRepository,
+    private readonly userReadRepository: AbstractUserReadRepository,
   ) {}
 
-  async execute(dto: LoginDTO): Promise<SignResponseDTO> {
-    const email = new Email(dto.email);
+  async execute(command: CreateUserSessionCommand): Promise<SignResponseDTO> {
+    const email = new Email(command.responseUserDTO.email);
 
-    const user = await this.userReadRepository.findByEmail(email);
-    if (!user) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    const existingUser = await this.userReadRepository.findByEmail(email);
+    if (!existingUser) {
+      throw new UnauthorizedException('Invalid credentials');
     }
-
-    const valid = await user.comparePassword(dto.password);
-
-    if (!valid) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
-    }
-
-    if (!user.isVerified()) {
+    if (!existingUser.isVerified()) {
       throw new UnauthorizedException('Email not verified');
     }
 
@@ -48,27 +40,27 @@ export class SignInUseCase {
 
     await this.authTokenCacheWriteRepository.setRefreshToken(
       refreshToken,
-      user.getId(),
+      existingUser.getId(),
       env.REFRESH_TOKEN_EXP,
     );
 
     await this.authTokenCacheWriteRepository.setSession(
-      user.getId(),
+      existingUser.getId(),
       { refreshToken },
       env.REFRESH_TOKEN_EXP,
     );
 
     const accessToken = new Token(
       this.jwtService.sign(
-        { sub: user.getId(), role: user.getRole() },
+        { sub: existingUser.getId(), role: existingUser.getRole() },
         { expiresIn: env.ACCESS_TOKEN_EXP },
       ),
     );
 
-    return {
-      user: new ResponseUserDTO(user),
-      accessToken: accessToken.getValue(),
+    return new SignResponseDTO(
+      new ResponseUserDTO(existingUser),
+      accessToken.getValue(),
       refreshToken,
-    };
+    );
   }
 }

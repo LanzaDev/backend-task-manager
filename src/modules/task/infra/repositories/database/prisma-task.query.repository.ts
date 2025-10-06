@@ -67,6 +67,53 @@ export class PrismaTaskQueryRepository implements AbstractTaskReadRepository {
     );
   }
 
+  async searchByUser(userId: string, searchText: string) {
+    const terms = searchText.trim().split(/\s+/);
+
+    const ilikeConditions = terms
+      .map((_, i) => `"title" ILIKE '%' || $${i + 3} || '%'`)
+      .join(' OR ');
+
+    return this.prisma.$queryRawUnsafe<any[]>(
+      `
+    SELECT *
+    FROM "Task"
+    WHERE "userId" = $1
+      AND (
+        SIMILARITY("title"::text, $2::text) > 0.1
+        OR (${ilikeConditions})
+      )
+    ORDER BY SIMILARITY("title"::text, $2::text) DESC
+    LIMIT 10
+    `,
+      userId,
+      searchText,
+      ...terms,
+    );
+  }
+
+  async searchGlobal(searchText: string) {
+    const terms = searchText.trim().split(/\s+/);
+    const ilikeConditions = terms
+      .map((_, i) => `"title" ILIKE '%' || $${i + 2} || '%'`)
+      .join(' OR ');
+
+    return this.prisma.$queryRawUnsafe<any[]>(
+      `
+    SELECT *
+    FROM "Task"
+    WHERE (
+      SIMILARITY("title"::text, $1::text) > 0.1
+      OR (${ilikeConditions})
+    )
+    ORDER BY SIMILARITY("title"::text, $1::text) DESC
+    LIMIT 20
+    `,
+      searchText,
+      ...terms,
+    );
+  }
+
   async findByStatus(userId: string, status: TaskStatus): Promise<Task[]> {
     const tasks = await this.prisma.task.findMany({
       where: { userId, status },

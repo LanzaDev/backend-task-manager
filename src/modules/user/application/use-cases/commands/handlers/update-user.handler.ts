@@ -25,10 +25,10 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
   ) {}
 
   async execute(command: UpdateUserCommand): Promise<void> {
-    const requesterUser = await this.userReadRepository.findById(
+    const requester = await this.userReadRepository.findById(
       command.requesterId,
     );
-    if (!requesterUser) {
+    if (!requester) {
       throw new NotFoundException('Requester not found');
     }
 
@@ -61,7 +61,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
           throw new Error('Password is required to update password');
         }
 
-        const isPasswordValid = await requesterUser.comparePassword(
+        const isPasswordValid = await requester.comparePassword(
           command.currentPassword,
         );
         if (!isPasswordValid) {

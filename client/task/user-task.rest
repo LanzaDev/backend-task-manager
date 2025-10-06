@@ -8,13 +8,17 @@ Authorization: Bearer
 GET http://localhost:3000/user/task/
 Authorization: Bearer
 
+### User search task | (searchText)
+GET http://localhost:3000/user/task/search?q=testar%20api
+Authorization: Bearer 
+
 ### User create task
 POST http://localhost:3000/user/task
 Content-Type: application/json
-Authorization: Bearer 
+Authorization: Bearer
 
 {
-  "title": "user test"
+  "title": ""
 }
 
 ### User update task | (taskId)

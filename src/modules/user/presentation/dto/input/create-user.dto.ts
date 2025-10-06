@@ -21,7 +21,7 @@ export class CreateUserDTO {
   @IsEmail()
   @IsNotEmpty()
   @ApiProperty({
-    example: 'lanzadev1@example.com',
+    example: 'user@example.com',
     description: 'Email address of the new user',
   })
   email!: string;

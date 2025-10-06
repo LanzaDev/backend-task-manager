@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Expose } from 'class-transformer'
+import { Expose } from 'class-transformer';
 import { IsEmail, IsEnum, IsString, IsUUID } from 'class-validator';
 
 import { User } from '@/modules/user/domain/entities/user.entity';
@@ -25,7 +25,7 @@ export class ResponseUserDTO {
   @IsEmail()
   @Expose()
   @ApiProperty({
-    example: 'lanzadev1@gmail.com',
+    example: 'user@example.com',
     description: 'Email address of the user',
   })
   readonly email: string;

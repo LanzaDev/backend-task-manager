@@ -1,4 +1,4 @@
-import { UpdateUserDTO } from '../../../../presentation/dto/input/update-user.dto';
+import { UpdateUserDTO } from '@/modules/user/presentation/dto/input/update-user.dto';
 import { Role } from '@/shared/types/role.type';
 
 export class UpdateUserCommand {

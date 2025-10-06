@@ -5,7 +5,9 @@ import { AbstractTaskWriteRepository } from '@/modules/task/domain/repositories/
 import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
 
 @Injectable()
-export class PrismaTaskCommandRepository implements AbstractTaskWriteRepository {
+export class PrismaTaskCommandRepository
+  implements AbstractTaskWriteRepository
+{
   constructor(private readonly prisma: PrismaService) {}
 
   async create(task: Task): Promise<Task> {

@@ -23,7 +23,6 @@ export class Email {
     return this.value;
   }
 
-
   equals(other: Email): boolean {
     if (!other) return false;
     return this.value === other.getValue();
@@ -31,9 +30,9 @@ export class Email {
 }
 
 // Domain-specific exception
-export class InvalidEmailError extends Error{
+export class InvalidEmailError extends Error {
   constructor(email: string) {
-    super(`The email "${email}" is not valid`)
-    this.name = "InvalidEmailError"
+    super(`The email "${email}" is not valid`);
+    this.name = 'InvalidEmailError';
   }
 }

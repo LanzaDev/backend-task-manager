@@ -9,7 +9,7 @@ import Redis from 'ioredis';
 export class RedisCacheRepository<V extends object> extends CacheRepository<V> {
   private systemName = 'Task Manager';
 
-constructor(
+  constructor(
     @Inject(REDIS_CLIENT) client: Redis,
     name: string,
     classConstructor?: any,

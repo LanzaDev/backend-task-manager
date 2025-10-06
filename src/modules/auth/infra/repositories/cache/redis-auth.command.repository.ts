@@ -7,7 +7,9 @@ import { REDIS_CLIENT } from '@/shared/infra/config/redis.config';
 import Redis from 'ioredis';
 
 @Injectable()
-export class RedisAuthTokenCommandCacheRepository implements AbstractAuthTokenCacheWriteRepository {
+export class RedisAuthTokenCommandCacheRepository
+  implements AbstractAuthTokenCacheWriteRepository
+{
   private systemName = 'TaskManager:Auth';
 
   constructor(@Inject(REDIS_CLIENT) private readonly client: Redis) {}

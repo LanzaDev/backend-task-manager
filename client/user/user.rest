@@ -2,7 +2,7 @@
 
 ### User get
 GET http://localhost:3000/user/profile
-Authorization: Bearer
+Authorization: Bearer 
 
 ### User update
 PATCH http://localhost:3000/user/profile
@@ -16,7 +16,7 @@ Authorization: Bearer
 ### User delete
 DELETE http://localhost:3000/user/profile
 Content-Type: application/json
-Authorization: Bearer 
+Authorization: Bearer
 
 {
   "currentPassword": "560065"
