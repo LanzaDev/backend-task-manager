@@ -15,8 +15,9 @@ Content-Type: application/json
 
 {
   "name": "Lanza",
-  "email": "lucas1511gll@gmail.com",
-  "password": "560065"
+  "email": "lucas1511gll1@gmail.com",
+  "password": "560065",
+  "confirmPassword": "560065"
 }
 
 ### Auth forgot password
@@ -28,13 +29,23 @@ Content-Type: application/json
 }
 
 ### Auth reset password
-POST http://localhost:3000/auth/reset-password
+POST http://localhost:3000/auth/reset-password/verify
 Content-Type: application/json
 
 {
-  "token": "3dc984bd-6c5c-4b32-8504-3820b90a90a1",
-  "password": "123456",
-  "confirmPassword": "123456"
+  "token": "",
+  "code": ""
+}
+
+### Auth reset password
+POST http://localhost:3000/auth/reset-password/confirm
+Content-Type: application/json
+
+{
+  "password": "560065",
+  "confirmPassword": "560065",
+  "token": "ec5fd3fa-1040-4e7d-9949-8eec8fd3f3ad",
+  "code": ""
 }
 
 ### Auth verify email
@@ -42,7 +53,8 @@ POST http://localhost:3000/auth/verify-email
 Content-Type: application/json
 
 {
-  "token": "282b1da8-2013-4187-8923-ec29adedfc98"
+  "token": "df9a0a9b-211c-478b-9d2c-398a310b1a3a",
+  "code": ""
 }
 
 ### Auth logout

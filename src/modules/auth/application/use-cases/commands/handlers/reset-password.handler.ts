@@ -19,20 +19,14 @@ export class ResetPasswordHandler
     private readonly verificationRepository: AbstractVerificationRepository,
   ) {}
 
-  async execute(command: ResetPasswordCommand): Promise<void> {
-    const { token, code } = command;
-
-    if (!token && !code)
-      throw new HttpException(
-        'Token or code is required',
-        HttpStatus.BAD_REQUEST,
-      );
+  async execute(command: ResetPasswordCommand): Promise<{ success: boolean }> {
+    const { code, token, password, confirmPassword } = command;
 
     const record = token
       ? await this.verificationRepository.findByToken(token)
       : await this.verificationRepository.findByCode(code!);
 
-    if (!record || record.isUsed || record.expiresAt < new Date()) {
+    if (!record || record.isUsed || record.expiresAt.getTime() <= Date.now()) {
       throw new HttpException(
         'Invalid or expired token',
         HttpStatus.UNAUTHORIZED,
@@ -44,13 +38,16 @@ export class ResetPasswordHandler
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    if (command.password !== command.confirmPassword) {
+    if (password !== confirmPassword) {
       throw new HttpException('Passwords do not match', HttpStatus.BAD_REQUEST);
     }
-    const newPassword = await Password.create(command.password);
 
+    const newPassword = await Password.create(password);
     user.setPassword(newPassword);
+
     await this.userWriteRepository.update(user);
     await this.verificationRepository.markAsUsed(record.id);
+
+    return { success: true };
   }
 }

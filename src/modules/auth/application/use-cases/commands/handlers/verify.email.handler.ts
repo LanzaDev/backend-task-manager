@@ -13,7 +13,7 @@ export class VerifyEmailHandler implements ICommandHandler<VerifyEmailCommand> {
     private readonly userWriteRepository: AbstractUserWriteRepository,
   ) {}
 
-  async execute(command: VerifyEmailCommand): Promise<EmailVerificationStatus> {
+  async execute(command: VerifyEmailCommand): Promise<any> {
     const { token, code } = command;
 
     if (!token && !code)
@@ -28,11 +28,10 @@ export class VerifyEmailHandler implements ICommandHandler<VerifyEmailCommand> {
 
     if (!record) return EmailVerificationStatus.INVALID;
     if (record.isUsed) return EmailVerificationStatus.ALREADY_VERIFIED;
-    if (record.expiresAt < new Date()) return EmailVerificationStatus.EXPIRED;
+    if (record.expiresAt.getTime() < Date.now())
+      return EmailVerificationStatus.EXPIRED;
 
     await this.userWriteRepository.updateIsVerified(record.userId);
     await this.verificationRepository.markAsUsed(record.id);
-
-    return EmailVerificationStatus.ALREADY_VERIFIED;
   }
 }
