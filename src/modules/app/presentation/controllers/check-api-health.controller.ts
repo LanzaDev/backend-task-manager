@@ -21,7 +21,7 @@ export class CheckApiHealthController {
   @ApiOperation({
     summary: 'Check application health',
     description:
-      'Returns the health status of the app and its dependencies (API, Database, Cache).',
+      'Returns the health status of the app and its dependencies (API, Database, Cache, Ia).',
   })
   @ApiOkResponse({
     description: 'Application and dependencies are healthy',

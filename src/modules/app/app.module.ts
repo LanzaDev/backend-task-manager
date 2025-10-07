@@ -13,9 +13,10 @@ import { PrismaHealthRepository } from '@/modules/app/infra/repositories/prisma-
 
 import { CheckHealthUseCase } from '@/modules/app/application/use-cases/check-health.use-case';
 import { CheckApiHealthController } from '@/modules/app/presentation/controllers/check-api-health.controller';
+import { IAAgentModule } from '@/modules/ia-agent/ia-agent.module';
 
 @Module({
-  imports: [SharedModule, UserModule, TaskModule, AuthModule, EmailModule],
+  imports: [SharedModule, UserModule, TaskModule, AuthModule, EmailModule, IAAgentModule],
   controllers: [CheckApiHealthController],
   providers: [
     CheckHealthUseCase,

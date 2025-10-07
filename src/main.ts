@@ -15,8 +15,8 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: ['http://localhost:5173', 'http://localhost:8001'],
-    // credentials: true,
+    origin: ['http://localhost:5173', 'http://localhost:8001', 'https://hostingfox.xyz:5173', 'http://hostingfox.xyz:5173' ],
+    credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   });
 
@@ -47,13 +47,17 @@ async function bootstrap() {
 
   SwaggerModule.setup('docs', app, documentFactory);
 
-  await app.listen(env.APP_PORT);
+  await app.listen(env.APP_PORT, '0.0.0.0');
 
   if (env.APP_ENV === 'dev') {
     console.log('------------------------------------');
     console.log(`API running on port ${env.APP_PORT}.`);
     console.log(`API: ${env.APP_URL}`);
     console.log(`Docs: ${env.APP_URL}/docs`);
+    console.log('------------------------------------');
+    console.log(`API running on port ${env.APP_PORT}.`);
+    console.log(`API(Dominio): ${env.APP_URL_DOM}`);
+    console.log(`Docs(Dominio): ${env.APP_URL_DOM}/docs`);
     console.log('------------------------------------');
   }
 }

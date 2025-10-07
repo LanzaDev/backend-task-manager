@@ -11,7 +11,7 @@ export class CheckHealthUseCase {
   ) {}
 
   async execute(): Promise<ResponseHealthDTO> {
-    const [isDbOnline, isCacheOnline] = await Promise.all([
+    const [isDbOnline, isCacheOnline ] = await Promise.all([
       this.databaseHealthRepository.checkConnection(),
       this.cacheHealthRepository.checkConnection(),
     ]);

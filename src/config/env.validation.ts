@@ -6,6 +6,7 @@ export const envSchema = z.object({
   APP_ENV: z.enum(['dev', 'prod', 'test']).default('dev'),
   APP_PORT: z.coerce.number().default(3000),
   APP_URL: z.string().default('http://localhost:3000'),
+  APP_URL_DOM: z.string().default('http://hostingfox.xyz:3000'),
 
   // Database
   DATABASE_USERNAME: z.string(),
