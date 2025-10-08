@@ -51,8 +51,8 @@ model Verification {
   id        String    @id @default(uuid())
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  token     String   @unique
-  code      String   @unique
+  token     String    @unique
+  code      String    @unique
   expiresAt DateTime
   isUsed    Boolean   @default(false)
   createdAt DateTime  @default(now())

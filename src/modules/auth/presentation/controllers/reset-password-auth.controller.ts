@@ -31,11 +31,9 @@ export class VerifyResetPasswordAuthController {
   async verifyResetPassword(@Body() dto: VerifyResetPasswordDTO) {
     const { token, code } = dto;
 
-    const result = await this.commandBus.execute(
-      new VerifyResetPasswordCommand(token, code),
-    );
+    await this.commandBus.execute(new VerifyResetPasswordCommand(token, code));
 
-    return result;
+    return { message: 'success' };
   }
 
   @Post('reset-password/confirm')

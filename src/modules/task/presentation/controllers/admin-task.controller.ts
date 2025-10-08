@@ -46,7 +46,7 @@ import { MessageResponseDTO } from '@/core/presentation/dto/message-response.dto
 
 @ApiTags('Admin Task')
 @ApiBearerAuth('access-token')
-@Controller('admin/task/')
+@Controller('admin/tasks')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN)
 export class AdminTaskController {
@@ -195,7 +195,9 @@ export class AdminTaskController {
       createTaskDTO.completedAt,
     );
 
-    return this.commandBus.execute(command);
+    await this.commandBus.execute(command);
+
+    return;
   }
 
   @Patch(':taskId')

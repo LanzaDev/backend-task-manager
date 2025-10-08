@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { plainToInstance } from 'class-transformer';
+import { ClassConstructor, plainToInstance } from 'class-transformer';
 import { CacheRepository } from '@/core/domain/repositories/cache.repository';
 import { MetaInputVO } from '@/shared/domain/value-objects/meta-input.vo';
 import { REDIS_CLIENT } from '../../config/redis.config';
@@ -12,10 +12,15 @@ export class RedisCacheRepository<V extends object> extends CacheRepository<V> {
   constructor(
     @Inject(REDIS_CLIENT) client: Redis,
     name: string,
-    classConstructor?: any,
+    classConstructor?: ClassConstructor<V>,
     ttl?: number,
   ) {
-    super(client, name, classConstructor ?? Object, ttl);
+    super(
+      client,
+      name,
+      classConstructor ?? (Object as unknown as ClassConstructor<V>),
+      ttl,
+    );
   }
 
   private buildUniqueKey(key: string): string {

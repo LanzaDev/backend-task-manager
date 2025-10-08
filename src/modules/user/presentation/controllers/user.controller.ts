@@ -38,7 +38,7 @@ import { MessageResponseDTO } from '@/core/presentation/dto/message-response.dto
 
 @ApiTags('User')
 @ApiBearerAuth('access-token')
-@Controller('user')
+@Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.USER)
 export class UserController {

@@ -45,7 +45,7 @@ import { MessageResponseDTO } from '@/core/presentation/dto/message-response.dto
 
 @ApiTags('User Task')
 @ApiBearerAuth('access-token')
-@Controller('user/task/')
+@Controller('users/tasks')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.USER)
 export class UserTaskController {

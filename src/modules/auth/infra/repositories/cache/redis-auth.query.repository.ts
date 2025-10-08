@@ -32,7 +32,7 @@ export class RedisAuthTokenCacheQueryRepository
 
   async getSession(userId: string): Promise<SessionData | null> {
     const data = await this.client.get(this.sessionKey(userId));
-    return data ? JSON.parse(data) : null;
+    return data ? (JSON.parse(data) as SessionData) : null;
   }
 
   async isTokenBlacklisted(token: string): Promise<boolean> {

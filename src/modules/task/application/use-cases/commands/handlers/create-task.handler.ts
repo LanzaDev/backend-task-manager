@@ -59,24 +59,24 @@ export class CreateTaskHandler implements ICommandHandler<CreateTaskCommand> {
     // -----------------------------
     // Envio para o MCP (desacoplado)
     // -----------------------------
-    try {
-      const taskForMCP = {
-        id: createdTask.getId(),
-        userId: createdTask.getUserId(),
-        title: createdTask.getTitle(),
-        description: createdTask.getDescription(),
-        status: createdTask.getStatus(),
-        priority: createdTask.getPriority(),
-        dueDate: createdTask.getDueDate()?.toISOString(),
-        createdAt: createdTask.getCreatedAt()?.toISOString(),
-        updatedAt: createdTask.getUpdatedAt()?.toISOString(),
-        completedAt: createdTask.getCompletedAt()?.toISOString(),
-        metadata: { source: 'NestJS API' },
-      };
-      await axios.post('http://localhost:8001/process-task', taskForMCP);
-    } catch (error) {
-      console.warn('MCP offline, skipping task processing', error);
-    }
+    // try {
+    //   const taskForMCP = {
+    //     id: createdTask.getId(),
+    //     userId: createdTask.getUserId(),
+    //     title: createdTask.getTitle(),
+    //     description: createdTask.getDescription(),
+    //     status: createdTask.getStatus(),
+    //     priority: createdTask.getPriority(),
+    //     dueDate: createdTask.getDueDate()?.toISOString(),
+    //     createdAt: createdTask.getCreatedAt()?.toISOString(),
+    //     updatedAt: createdTask.getUpdatedAt()?.toISOString(),
+    //     completedAt: createdTask.getCompletedAt()?.toISOString(),
+    //     metadata: { source: 'NestJS API' },
+    //   };
+    //   await axios.post('http://localhost:8001/process-task', taskForMCP);
+    // } catch (error) {
+    //   console.warn('MCP offline, skipping task processing', error);
+    // }
 
     return createdTask;
   }

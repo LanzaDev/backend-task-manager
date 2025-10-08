@@ -44,7 +44,7 @@ Content-Type: application/json
 {
   "password": "560065",
   "confirmPassword": "560065",
-  "token": "ec5fd3fa-1040-4e7d-9949-8eec8fd3f3ad",
+  "token": "",
   "code": ""
 }
 
