@@ -1,4 +1,4 @@
-# Task Manager
+# Task-Manager
 
 Repositório da API do **Task Manager**, um sistema para gerenciar tarefas de forma prática.
 
