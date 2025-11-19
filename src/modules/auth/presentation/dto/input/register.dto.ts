@@ -14,11 +14,6 @@ export class RegisterDTO {
 
   @MinLength(6)
   @IsNotEmpty()
-  @ApiProperty({ example: 'mypassword123', minLength: 6 })
+  @ApiProperty({ example: 'myPassword123', minLength: 6 })
   password!: string;
-
-  @MinLength(6)
-  @IsNotEmpty()
-  @ApiProperty({ example: 'mypassword123', minLength: 6 })
-  confirmPassword!: string;
 }

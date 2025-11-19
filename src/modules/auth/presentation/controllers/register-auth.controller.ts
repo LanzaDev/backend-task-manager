@@ -26,12 +26,7 @@ export class RegisterAuthController {
   @ApiUnauthorizedResponse({ description: 'Invalid input data' })
   async signUp(@Body() dto: RegisterDTO): Promise<MessageResponseDTO> {
     await this.commandBus.execute(
-      new CreateAccountCommand(
-        dto.name,
-        dto.email,
-        dto.password,
-        dto.confirmPassword,
-      ),
+      new CreateAccountCommand(dto.name, dto.email, dto.password),
     );
 
     return new MessageResponseDTO(

@@ -16,18 +16,16 @@ export class PrismaUserQueryRepository implements AbstractUserReadRepository {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) return null;
 
-    return new User(
-      {
-        name: user.name,
-        email: new Email(user.email),
-        password: Password.fromHashed(user.password),
-        role: user.role as Role,
-        isVerified: user.isVerified,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
-      user.id,
-    );
+    return new User({
+      id,
+      name: user.name,
+      email: new Email(user.email),
+      password: Password.fromHashed(user.password),
+      role: user.role as Role,
+      isVerified: user.isVerified,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
   }
 
   async findByEmail(email: Email): Promise<User | null> {
@@ -36,36 +34,32 @@ export class PrismaUserQueryRepository implements AbstractUserReadRepository {
     });
     if (!user) return null;
 
-    return new User(
-      {
-        name: user.name,
-        email: new Email(user.email),
-        password: Password.fromHashed(user.password),
-        role: user.role as Role,
-        isVerified: user.isVerified,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
-      user.id,
-    );
+    return new User({
+      id: user.id,
+      name: user.name,
+      email: new Email(user.email),
+      password: Password.fromHashed(user.password),
+      role: user.role as Role,
+      isVerified: user.isVerified,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    });
   }
 
   async findAll(): Promise<User[]> {
     const Users = await this.prisma.user.findMany();
     return Users.map(
       (user) =>
-        new User(
-          {
-            name: user.name,
-            email: new Email(user.email),
-            password: Password.fromHashed(user.password),
-            role: user.role as Role,
-            isVerified: user.isVerified,
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt,
-          },
-          user.id,
-        ),
+        new User({
+          id: user.id,
+          name: user.name,
+          email: new Email(user.email),
+          password: Password.fromHashed(user.password),
+          role: user.role as Role,
+          isVerified: user.isVerified,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        }),
     );
   }
 }

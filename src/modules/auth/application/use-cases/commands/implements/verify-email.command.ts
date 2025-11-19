@@ -1,6 +1,5 @@
+import { VerifyRecoveryCommand } from './verify-recovery.command';
+
 export class VerifyEmailCommand {
-  constructor(
-    public readonly token?: string,
-    public readonly code?: string,
-  ) {}
+  constructor(public readonly data: VerifyRecoveryCommand) {}
 }

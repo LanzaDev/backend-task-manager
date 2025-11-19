@@ -36,7 +36,7 @@ const QueryHandlers = [
 
 @Module({
   imports: [CqrsModule],
-  controllers: [AdminTaskController, UserTaskController],
+  controllers: [UserTaskController, AdminTaskController],
   providers: [
     {
       provide: AbstractUserReadRepository,

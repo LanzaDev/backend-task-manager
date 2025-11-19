@@ -7,7 +7,6 @@ import { AbstractUserReadRepository } from '@/modules/user/domain/repositories/u
 
 import { CreateTaskCommand } from '../implements/create-task.command';
 import { Role } from '@/shared/types/role.type';
-import axios from 'axios';
 
 @Injectable()
 @CommandHandler(CreateTaskCommand)
@@ -43,41 +42,16 @@ export class CreateTaskHandler implements ICommandHandler<CreateTaskCommand> {
       throw new Error('title is required');
     }
 
-    const task = new Task({
+    const task = Task.create({
       userId: command.targetUserId,
       title: command.title,
-      description: command.description,
-      status: command.status,
-      priority: command.priority,
-      dueDate: command.dueDate,
-      completedAt: command.completedAt,
-      createdAt: new Date(),
+      description: command.description!,
+      status: command.status!,
+      priority: command.priority!,
+      dueDate: command.dueDate!,
+      completedAt: command.completedAt!,
     });
-
     const createdTask = await this.taskWriteRepository.create(task);
-
-    // -----------------------------
-    // Envio para o MCP (desacoplado)
-    // -----------------------------
-    // try {
-    //   const taskForMCP = {
-    //     id: createdTask.getId(),
-    //     userId: createdTask.getUserId(),
-    //     title: createdTask.getTitle(),
-    //     description: createdTask.getDescription(),
-    //     status: createdTask.getStatus(),
-    //     priority: createdTask.getPriority(),
-    //     dueDate: createdTask.getDueDate()?.toISOString(),
-    //     createdAt: createdTask.getCreatedAt()?.toISOString(),
-    //     updatedAt: createdTask.getUpdatedAt()?.toISOString(),
-    //     completedAt: createdTask.getCompletedAt()?.toISOString(),
-    //     metadata: { source: 'NestJS API' },
-    //   };
-    //   await axios.post('http://localhost:8001/process-task', taskForMCP);
-    // } catch (error) {
-    //   console.warn('MCP offline, skipping task processing', error);
-    // }
-
     return createdTask;
   }
 }

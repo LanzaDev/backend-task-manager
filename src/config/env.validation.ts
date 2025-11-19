@@ -25,13 +25,13 @@ export const envSchema = z.object({
 
   // JWT
   JWT_SECRET: z.string().default('secret-key-123'),
-  ACCESS_TOKEN_EXP: z.coerce.number().default(15),
-  REFRESH_TOKEN_EXP: z.coerce.number().default(7),
+  ACCESS_TOKEN_EXP: z.string().default('1h'),
+  REFRESH_TOKEN_EXP: z.string().default('7d'),
 
   // Email
   EMAIL_HOST: z.string().default('smtp.example.com'),
   EMAIL_PORT: z.coerce.number().default(587),
-  EMAIL_USER: z.string().default('usar@example.com'),
-  EMAIL_PASSWORD: z.string().default('password123'),
+  EMAIL_USER: z.string(),
+  EMAIL_PASSWORD: z.string(),
   EMAIL_FAKE: z.coerce.boolean().default(true),
 });

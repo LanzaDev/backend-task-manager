@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AbstractVerificationRepository } from '@/modules/auth/domain/repositories/verify.repository';
 import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
 import { Verification } from '@/shared/domain/value-objects/verify.vo';
+import { VerificationType } from '@/shared/types/verification-type.type';
 
 @Injectable()
 export class PrismaPasswordResetTokenRepository
@@ -13,6 +14,7 @@ export class PrismaPasswordResetTokenRepository
     userId: string;
     token: string;
     code: string;
+    type: VerificationType;
     expiresAt: Date;
     isUsed: boolean;
   }): Promise<void> {
@@ -21,6 +23,7 @@ export class PrismaPasswordResetTokenRepository
         userId: data.userId,
         token: data.token,
         code: data.code,
+        type: data.type,
         expiresAt: data.expiresAt,
         isUsed: data.isUsed,
       },

@@ -22,49 +22,48 @@ export class PrismaUserCommandRepository
         email: user.getEmailValue(),
         password: user.getHashedPassword(),
         role: user.getRole(),
-        isVerified: user.isVerified(),
-        createdAt: user.getCreatedAt(),
-        updatedAt: user.getUpdatedAt(),
+        isVerified: user.isUserVerified(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       },
     });
 
-    return new User(
-      {
-        name: created.name,
-        email: new Email(created.email),
-        password: Password.fromHashed(created.password),
-        isVerified: created.isVerified,
-        role: created.role as Role,
-        createdAt: created.createdAt,
-      },
-      created.id,
-    );
+    return new User({
+      id: created.id,
+      name: created.name,
+      email: new Email(created.email),
+      password: Password.fromHashed(created.password),
+      isVerified: created.isVerified,
+      role: created.role as Role,
+      createdAt: created.createdAt,
+      updatedAt: created.updatedAt,
+    });
   }
 
   async update(user: User): Promise<User> {
     const updated = await this.prisma.user.update({
       where: { id: user.getId() },
       data: {
+        id: user.getId(),
         name: user.getName(),
         email: user.getEmailValue(),
         password: user.getHashedPassword(),
-        isVerified: user.isVerified(),
+        isVerified: user.isUserVerified(),
         role: user.getRole(),
-        updatedAt: user.getUpdatedAt(),
+        updatedAt: new Date(),
       },
     });
 
-    return new User(
-      {
-        name: updated.name,
-        email: new Email(updated.email),
-        password: Password.fromHashed(updated.password),
-        role: updated.role as Role,
-        isVerified: updated.isVerified,
-        createdAt: updated.createdAt,
-      },
-      updated.id,
-    );
+    return new User({
+      id: updated.id,
+      name: updated.name,
+      email: new Email(updated.email),
+      password: Password.fromHashed(updated.password),
+      role: updated.role as Role,
+      isVerified: updated.isVerified,
+      createdAt: updated.createdAt,
+      updatedAt: updated.updatedAt,
+    });
   }
 
   async delete(id: string): Promise<void> {

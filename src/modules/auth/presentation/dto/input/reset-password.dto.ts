@@ -7,11 +7,6 @@ export class ResetPasswordDTO {
   @ApiProperty({ example: 'newPassword123', minLength: 6 })
   password!: string;
 
-  @IsNotEmpty()
-  @MinLength(6)
-  @ApiProperty({ example: 'newPassword123', minLength: 6 })
-  confirmPassword!: string;
-
   @IsString()
   @IsOptional()
   @ApiProperty({ example: 'abcdef123456...' })

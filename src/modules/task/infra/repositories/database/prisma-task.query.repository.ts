@@ -3,6 +3,7 @@ import { Task } from '@/modules/task/domain/entities/task.entity';
 import { TaskStatus } from '@/modules/task/domain/entities/task.entity';
 import { AbstractTaskReadRepository } from '@/modules/task/domain/repositories/task.read-repository';
 import { PrismaService } from '@/shared/infra/database/prisma/prisma.service';
+import { TaskMapper } from './mapper/task.mapper';
 
 @Injectable()
 export class PrismaTaskQueryRepository implements AbstractTaskReadRepository {
@@ -12,59 +13,17 @@ export class PrismaTaskQueryRepository implements AbstractTaskReadRepository {
     const task = await this.prisma.task.findUnique({ where: { id: taskId } });
     if (!task) return null;
 
-    return new Task(
-      {
-        userId: task.userId,
-        title: task.title,
-        description: task.description ?? undefined,
-        status: task.status as TaskStatus,
-        priority: task.priority ?? undefined,
-        dueDate: task.dueDate ?? undefined,
-        completedAt: task.completedAt ?? undefined,
-        createdAt: task.createdAt,
-      },
-      task.id,
-    );
+    return TaskMapper.toDomain(task);
   }
 
   async findAllTasks(): Promise<Task[]> {
     const tasks = await this.prisma.task.findMany();
-    return tasks.map(
-      (task) =>
-        new Task(
-          {
-            userId: task.userId,
-            title: task.title,
-            description: task.description ?? undefined,
-            status: task.status as TaskStatus,
-            priority: task.priority ?? undefined,
-            dueDate: task.dueDate ?? undefined,
-            completedAt: task.completedAt ?? undefined,
-            createdAt: task.createdAt,
-          },
-          task.id,
-        ),
-    );
+    return tasks.map((task) => TaskMapper.toDomain(task));
   }
 
   async findAllByUser(userId: string): Promise<Task[]> {
     const tasks = await this.prisma.task.findMany({ where: { userId } });
-    return tasks.map(
-      (task) =>
-        new Task(
-          {
-            userId: task.userId,
-            title: task.title,
-            description: task.description ?? undefined,
-            status: task.status as TaskStatus,
-            priority: task.priority ?? undefined,
-            dueDate: task.dueDate ?? undefined,
-            completedAt: task.completedAt ?? undefined,
-            createdAt: task.createdAt,
-          },
-          task.id,
-        ),
-    );
+    return tasks.map((task) => TaskMapper.toDomain(task));
   }
 
   async searchByUser(userId: string, searchText: string) {
@@ -118,21 +77,6 @@ export class PrismaTaskQueryRepository implements AbstractTaskReadRepository {
     const tasks = await this.prisma.task.findMany({
       where: { userId, status },
     });
-    return tasks.map(
-      (task) =>
-        new Task(
-          {
-            userId: task.userId,
-            title: task.title,
-            description: task.description ?? undefined,
-            status: task.status as TaskStatus,
-            priority: task.priority ?? undefined,
-            dueDate: task.dueDate ?? undefined,
-            completedAt: task.completedAt ?? undefined,
-            createdAt: task.createdAt,
-          },
-          task.id,
-        ),
-    );
+    return tasks.map((task) => TaskMapper.toDomain(task));
   }
 }

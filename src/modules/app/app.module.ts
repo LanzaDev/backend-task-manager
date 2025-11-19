@@ -15,7 +15,7 @@ import { CheckHealthUseCase } from '@/modules/app/application/use-cases/check-he
 import { CheckApiHealthController } from '@/modules/app/presentation/controllers/check-api-health.controller';
 
 @Module({
-  imports: [SharedModule, UserModule, TaskModule, AuthModule, EmailModule],
+  imports: [SharedModule, AuthModule, UserModule, TaskModule, EmailModule],
   controllers: [CheckApiHealthController],
   providers: [
     CheckHealthUseCase,

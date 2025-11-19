@@ -17,12 +17,13 @@ import { PrismaUserCommandRepository } from '../user/infra/repositories/database
 import { PrismaPasswordResetTokenRepository } from '@/modules/auth/infra/repositories/database/prisma-auth.repository';
 
 import { RequestPasswordResetHandler } from '@/modules/auth/application/use-cases/commands/handlers/request-password-reset.handler';
-import { VerifyResetPasswordHandler } from './application/use-cases/commands/handlers/verify-reset-password.handler';
 import { LogoutUserHandler } from '@/modules/auth/application/use-cases/commands/handlers/logout-user.handler';
 import { ValidateUserCredentialsHandler } from './application/use-cases/query/handlers/validate-user-credentials.handler';
 import { CreateUserSessionHandler } from './application/use-cases/commands/handlers/create-user-session.handler';
-import { VerifyEmailHandler } from './application/use-cases/commands/handlers/verify.email.handler';
+import { VerifyRecoveryHandler } from './application/use-cases/commands/handlers/verify-recovery.handler';
 import { CreateAccountHandler } from './application/use-cases/commands/handlers/create-account.handler';
+import { ResetPasswordHandler } from './application/use-cases/commands/handlers/reset-password.handler';
+import { VerifyEmailHandler } from './application/use-cases/commands/handlers/verify-email.handler';
 
 import { JwtStrategy } from '@/modules/auth/infra/strategies/jwt-strategy';
 import { LoginAuthController } from './presentation/controllers/login-auth.controller';
@@ -31,16 +32,15 @@ import { RegisterAuthController } from './presentation/controllers/register-auth
 import { LogoutAuthController } from './presentation/controllers/logout-auth.controller';
 import { RequestPasswordResetAuthController } from './presentation/controllers/request-password-reset-auth.controller';
 import { VerifyResetPasswordAuthController } from './presentation/controllers/reset-password-auth.controller';
-import { ResetPasswordHandler } from './application/use-cases/commands/handlers/reset-password.handler';
 
 const CommandHandlers = [
   CreateAccountHandler,
   CreateUserSessionHandler,
   LogoutUserHandler,
   RequestPasswordResetHandler,
-  VerifyResetPasswordHandler,
   ResetPasswordHandler,
   VerifyEmailHandler,
+  VerifyRecoveryHandler,
 ];
 
 const QueryHandlers = [ValidateUserCredentialsHandler];
@@ -57,11 +57,11 @@ const QueryHandlers = [ValidateUserCredentialsHandler];
   ],
   controllers: [
     LoginAuthController,
-    LogoutAuthController,
     RegisterAuthController,
+    VerifyEmailAuthController,
     RequestPasswordResetAuthController,
     VerifyResetPasswordAuthController,
-    VerifyEmailAuthController,
+    LogoutAuthController,
   ],
   providers: [
     JwtStrategy,

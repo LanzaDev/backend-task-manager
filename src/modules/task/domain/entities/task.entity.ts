@@ -1,4 +1,6 @@
-import { randomUUID } from 'crypto';
+import { AggregateRoot } from '@/core/domain/entities/aggregate-root';
+import { BaseEntityType } from '@/core/types/base-entity.type';
+import { v4 as uuidv4 } from 'uuid';
 
 export enum TaskStatus {
   PENDING = 'PENDING',
@@ -8,108 +10,140 @@ export enum TaskStatus {
   OVERDUE = 'OVERDUE',
 }
 
-interface TaskSchema {
+export type CreateTaskProps = {
   userId: string;
   title: string;
-  description?: string;
-  status?: TaskStatus;
-  priority?: number;
-  dueDate?: Date;
-  completedAt?: Date;
-  createdAt?: Date;
+  description: string;
+  status: TaskStatus;
+  priority: number;
+  dueDate: Date;
+  completedAt: Date;
+};
+
+export type UpdateTaskProps = Partial<CreateTaskProps>;
+
+interface TaskProps extends BaseEntityType {
+  userId: string;
+  title: string;
+  description: string | null;
+  status: TaskStatus | TaskStatus.PENDING;
+  priority: number | null;
+  dueDate: Date | null;
+  completedAt: Date | null;
 }
 
-export class Task {
-  private readonly id: string;
-  private readonly props: TaskSchema;
-  private updatedAt: Date;
+export class Task extends AggregateRoot {
+  private userId: string;
+  private title: string;
+  private description: string | null;
+  private status: TaskStatus | TaskStatus.PENDING;
+  private priority: number | null;
+  private dueDate: Date | null;
+  private completedAt: Date | null;
 
-  constructor(props: TaskSchema, id?: string) {
-    this.id = id || randomUUID();
-    this.props = {
-      ...props,
-      status: props.status ?? TaskStatus.PENDING,
-      createdAt: props.createdAt ?? new Date(),
-    };
-    this.updatedAt = new Date();
+  constructor(props: TaskProps) {
+    super({
+      id: props.id,
+      createdAt: props.createdAt,
+      updatedAt: props.updatedAt,
+    });
+    this.userId = props.userId;
+    this.title = props.title;
+    this.description = props.description;
+    this.status = props.status;
+    this.priority = props.priority;
+    this.dueDate = props.dueDate;
+    this.completedAt = props.completedAt;
   }
 
-  // id
+  static create(props: CreateTaskProps) {
+    const userId = props.userId;
+    const title = props.title;
+    const description = props.description ?? null;
+    const status = props.status ?? TaskStatus.PENDING;
+    const priority = props.priority ?? null;
+    const dueDate = props.dueDate ?? null;
+    const completedAt = props.completedAt ?? null;
+
+    return new Task({
+      id: uuidv4(),
+      userId,
+      title,
+      description,
+      status,
+      priority,
+      dueDate,
+      completedAt,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+  }
+
+  update(props: UpdateTaskProps) {
+    if (props.title) this.title = props.title;
+    if (props.description) this.description = props.description;
+    if (props.status) this.status = props.status;
+    if (props.priority) this.priority = props.priority;
+    if (props.dueDate) this.dueDate = props.dueDate;
+    if (props.completedAt) this.completedAt = props.completedAt;
+  }
+
   getId(): string {
     return this.id;
   }
   getUserId(): string {
-    return this.props.userId;
+    return this.userId;
   }
   setUserId(userId: string) {
-    this.props.userId = userId;
-    this.touch();
+    this.userId = userId;
   }
 
-  // title
   getTitle(): string {
-    return this.props.title;
+    return this.title;
   }
   setTitle(title: string) {
-    this.props.title = title;
-    this.touch();
+    this.title = title;
   }
 
-  // description
-  getDescription(): string | undefined {
-    return this.props.description;
+  getDescription(): string | null {
+    return this.description;
   }
   setDescription(description: string) {
-    this.props.description = description;
-    this.touch();
+    this.description = description;
   }
 
-  // status
   getStatus(): TaskStatus {
-    return this.props.status!;
+    return this.status;
   }
   setStatus(status: TaskStatus) {
-    this.props.status = status;
-    this.touch();
+    this.status = status;
   }
 
-  // priority
-  getPriority(): number | undefined {
-    return this.props.priority;
+  getPriority(): number | null {
+    return this.priority;
   }
   setPriority(priority: number) {
-    this.props.priority = priority;
-    this.touch();
+    this.priority = priority;
   }
 
-  // dueDate
-  getDueDate(): Date | undefined {
-    return this.props.dueDate;
+  getDueDate(): Date | null {
+    return this.dueDate;
   }
   setDueDate(dueDate: Date) {
-    this.props.dueDate = dueDate;
-    this.touch();
+    this.dueDate = dueDate;
   }
 
-  // completedAt
-  getCompletedAt(): Date | undefined {
-    return this.props.completedAt;
+  getCompletedAt(): Date | null {
+    return this.completedAt;
   }
   setCompletedAt(date: Date) {
-    this.props.completedAt = date;
-    this.touch();
+    this.completedAt = date;
   }
 
-  // timestamps
   getCreatedAt(): Date {
-    return this.props.createdAt!;
+    return this.createdAt;
   }
   getUpdatedAt(): Date {
     return this.updatedAt;
-  }
-
-  // touch
-  private touch() {
-    this.updatedAt = new Date();
   }
 }

@@ -9,9 +9,10 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { VerifyResetPasswordDTO } from '../dto/input/verify-reset-password-token.dto';
-import { VerifyResetPasswordCommand } from '../../application/use-cases/commands/implements/verify-reset-password.command';
 import { ResetPasswordCommand } from '../../application/use-cases/commands/implements/reset-password.command';
 import { ResetPasswordDTO } from '../dto/input/reset-password.dto';
+import { VerifyRecoveryCommand } from '../../application/use-cases/commands/implements/verify-recovery.command';
+import { VerificationType } from '@prisma/client';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -28,22 +29,32 @@ export class VerifyResetPasswordAuthController {
   @ApiUnauthorizedResponse({
     description: 'Invalid token or password mismatch',
   })
-  async verifyResetPassword(@Body() dto: VerifyResetPasswordDTO) {
-    const { token, code } = dto;
+  async verifyResetPassword(@Body() body: VerifyResetPasswordDTO) {
+    const { token, code } = body;
 
-    await this.commandBus.execute(new VerifyResetPasswordCommand(token, code));
+    const command = new VerifyRecoveryCommand(
+      VerificationType.RESET_PASSWORD,
+      token,
+      code,
+    );
+
+    await this.commandBus.execute(command);
 
     return { message: 'success' };
   }
 
   @Post('reset-password/confirm')
-  async resetPassword(@Body() dto: ResetPasswordDTO) {
-    const { password, confirmPassword, token, code } = dto;
-
-    await this.commandBus.execute(
-      new ResetPasswordCommand(password, confirmPassword, token, code),
+  async resetPassword(@Body() body: ResetPasswordDTO) {
+    const data = new VerifyRecoveryCommand(
+      VerificationType.RESET_PASSWORD,
+      body.token,
+      body.code,
     );
 
-    return { success: true };
+    await this.commandBus.execute(
+      new ResetPasswordCommand(body.password, data),
+    );
+
+    return { message: 'Password reset successfully' };
   }
 }

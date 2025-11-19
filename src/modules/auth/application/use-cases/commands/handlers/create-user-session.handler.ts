@@ -13,6 +13,7 @@ import { ResponseUserDTO } from '@/modules/user/presentation/dto/output/response
 
 import { Token } from '@/shared/domain/value-objects/token.vo';
 import { Email } from '@/shared/domain/value-objects/email.vo';
+import { parseTimeToSeconds } from '@/shared/utils/time.util';
 
 @Injectable()
 @CommandHandler(CreateUserSessionCommand)
@@ -32,22 +33,33 @@ export class CreateUserSessionHandler
     if (!existingUser) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    if (!existingUser.isVerified()) {
+    if (!existingUser.isUserVerified()) {
       throw new UnauthorizedException('Email not verified');
     }
 
-    const refreshToken = randomUUID();
+    const refreshPayload = {
+      sub: existingUser.getId(),
+      role: existingUser.getRole(),
+      type: 'refresh',
+      jti: randomUUID(),
+    };
+
+    const refreshToken = new Token(
+      this.jwtService.sign(refreshPayload, {
+        expiresIn: env.REFRESH_TOKEN_EXP,
+      }),
+    );
 
     await this.authTokenCacheWriteRepository.setRefreshToken(
-      refreshToken,
       existingUser.getId(),
-      env.REFRESH_TOKEN_EXP,
+      refreshToken.getValue(),
+      parseTimeToSeconds(env.REFRESH_TOKEN_EXP),
     );
 
     await this.authTokenCacheWriteRepository.setSession(
       existingUser.getId(),
       { refreshToken },
-      env.REFRESH_TOKEN_EXP,
+      parseTimeToSeconds(env.REFRESH_TOKEN_EXP),
     );
 
     const accessToken = new Token(
@@ -60,7 +72,7 @@ export class CreateUserSessionHandler
     return new SignResponseDTO(
       new ResponseUserDTO(existingUser),
       accessToken.getValue(),
-      refreshToken,
+      refreshToken.getValue(),
     );
   }
 }

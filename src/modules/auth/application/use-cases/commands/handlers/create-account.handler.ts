@@ -10,12 +10,13 @@ import { AbstractVerificationRepository } from '../../../../domain/repositories/
 
 import { CreateAccountCommand } from '../implements/create-account.command';
 
-import { GenerateVerificationCode } from '@/shared/utils/generate-verification-code';
+import { GenerateVerificationCode } from '@/shared/utils/generate-verification-code.util';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
 import { Token } from '@/shared/domain/value-objects/token.vo';
 import { env } from '@/config/env';
-
+import { Role } from '@/shared/types/role.type';
+import { VerificationType } from '@/shared/types/verification-type.type';
 @Injectable()
 @CommandHandler(CreateAccountCommand)
 export class CreateAccountHandler
@@ -30,38 +31,36 @@ export class CreateAccountHandler
 
   async execute(command: CreateAccountCommand): Promise<string> {
     const email = new Email(command.email);
+    const password = await Password.create(command.password);
 
     const existingUser = await this.userReadRepository.findByEmail(email);
     if (existingUser) {
       throw new ConflictException('Email already in use');
     }
 
-    if (command.confirmPassword !== command.password) {
-      throw new ConflictException('Passwords do not match');
-    }
-
-    const password = await Password.create(command.password);
-
-    const user = new User({
+    const user = User.create({
       name: command.name,
       email,
       password,
+      role: Role.USER,
       isVerified: false,
     });
     await this.userWriteRepository.create(user);
 
     const verificationToken = new Token(randomUUID());
     const verificationCode = GenerateVerificationCode(6);
+    const verificationType = VerificationType.VERIFY_EMAIL;
 
     await this.verificationTokenRepository.create({
       userId: user.getId(),
       token: verificationToken.toString(),
       code: verificationCode,
+      type: verificationType,
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h
       isUsed: false,
     });
 
-    const redirect_url = `http://localhost:5173/verify-email?token=${verificationToken.getValue()}&code=${verificationCode}`;
+    const redirect_url = `http://localhost:5173/verify-email?token=${verificationToken.getValue()}&code=${verificationCode}&type=${verificationType}`;
 
     await this.emailService.sendEmail({
       to: [user.getEmailValue()],

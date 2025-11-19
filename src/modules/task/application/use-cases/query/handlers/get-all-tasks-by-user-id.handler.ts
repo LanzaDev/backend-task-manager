@@ -36,7 +36,7 @@ export class GetAllTaskByUserIdHandler
 
     const tasks = await this.taskReadRepository.findAllByUser(userIdToFetch);
     if (!tasks || tasks.length === 0) {
-      throw new NotFoundException('No task found for this user');
+      throw new NotFoundException('Tasks not found for this user');
     }
 
     return TaskMapper.toDTOList(tasks);

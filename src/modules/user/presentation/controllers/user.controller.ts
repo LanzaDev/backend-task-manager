@@ -77,7 +77,6 @@ export class UserController {
   async updateProfile(
     @Request() req: { user: JwtUser },
     @Body() updateData: UpdateUserDTO,
-    @Body('currentPassword') currentPassword: string,
   ): Promise<MessageResponseDTO> {
     const { sub: requesterId, role: requesterRole } = req.user;
 
@@ -86,7 +85,7 @@ export class UserController {
       requesterId,
       requesterRole,
       requesterId,
-      currentPassword,
+      updateData.currentPassword,
     );
 
     await this.commandBus.execute(command);

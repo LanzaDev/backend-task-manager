@@ -28,7 +28,7 @@ export class ValidateUserCredentialsHandler
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    if (!existingUser.isVerified()) {
+    if (!existingUser.isUserVerified()) {
       throw new UnauthorizedException('Email not verified');
     }
 

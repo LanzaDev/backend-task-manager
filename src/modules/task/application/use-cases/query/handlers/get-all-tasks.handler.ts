@@ -30,7 +30,7 @@ export class GetAllTasksHandler implements IQueryHandler<GetAllTasksQuery> {
 
     const tasks = await this.taskReadRepository.findAllTasks();
     if (!tasks || tasks.length === 0) {
-      throw new NotFoundException('No task found');
+      throw new NotFoundException('Tasks not found');
     }
 
     return TaskMapper.toDTOList(tasks);

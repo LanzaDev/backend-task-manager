@@ -5,6 +5,7 @@ import {
 } from '@/modules/auth/domain/repositories/auth-token-cache.write-repository';
 import { REDIS_CLIENT } from '@/shared/infra/config/redis.config';
 import Redis from 'ioredis';
+import { Token } from '@/shared/domain/value-objects/token.vo';
 
 @Injectable()
 export class RedisAuthTokenCommandCacheRepository
@@ -34,8 +35,8 @@ export class RedisAuthTokenCommandCacheRepository
     await this.client.set(this.refreshKey(refreshToken), userId, 'EX', ttl);
   }
 
-  async deleteRefreshToken(refreshToken: string): Promise<void> {
-    await this.client.del(this.refreshKey(refreshToken));
+  async deleteRefreshToken(refreshToken: Token): Promise<void> {
+    await this.client.del(this.refreshKey(refreshToken.getValue()));
   }
 
   async setSession(

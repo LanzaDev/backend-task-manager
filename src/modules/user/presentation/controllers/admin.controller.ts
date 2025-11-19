@@ -109,6 +109,7 @@ export class AdminController {
       createUserDTO.name,
       createUserDTO.email,
       createUserDTO.password,
+      createUserDTO.role,
     );
 
     await this.commandBus.execute(command);

@@ -1,106 +1,129 @@
-import { randomUUID } from 'crypto';
 import { Email } from '@/shared/domain/value-objects/email.vo';
 import { Password } from '@/shared/domain/value-objects/password.vo';
 import { Role } from '@/shared/types/role.type';
+import { BaseEntityType } from '@/core/types/base-entity.type';
+import { AggregateRoot } from '@/core/domain/entities/aggregate-root';
+import { v4 as uuidv4 } from 'uuid';
 
-interface UserSchema {
+interface UserProps extends BaseEntityType {
+  name: string;
+  email: Email;
+  password: Password;
+  role: Role;
+  isVerified: boolean;
+}
+
+export type CreateUserProps = {
   name: string;
   email: Email;
   password: Password;
   role?: Role;
   isVerified: boolean;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+};
 
-export class User {
-  private readonly id: string;
-  private readonly props: UserSchema;
+export type UpdateUserProps = Partial<Omit<CreateUserProps, 'password'>>;
 
-  constructor(props: UserSchema, id?: string) {
-    this.props = {
-      ...props,
-      role: props.role ?? Role.USER,
-      isVerified: props.isVerified ?? false,
-      createdAt: props.createdAt ?? new Date(),
-      updatedAt: props.updatedAt ?? new Date(),
-    };
-    this.id = id || randomUUID();
+export class User extends AggregateRoot {
+  private name: string;
+  private email: Email;
+  private password: Password;
+  private role: Role;
+  private isVerified: boolean;
+
+  constructor(props: UserProps) {
+    super({
+      id: props.id,
+      createdAt: props.createdAt,
+      updatedAt: props.updatedAt,
+    });
+    this.name = props.name;
+    this.email = props.email;
+    this.password = props.password;
+    this.role = props.role;
+    this.isVerified = props.isVerified;
   }
 
-  // id
+  static create(props: CreateUserProps): User {
+    const name = props.name;
+    const email = props.email;
+    const password = props.password;
+    const role = props.role ?? Role.USER;
+    const isVerified = props.isVerified ?? false;
+
+    return new User({
+      id: uuidv4(),
+      name,
+      email,
+      password,
+      role,
+      isVerified,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+  }
+
+  update(props: UpdateUserProps) {
+    if (props.name) this.name = props.name;
+    if (props.email) this.email = props.email;
+    if (props.role) this.role = props.role;
+    if (props.isVerified) this.isVerified = props.isVerified;
+  }
+
   getId(): string {
     return this.id;
   }
 
-  // name
   getName(): string {
-    return this.props.name;
+    return this.name;
   }
   setName(newName: string) {
-    this.props.name = newName;
-    this.touch();
+    this.name = newName;
   }
 
-  // email
   getEmail(): Email {
-    return this.props.email;
+    return this.email;
   }
   getEmailValue(): string {
-    return this.props.email.getValue();
+    return this.email.getValue();
   }
   setEmail(newEmail: Email) {
-    this.props.email = newEmail;
-    this.touch();
+    this.email = newEmail;
   }
 
-  // password
   /** 🔒 Não expõe o VO inteiro, só a validação controlada */
   async comparePassword(plain: string): Promise<boolean> {
-    return this.props.password.compare(plain);
+    return this.password.compare(plain);
   }
 
   /** 🔒 Usado apenas pelo repositório para persistir no banco */
   getHashedPassword(): string {
-    return this.props.password.getHashedValue();
+    return this.password.getHashedValue();
   }
-
   setPassword(newPassword: Password) {
-    this.props.password = newPassword;
-    this.touch();
+    this.password = newPassword;
   }
 
-  // role
   getRole(): Role {
-    return this.props.role ?? Role.USER;
+    return this.role ?? Role.USER;
   }
   isDeletable(): boolean {
-    return this.props.role === Role.USER;
+    return this.role === Role.USER;
   }
   setRole(newRole: Role) {
-    this.props.role = newRole;
-    this.touch();
+    this.role = newRole;
   }
 
-  // verification
-  isVerified(): boolean {
-    return this.props.isVerified ?? false;
+  isUserVerified(): boolean {
+    return this.isVerified ?? false;
   }
   markAsVerified() {
-    this.props.isVerified = true;
-    this.touch();
+    this.isVerified = true;
   }
 
-  // timestamps
-  getCreatedAt(): Date {
-    return this.props.createdAt!;
+  getCreatedAt() {
+    return this.createdAt;
   }
-  getUpdatedAt(): Date {
-    return this.props.updatedAt!;
-  }
-
-  // touch
-  private touch() {
-    this.props.updatedAt = new Date();
+  getUpdatedAt() {
+    return this.updatedAt;
   }
 }

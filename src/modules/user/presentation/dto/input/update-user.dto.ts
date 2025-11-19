@@ -36,6 +36,17 @@ export class UpdateUserDTO {
       'New password for the user. Optional; if the requester is a regular user, current password is required to update. Admins can update without providing the current password. Must be at least 6 characters if provided.',
     required: false,
   })
+  currentPassword?: string;
+
+  @IsString()
+  @IsOptional()
+  @MinLength(6)
+  @ApiProperty({
+    example: 'Password123!',
+    description:
+      'New password for the user. Optional; if the requester is a regular user, current password is required to update. Admins can update without providing the current password. Must be at least 6 characters if provided.',
+    required: false,
+  })
   newPassword?: string;
 
   @IsString()

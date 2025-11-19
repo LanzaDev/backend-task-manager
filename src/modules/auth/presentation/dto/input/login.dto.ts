@@ -9,6 +9,6 @@ export class LoginDTO {
 
   @MinLength(6)
   @IsNotEmpty()
-  @ApiProperty({ example: 'securePassword123', minLength: 6 })
+  @ApiProperty({ example: 'myPassword123', minLength: 6 })
   password!: string;
 }

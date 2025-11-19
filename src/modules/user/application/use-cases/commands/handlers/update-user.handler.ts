@@ -51,6 +51,9 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
     if (command.requesterRole === Role.USER) {
       delete updateData.role;
     }
+    if (command.requesterRole === Role.ADMIN) {
+      delete updateData.currentPassword;
+    }
 
     if (updateData.newName) targetUser.setName(updateData.newName);
     if (updateData.newEmail)

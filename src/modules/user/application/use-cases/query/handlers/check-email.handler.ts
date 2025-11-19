@@ -6,7 +6,9 @@ import { CheckEmailQuery } from '../implements/check-email.query';
 
 @Injectable()
 @QueryHandler(CheckEmailQuery)
-export class CheckEmailHandler implements IQueryHandler<CheckEmailQuery> {
+export class CheckEmailHandler
+  implements IQueryHandler<CheckEmailQuery, boolean>
+{
   constructor(
     private readonly userReadRepository: AbstractUserReadRepository,
   ) {}
